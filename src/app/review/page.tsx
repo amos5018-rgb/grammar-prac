@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
-import { getAllWrongAnswers } from '@/lib/storage';
+import { getAllWrongAnswers, clearAllHistory } from '@/lib/storage';
 import { AnswerRecord } from '@/lib/types';
 
 type WrongAnswer = AnswerRecord & { unitCode: string; date: string };
@@ -27,6 +27,13 @@ export default function ReviewPage() {
     setWrongAnswers(getAllWrongAnswers());
   }, []);
 
+  const handleReset = () => {
+    if (!window.confirm('오답 노트와 학습 기록을 모두 초기화할까요?\n이 작업은 되돌릴 수 없습니다.')) return;
+    clearAllHistory();
+    setWrongAnswers([]);
+    setFilter('all');
+  };
+
   const allDeduplicated = useMemo(() => deduplicateByQuestion(wrongAnswers), [wrongAnswers]);
 
   const unitCodes = [...new Set(allDeduplicated.map(w => w.unitCode))];
@@ -37,7 +44,17 @@ export default function ReviewPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6">
-      <h1 className="text-2xl font-bold mb-1">오답 노트</h1>
+      <div className="flex items-start justify-between mb-1">
+        <h1 className="text-2xl font-bold">오답 노트</h1>
+        {allDeduplicated.length > 0 && (
+          <button
+            onClick={handleReset}
+            className="text-xs text-text-secondary hover:text-error border border-border hover:border-error/50 px-2.5 py-1 rounded-lg transition-colors"
+          >
+            기록 초기화
+          </button>
+        )}
+      </div>
       <p className="text-text-secondary text-sm mb-6">틀린 문제를 다시 확인하세요</p>
 
       {allDeduplicated.length === 0 ? (

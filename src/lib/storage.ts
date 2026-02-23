@@ -60,6 +60,11 @@ export function getAllWrongAnswers(): (AnswerRecord & { unitCode: string; date: 
   return wrong;
 }
 
+export function clearAllHistory() {
+  localStorage.removeItem(RESULTS_KEY);
+  localStorage.removeItem(LAST_RESULT_KEY);
+}
+
 export function getUnitProgress(): Record<string, { attempts: number; bestScore: number | null }> {
   const results = getQuizResults();
   const progress: Record<string, { attempts: number; bestScore: number | null }> = {};

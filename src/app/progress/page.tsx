@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { getQuizResults, getUnitProgress } from '@/lib/storage';
+import { getQuizResults, getUnitProgress, clearAllHistory } from '@/lib/storage';
 import { QuizAttempt } from '@/lib/types';
 
 export default function ProgressPage() {
@@ -14,6 +14,13 @@ export default function ProgressPage() {
     setResults(getQuizResults());
   }, []);
 
+  const handleReset = () => {
+    if (!window.confirm('오답 노트와 학습 기록을 모두 초기화할까요?\n이 작업은 되돌릴 수 없습니다.')) return;
+    clearAllHistory();
+    setProgress({});
+    setResults([]);
+  };
+
   const unitCodes = Object.keys(progress);
   const totalAttempts = results.length;
   const avgScore = results.length > 0
@@ -22,7 +29,17 @@ export default function ProgressPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6">
-      <h1 className="text-2xl font-bold mb-1">학습 진도</h1>
+      <div className="flex items-start justify-between mb-1">
+        <h1 className="text-2xl font-bold">학습 진도</h1>
+        {totalAttempts > 0 && (
+          <button
+            onClick={handleReset}
+            className="text-xs text-text-secondary hover:text-error border border-border hover:border-error/50 px-2.5 py-1 rounded-lg transition-colors"
+          >
+            기록 초기화
+          </button>
+        )}
+      </div>
       <p className="text-text-secondary text-sm mb-6">전체 학습 현황을 확인하세요</p>
 
       {totalAttempts === 0 ? (
