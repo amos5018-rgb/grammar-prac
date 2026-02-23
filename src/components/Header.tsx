@@ -25,7 +25,7 @@ export default function Header() {
       <div className="max-w-3xl mx-auto px-4">
         <div className="h-12 flex items-center">
           <Link href="/" className="font-bold text-primary text-lg">
-            국어 문법 연습
+            오남고 1학년 국어: 문법 연습📚
           </Link>
         </div>
         <nav className="flex items-center gap-1 pb-2">
