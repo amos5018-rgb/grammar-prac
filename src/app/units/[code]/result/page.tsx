@@ -60,18 +60,26 @@ export default function ResultPage() {
               answer.correct ? 'border-success/30 bg-success-light/50' : 'border-error/30 bg-error-light/50'
             }`}
           >
-            <div className="flex items-center gap-2 mb-1">
+            <div className="flex items-center gap-2 mb-2">
               <span className={`text-sm font-bold ${answer.correct ? 'text-success' : 'text-error'}`}>
                 {answer.correct ? 'O' : 'X'}
               </span>
               <span className="text-sm text-text-secondary">문제 {idx + 1}</span>
             </div>
+            {answer.questionText && (
+              <p className="text-sm mb-2 leading-relaxed">{answer.questionText}</p>
+            )}
             {!answer.correct && (
-              <p className="text-sm">
-                <span className="text-text-secondary">내 답:</span> {answer.studentAnswer || '(미입력)'}{' '}
-                <span className="text-text-secondary ml-2">정답:</span>{' '}
-                <span className="font-medium">{answer.correctAnswer}</span>
-              </p>
+              <div className="text-sm space-y-1">
+                <p>
+                  <span className="text-error font-medium">내 답:</span> {answer.studentAnswer || '(미입력)'}
+                  <span className="text-text-secondary mx-2">|</span>
+                  <span className="text-success font-medium">정답:</span> {answer.correctAnswer}
+                </p>
+                {answer.explanation && (
+                  <p className="text-text-secondary leading-relaxed">{answer.explanation}</p>
+                )}
+              </div>
             )}
           </div>
         ))}

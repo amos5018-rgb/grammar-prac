@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Question, AnswerRecord } from '@/lib/types';
 import { saveQuizResult } from '@/lib/storage';
 
@@ -62,6 +63,8 @@ export default function QuizRunner({ unitCode, questions }: QuizRunnerProps) {
     setShowFeedback(true);
     setAnswers(prev => [...prev, {
       questionId: question.id,
+      questionText: question.question,
+      explanation: question.explanation,
       studentAnswer,
       correctAnswer: question.answer,
       correct,
@@ -94,11 +97,24 @@ export default function QuizRunner({ unitCode, questions }: QuizRunnerProps) {
 
   const canSubmit =
     question.type === '빈칸'
-      ? blankAnswers.some(a => a.trim() !== '')
+      ? blankAnswers.length >= blankCount && blankAnswers.every(a => a.trim() !== '')
       : selectedAnswer.trim() !== '';
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6">
+      {/* Back link */}
+      <Link
+        href={`/units/${unitCode}`}
+        onClick={e => {
+          if (!confirm('퀴즈를 종료하시겠습니까? 진행 상황이 저장되지 않습니다.')) {
+            e.preventDefault();
+          }
+        }}
+        className="inline-block text-sm text-text-secondary hover:text-primary mb-4"
+      >
+        &larr; 나가기
+      </Link>
+
       {/* Progress bar */}
       <div className="mb-6">
         <div className="flex justify-between text-sm text-text-secondary mb-2">
@@ -217,7 +233,7 @@ export default function QuizRunner({ unitCode, questions }: QuizRunnerProps) {
               <p className="text-sm mb-2">
                 <span className="font-medium">정답:</span>{' '}
                 {question.type === '객관식'
-                  ? `${question.answer}번 - ${question.choices[parseInt(question.answer) - 1]}`
+                  ? `${question.answer}번 - ${question.choices[parseInt(question.answer) - 1] ?? ''}`
                   : question.answer}
               </p>
             )}

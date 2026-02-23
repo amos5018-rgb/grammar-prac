@@ -1,11 +1,23 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
 import { getAllWrongAnswers } from '@/lib/storage';
 import { AnswerRecord } from '@/lib/types';
 
 type WrongAnswer = AnswerRecord & { unitCode: string; date: string };
+
+function deduplicateByQuestion(items: WrongAnswer[]): WrongAnswer[] {
+  return items.reduce<WrongAnswer[]>((acc, curr) => {
+    const existing = acc.findIndex(a => a.questionId === curr.questionId);
+    if (existing >= 0) {
+      if (curr.date > acc[existing].date) acc[existing] = curr;
+    } else {
+      acc.push(curr);
+    }
+    return acc;
+  }, []);
+}
 
 export default function ReviewPage() {
   const [wrongAnswers, setWrongAnswers] = useState<WrongAnswer[]>([]);
@@ -15,28 +27,20 @@ export default function ReviewPage() {
     setWrongAnswers(getAllWrongAnswers());
   }, []);
 
-  const unitCodes = [...new Set(wrongAnswers.map(w => w.unitCode))];
-  const filtered = filter === 'all'
-    ? wrongAnswers
-    : wrongAnswers.filter(w => w.unitCode === filter);
+  const allDeduplicated = useMemo(() => deduplicateByQuestion(wrongAnswers), [wrongAnswers]);
 
-  // Deduplicate by questionId (show latest attempt only)
-  const deduplicated = filtered.reduce<WrongAnswer[]>((acc, curr) => {
-    const existing = acc.findIndex(a => a.questionId === curr.questionId);
-    if (existing >= 0) {
-      if (curr.date > acc[existing].date) acc[existing] = curr;
-    } else {
-      acc.push(curr);
-    }
-    return acc;
-  }, []);
+  const unitCodes = [...new Set(allDeduplicated.map(w => w.unitCode))];
+
+  const filtered = filter === 'all'
+    ? allDeduplicated
+    : allDeduplicated.filter(w => w.unitCode === filter);
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6">
       <h1 className="text-2xl font-bold mb-1">오답 노트</h1>
       <p className="text-text-secondary text-sm mb-6">틀린 문제를 다시 확인하세요</p>
 
-      {wrongAnswers.length === 0 ? (
+      {allDeduplicated.length === 0 ? (
         <div className="text-center py-16">
           <p className="text-text-secondary mb-4">아직 오답 기록이 없습니다.</p>
           <Link href="/" className="text-primary font-medium">문제 풀러 가기</Link>
@@ -51,10 +55,10 @@ export default function ReviewPage() {
                 filter === 'all' ? 'bg-primary text-white' : 'bg-gray-100 text-text-secondary hover:bg-gray-200'
               }`}
             >
-              전체 ({wrongAnswers.length})
+              전체 ({allDeduplicated.length})
             </button>
             {unitCodes.map(code => {
-              const count = wrongAnswers.filter(w => w.unitCode === code).length;
+              const count = allDeduplicated.filter(w => w.unitCode === code).length;
               return (
                 <button
                   key={code}
@@ -71,7 +75,7 @@ export default function ReviewPage() {
 
           {/* Wrong answers list */}
           <div className="space-y-3">
-            {deduplicated.map((answer, idx) => (
+            {filtered.map((answer, idx) => (
               <div key={idx} className="bg-surface rounded-xl border border-border p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-xs bg-error-light text-error px-2 py-0.5 rounded-full font-medium">
@@ -82,10 +86,10 @@ export default function ReviewPage() {
                     {new Date(answer.date).toLocaleDateString('ko-KR')}
                   </span>
                 </div>
-                <p className="text-sm mb-2">
-                  <span className="text-text-secondary">문제 ID:</span> {answer.questionId}
-                </p>
-                <div className="flex gap-4 text-sm">
+                {answer.questionText && (
+                  <p className="text-sm mb-3 leading-relaxed">{answer.questionText}</p>
+                )}
+                <div className="flex gap-4 text-sm mb-2">
                   <p>
                     <span className="text-error font-medium">내 답:</span>{' '}
                     {answer.studentAnswer || '(미입력)'}
@@ -95,12 +99,15 @@ export default function ReviewPage() {
                     {answer.correctAnswer}
                   </p>
                 </div>
+                {answer.explanation && (
+                  <p className="text-xs text-text-secondary leading-relaxed">{answer.explanation}</p>
+                )}
               </div>
             ))}
           </div>
 
           {/* Re-quiz button */}
-          {deduplicated.length > 0 && filter !== 'all' && (
+          {filtered.length > 0 && filter !== 'all' && (
             <Link
               href={`/units/${filter}/quiz`}
               className="block w-full mt-6 py-3 text-center bg-primary text-white rounded-xl font-semibold hover:bg-primary-dark transition-colors"

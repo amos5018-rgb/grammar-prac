@@ -37,6 +37,8 @@ export interface QuizAttempt {
 
 export interface AnswerRecord {
   questionId: string;
+  questionText: string;
+  explanation: string;
   studentAnswer: string;
   correctAnswer: string;
   correct: boolean;
