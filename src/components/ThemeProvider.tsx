@@ -28,11 +28,9 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
 
     const mq = window.matchMedia('(prefers-color-scheme: dark)');
     const handler = () => {
-      if (!localStorage.getItem('theme')) {
-        const next: Theme = mq.matches ? 'dark' : 'light';
-        setTheme(next);
-        document.documentElement.classList.toggle('dark', mq.matches);
-      }
+      localStorage.removeItem('theme');
+      const next: Theme = mq.matches ? 'dark' : 'light';
+      setTheme(next);
     };
     mq.addEventListener('change', handler);
     return () => mq.removeEventListener('change', handler);
