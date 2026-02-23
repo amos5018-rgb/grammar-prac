@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { getProfile, clearProfile } from '@/lib/storage';
+import { getProfile } from '@/lib/storage';
 
 export default function Header() {
   const pathname = usePathname();
@@ -41,12 +41,9 @@ export default function Header() {
             </Link>
           ))}
           {name && (
-            <button
-              onClick={() => { clearProfile(); setName(null); window.location.href = '/'; }}
-              className="ml-2 px-3 py-1.5 text-sm text-text-secondary hover:bg-gray-100 rounded-lg"
-            >
+            <span className="ml-2 px-3 py-1.5 text-sm text-text-secondary">
               {name}
-            </button>
+            </span>
           )}
         </nav>
       </div>

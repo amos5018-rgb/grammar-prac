@@ -63,6 +63,7 @@ export function getAllWrongAnswers(): (AnswerRecord & { unitCode: string; date: 
 export function clearAllHistory() {
   localStorage.removeItem(RESULTS_KEY);
   localStorage.removeItem(LAST_RESULT_KEY);
+  clearProfile();
 }
 
 export function getUnitProgress(): Record<string, { attempts: number; bestScore: number | null }> {
