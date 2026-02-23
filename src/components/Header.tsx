@@ -22,11 +22,13 @@ export default function Header() {
 
   return (
     <header className="bg-surface border-b border-border sticky top-0 z-50">
-      <div className="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between">
-        <Link href="/" className="font-bold text-primary text-lg">
-          국어 문법 연습
-        </Link>
-        <nav className="flex items-center gap-1">
+      <div className="max-w-3xl mx-auto px-4">
+        <div className="h-12 flex items-center">
+          <Link href="/" className="font-bold text-primary text-lg">
+            국어 문법 연습
+          </Link>
+        </div>
+        <nav className="flex items-center gap-1 pb-2">
           {navItems.map(item => (
             <Link
               key={item.href}
@@ -41,7 +43,7 @@ export default function Header() {
             </Link>
           ))}
           {name && (
-            <span className="ml-2 px-3 py-1.5 text-sm text-text-secondary">
+            <span className="ml-auto px-3 py-1.5 text-sm text-text-secondary">
               {name}
             </span>
           )}
