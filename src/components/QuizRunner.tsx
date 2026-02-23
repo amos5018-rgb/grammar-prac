@@ -127,7 +127,7 @@ export default function QuizRunner({ unitCode, questions }: QuizRunnerProps) {
             {question.difficulty}
           </span>
         </div>
-        <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+        <div className="h-2 bg-gray-200 dark:bg-white/15 rounded-full overflow-hidden">
           <div
             className="h-full bg-primary rounded-full transition-all duration-300"
             style={{ width: `${progress}%` }}
@@ -142,7 +142,7 @@ export default function QuizRunner({ unitCode, questions }: QuizRunnerProps) {
         </span>
 
         {question.passage && (
-          <div className="bg-gray-50 rounded-xl p-4 mb-4 text-sm leading-relaxed border border-gray-100">
+          <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-4 mb-4 text-sm leading-relaxed border border-gray-100 dark:border-white/10">
             {question.passage}
           </div>
         )}
@@ -159,10 +159,10 @@ export default function QuizRunner({ unitCode, questions }: QuizRunnerProps) {
                 className={`w-full text-left px-5 py-4 rounded-xl border-2 transition-all text-base ${
                   selectedAnswer === String(idx + 1)
                     ? 'border-primary bg-primary-light'
-                    : 'border-border hover:border-gray-300'
+                    : 'border-border hover:border-gray-300 dark:hover:border-white/20'
                 }`}
               >
-                <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-gray-100 text-sm font-semibold mr-3">
+                <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-gray-100 dark:bg-white/10 text-sm font-semibold mr-3">
                   {idx + 1}
                 </span>
                 {choice}
@@ -180,7 +180,7 @@ export default function QuizRunner({ unitCode, questions }: QuizRunnerProps) {
                         ? val === 'O'
                           ? 'border-primary bg-primary-light text-primary'
                           : 'border-error bg-error-light text-error'
-                        : 'border-border hover:border-gray-300'
+                        : 'border-border hover:border-gray-300 dark:hover:border-white/20'
                     }`}
                   >
                     {val}

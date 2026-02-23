@@ -81,7 +81,7 @@ export default function ProgressPage() {
                     <span className="text-sm text-text-secondary">{data.attempts}회 풀이</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="flex-1 h-3 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="flex-1 h-3 bg-gray-100 dark:bg-white/10 rounded-full overflow-hidden">
                       <div
                         className={`h-full rounded-full transition-all ${
                           score >= 80 ? 'bg-success' :

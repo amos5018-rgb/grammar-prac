@@ -69,7 +69,7 @@ export default function ReviewPage() {
             <button
               onClick={() => setFilter('all')}
               className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                filter === 'all' ? 'bg-primary text-white' : 'bg-gray-100 text-text-secondary hover:bg-gray-200'
+                filter === 'all' ? 'bg-primary text-white' : 'bg-gray-100 dark:bg-white/10 text-text-secondary hover:bg-gray-200 dark:hover:bg-white/15'
               }`}
             >
               전체 ({allDeduplicated.length})
@@ -81,7 +81,7 @@ export default function ReviewPage() {
                   key={code}
                   onClick={() => setFilter(code)}
                   className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                    filter === code ? 'bg-primary text-white' : 'bg-gray-100 text-text-secondary hover:bg-gray-200'
+                    filter === code ? 'bg-primary text-white' : 'bg-gray-100 dark:bg-white/10 text-text-secondary hover:bg-gray-200 dark:hover:bg-white/15'
                   }`}
                 >
                   {code} ({count})

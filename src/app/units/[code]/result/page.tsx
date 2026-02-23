@@ -94,7 +94,7 @@ export default function ResultPage() {
         </Link>
         <Link
           href="/"
-          className="flex-1 py-3 text-center border border-border rounded-xl font-semibold hover:bg-gray-50 transition-colors"
+          className="flex-1 py-3 text-center border border-border rounded-xl font-semibold hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
         >
           단원 목록
         </Link>

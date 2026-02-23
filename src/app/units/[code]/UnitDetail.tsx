@@ -37,7 +37,7 @@ export default function UnitDetail({ unit, questionCount }: UnitDetailProps) {
             </span>
           )}
           {attempts > 0 && (
-            <span className="bg-gray-100 text-text-secondary px-3 py-1.5 rounded-full">
+            <span className="bg-gray-100 dark:bg-white/10 text-text-secondary px-3 py-1.5 rounded-full">
               {attempts}회 풀이
             </span>
           )}
