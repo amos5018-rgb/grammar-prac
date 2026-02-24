@@ -14,23 +14,15 @@ const ThemeContext = createContext<{
 
 export const useTheme = () => useContext(ThemeContext);
 
-function getResolvedTheme(): Theme {
-  const stored = localStorage.getItem('theme') as Theme | null;
-  if (stored) return stored;
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-}
-
 export default function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>('light');
 
   useEffect(() => {
-    setTheme(getResolvedTheme());
-
     const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    setTheme(mq.matches ? 'dark' : 'light');
+
     const handler = () => {
-      localStorage.removeItem('theme');
-      const next: Theme = mq.matches ? 'dark' : 'light';
-      setTheme(next);
+      setTheme(mq.matches ? 'dark' : 'light');
     };
     mq.addEventListener('change', handler);
     return () => mq.removeEventListener('change', handler);
@@ -41,11 +33,7 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
   }, [theme]);
 
   const toggleTheme = useCallback(() => {
-    setTheme(prev => {
-      const next: Theme = prev === 'light' ? 'dark' : 'light';
-      localStorage.setItem('theme', next);
-      return next;
-    });
+    setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
   }, []);
 
   return (
