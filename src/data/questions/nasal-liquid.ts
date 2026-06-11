@@ -1,0 +1,131 @@
+// ============================================================
+// 📝 [음운의 교체: 비음화와 유음화] 문제 (학습지: 우리말 소리의 변화 2차시)
+// ============================================================
+// 문제 작성 형식은 phoneme-basics.ts 상단 안내 참고
+// ============================================================
+import { Question } from '@/lib/types';
+
+export const nasalLiquidQuestions: Question[] = [
+  {
+    id: 'NL001', unitCode: 'nasal-liquid', type: '객관식', difficulty: '하',
+    passage: '',
+    question: '비음화에 대한 설명으로 알맞은 것은?',
+    choices: [
+      'ㅂ, ㄷ, ㄱ(평파열음)이 ㅁ, ㄴ의 앞에서 비음 ㅁ, ㄴ, ㅇ으로 바뀐다',
+      'ㄴ이 ㄹ의 앞이나 뒤에서 ㄹ로 바뀐다',
+      '예사소리가 된소리로 바뀐다',
+      'ㄷ, ㅌ이 ㅈ, ㅊ으로 바뀐다',
+    ],
+    answer: '1',
+    explanation: '비음화: ㅂ, ㄷ, ㄱ(평파열음) → ㅁ, ㄴ, ㅇ(비음) / ㅁ, ㄴ의 앞(비음의 앞). ②는 유음화, ③은 된소리되기, ④는 구개음화입니다.',
+  },
+  {
+    id: 'NL002', unitCode: 'nasal-liquid', type: '단답형', difficulty: '중',
+    passage: '',
+    question: "'국물'을 소리 나는 대로 쓰면? (대괄호 없이)",
+    choices: [],
+    answer: '궁물',
+    explanation: "'ㄱ'이 비음 'ㅁ'의 앞에서 비음 'ㅇ'으로 바뀌어 [궁물]로 발음됩니다. (비음화)",
+  },
+  {
+    id: 'NL003', unitCode: 'nasal-liquid', type: '객관식', difficulty: '중',
+    passage: '',
+    question: '다음 중 비음화가 일어나는 것은?',
+    choices: ['국이', '국밥', '닫는', '닫아'],
+    answer: '3',
+    explanation: "'닫는[단는]': ㄷ이 ㄴ의 앞에서 ㄴ으로 바뀝니다. '국이[구기]'와 '닫아[다다]'는 연음, '국밥[국빱]'은 된소리되기입니다.",
+  },
+  {
+    id: 'NL004', unitCode: 'nasal-liquid', type: '객관식', difficulty: '중',
+    passage: '',
+    question: "'잡는[잠는]'에서 일어난 음운의 변화는?",
+    choices: ['ㅂ → ㅁ', 'ㄴ → ㄹ', 'ㅂ → ㅃ', 'ㄴ → ㅁ'],
+    answer: '1',
+    explanation: "'ㅂ'이 비음 'ㄴ'의 앞에서 비음 'ㅁ'으로 바뀌었습니다. (비음화)",
+  },
+  {
+    id: 'NL005', unitCode: 'nasal-liquid', type: '단답형', difficulty: '상',
+    passage: '',
+    question: "'밥물'을 소리 나는 대로 쓰면? (대괄호 없이)",
+    choices: [],
+    answer: '밤물',
+    explanation: "'ㅂ'이 비음 'ㅁ'의 앞에서 비음 'ㅁ'으로 바뀌어 [밤물]로 발음됩니다. 학습지의 '국물[궁물]'과 같은 원리입니다.",
+  },
+  {
+    id: 'NL006', unitCode: 'nasal-liquid', type: '단답형', difficulty: '상',
+    passage: '',
+    question: "'먹는'을 소리 나는 대로 쓰면? (대괄호 없이)",
+    choices: [],
+    answer: '멍는',
+    explanation: "'ㄱ'이 비음 'ㄴ'의 앞에서 비음 'ㅇ'으로 바뀌어 [멍는]으로 발음됩니다. (비음화)",
+  },
+  {
+    id: 'NL007', unitCode: 'nasal-liquid', type: 'ox', difficulty: '상',
+    passage: '',
+    question: "'국수'에서는 비음화가 일어난다.",
+    choices: [],
+    answer: 'X',
+    explanation: "'국수[국쑤]'는 받침 ㄱ 뒤의 ㅅ이 ㅆ으로 바뀌는 된소리되기입니다. 뒤에 비음(ㅁ, ㄴ)이 없으므로 비음화의 환경이 아닙니다.",
+  },
+  {
+    id: 'NL008', unitCode: 'nasal-liquid', type: '객관식', difficulty: '하',
+    passage: '',
+    question: '유음화에 대한 설명으로 알맞은 것은?',
+    choices: [
+      'ㄴ이 ㄹ의 앞이나 뒤에서 ㄹ로 바뀐다',
+      'ㄹ이 ㄴ의 앞에서 ㄴ으로 바뀐다',
+      'ㅂ, ㄷ, ㄱ이 비음으로 바뀐다',
+      '두 음운이 합쳐져 거센소리가 된다',
+    ],
+    answer: '1',
+    explanation: '유음화: ㄴ → ㄹ(유음) / ㄹ의 앞이나 뒤(유음의 앞이나 뒤). (예: 신라[실라], 설날[설랄])',
+  },
+  {
+    id: 'NL009', unitCode: 'nasal-liquid', type: '객관식', difficulty: '중',
+    passage: '',
+    question: '다음 중 유음화가 일어나는 것은?',
+    choices: ['닫는', '국물', '실내', '신문'],
+    answer: '3',
+    explanation: "'실내[실래]': ㄴ이 ㄹ의 뒤에서 ㄹ로 바뀝니다. '닫는'과 '국물'은 비음화, '신문[신문]'은 음운 변동이 없습니다.",
+  },
+  {
+    id: 'NL010', unitCode: 'nasal-liquid', type: '단답형', difficulty: '중',
+    passage: '',
+    question: "'설날'을 소리 나는 대로 쓰면? (대괄호 없이)",
+    choices: [],
+    answer: '설랄',
+    explanation: "'ㄴ'이 'ㄹ'의 뒤에서 'ㄹ'로 바뀌어 [설랄]로 발음됩니다. (유음화)",
+  },
+  {
+    id: 'NL011', unitCode: 'nasal-liquid', type: '단답형', difficulty: '상',
+    passage: '',
+    question: "'난로'를 소리 나는 대로 쓰면? (대괄호 없이)",
+    choices: [],
+    answer: '날로',
+    explanation: "'ㄴ'이 'ㄹ'의 앞에서 'ㄹ'로 바뀌어 [날로]로 발음됩니다. 학습지의 '신라[실라]', '논란[놀란]'과 같은 원리입니다.",
+  },
+  {
+    id: 'NL012', unitCode: 'nasal-liquid', type: '단답형', difficulty: '상',
+    passage: '',
+    question: "'달나라'를 소리 나는 대로 쓰면? (대괄호 없이)",
+    choices: [],
+    answer: '달라라',
+    explanation: "'ㄴ'이 'ㄹ'의 뒤에서 'ㄹ'로 바뀌어 [달라라]로 발음됩니다. '설날[설랄]'과 같은 원리입니다.",
+  },
+  {
+    id: 'NL013', unitCode: 'nasal-liquid', type: 'ox', difficulty: '중',
+    passage: '',
+    question: "'봄날'에서는 유음화가 일어난다.",
+    choices: [],
+    answer: 'X',
+    explanation: "'봄날[봄날]'은 'ㄴ'의 앞이 'ㄹ'이 아니라 'ㅁ'이므로 유음화의 환경이 아닙니다. 음운 변동 없이 그대로 발음됩니다.",
+  },
+  {
+    id: 'NL014', unitCode: 'nasal-liquid', type: '객관식', difficulty: '상',
+    passage: '',
+    question: "'앞날'의 발음으로 알맞은 것은?",
+    choices: ['[압날]', '[암날]', '[안날]', '[앞날]'],
+    answer: '2',
+    explanation: "먼저 'ㅍ'이 대표음 [ㅂ]으로 바뀌고(음절의 끝소리 규칙), 'ㅂ'이 'ㄴ'의 앞에서 'ㅁ'으로 바뀌어(비음화) [암날]로 발음됩니다. 학습지의 '부엌만[부엉만]'과 같은 2단계 과정입니다.",
+  },
+];

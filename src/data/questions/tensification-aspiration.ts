@@ -1,0 +1,131 @@
+// ============================================================
+// 📝 [된소리되기와 거센소리되기] 문제 (학습지: 우리말 소리의 변화 4차시)
+// ============================================================
+// 문제 작성 형식은 phoneme-basics.ts 상단 안내 참고
+// ============================================================
+import { Question } from '@/lib/types';
+
+export const tensificationAspirationQuestions: Question[] = [
+  {
+    id: 'TA001', unitCode: 'tensification-aspiration', type: '객관식', difficulty: '하',
+    passage: '',
+    question: '된소리되기에 대한 설명으로 알맞은 것은?',
+    choices: [
+      '예사소리(ㄱ, ㄷ, ㅂ, ㅅ, ㅈ)가 된소리(ㄲ, ㄸ, ㅃ, ㅆ, ㅉ)로 교체되는 현상',
+      '된소리가 예사소리로 교체되는 현상',
+      '두 음운이 합쳐져 거센소리가 되는 현상',
+      '비음이 유음으로 교체되는 현상',
+    ],
+    answer: '1',
+    explanation: '된소리되기(경음화)는 예사소리가 된소리로 교체되는 현상입니다. (예: 학비[학삐], 갈 곳[갈꼳])',
+  },
+  {
+    id: 'TA002', unitCode: 'tensification-aspiration', type: '객관식', difficulty: '중',
+    passage: '',
+    question: "'국수'의 발음으로 알맞은 것은?",
+    choices: ['[국수]', '[국쑤]', '[궁수]', '[궁쑤]'],
+    answer: '2',
+    explanation: "받침 'ㄱ' 뒤에 'ㅅ'이 와서 된소리 'ㅆ'으로 바뀌어 [국쑤]로 발음됩니다.",
+  },
+  {
+    id: 'TA003', unitCode: 'tensification-aspiration', type: '객관식', difficulty: '상',
+    passage: "(신발을) 신고 [신꼬] / (경찰에) 신고 [신고]",
+    question: '위 두 단어의 발음이 다른 이유로 알맞은 것은?',
+    choices: [
+      "앞의 '신고'는 용언 어간 '신-'에 어미 '-고'가 결합한 것이고, 뒤의 '신고'는 하나의 명사이기 때문",
+      '앞의 단어가 더 자주 쓰이기 때문',
+      '뒤의 단어는 외래어이기 때문',
+      '두 단어의 받침이 다르기 때문',
+    ],
+    answer: '1',
+    explanation: "된소리되기는 어간 말음 'ㄴ, ㅁ' 뒤에 어미가 올 때 일어납니다. '신고(申告)'는 어간+어미 구성이 아닌 하나의 명사이므로 [신고]로 발음됩니다.",
+  },
+  {
+    id: 'TA004', unitCode: 'tensification-aspiration', type: '단답형', difficulty: '상',
+    passage: '',
+    question: "'책상'을 소리 나는 대로 쓰면? (대괄호 없이)",
+    choices: [],
+    answer: '책쌍',
+    explanation: "받침 'ㄱ' 뒤에 'ㅅ'이 와서 된소리 'ㅆ'으로 바뀌어 [책쌍]으로 발음됩니다. 학습지의 '국수[국쑤]'와 같은 원리입니다.",
+  },
+  {
+    id: 'TA005', unitCode: 'tensification-aspiration', type: '단답형', difficulty: '상',
+    passage: '',
+    question: "'갈등'을 소리 나는 대로 쓰면? (대괄호 없이)",
+    choices: [],
+    answer: '갈뜽',
+    explanation: "한자어에서 받침 'ㄹ' 뒤에 'ㄷ'이 와서 된소리 'ㄸ'으로 바뀌어 [갈뜽]으로 발음됩니다. 학습지의 '결단[결딴]'과 같은 원리입니다.",
+  },
+  {
+    id: 'TA006', unitCode: 'tensification-aspiration', type: 'ox', difficulty: '상',
+    passage: '',
+    question: "'감기'는 [감끼]로 발음된다.",
+    choices: [],
+    answer: 'X',
+    explanation: "'감기'는 하나의 단어(명사)로, 어간 'ㄴ, ㅁ' 뒤에 어미가 결합한 것이 아니므로 된소리되기가 일어나지 않아 [감기]로 발음됩니다. 학습지의 '안개[안개]'와 같은 경우입니다.",
+  },
+  {
+    id: 'TA007', unitCode: 'tensification-aspiration', type: '객관식', difficulty: '상',
+    passage: '',
+    question: "'(아기를) 안고'의 발음으로 알맞은 것은?",
+    choices: ['[안고]', '[안꼬]', '[앙꼬]', '[안코]'],
+    answer: '2',
+    explanation: "용언 어간 '안-'의 말음 'ㄴ' 뒤에 어미 '-고'가 와서 된소리되기가 일어나 [안꼬]로 발음됩니다. 학습지의 '(신발을) 신고[신꼬]'와 같은 원리입니다.",
+  },
+  {
+    id: 'TA008', unitCode: 'tensification-aspiration', type: '객관식', difficulty: '상',
+    passage: '',
+    question: "'할 수 있다'에서 '할 수'의 발음으로 알맞은 것은?",
+    choices: ['[할수]', '[할쑤]', '[한수]', '[하쑤]'],
+    answer: '2',
+    explanation: "관형사형 어미 '-(으)ㄹ' 뒤에 'ㅅ'이 와서 된소리로 바뀌어 [할쑤]로 발음됩니다. 학습지의 '갈 곳[갈꼳]', '쓸 줄[쓸쭐]'과 같은 원리입니다.",
+  },
+  {
+    id: 'TA009', unitCode: 'tensification-aspiration', type: '객관식', difficulty: '하',
+    passage: '',
+    question: '거센소리되기가 속하는 음운 변동의 유형은?',
+    choices: ['교체', '축약', '탈락', '첨가'],
+    answer: '2',
+    explanation: "거센소리되기는 'ㄱ, ㄷ, ㅂ, ㅈ'과 'ㅎ' 두 음운이 합쳐져 'ㅋ, ㅌ, ㅍ, ㅊ' 하나의 음운으로 바뀌므로 축약입니다.",
+  },
+  {
+    id: 'TA010', unitCode: 'tensification-aspiration', type: '단답형', difficulty: '중',
+    passage: '',
+    question: "'입학'을 소리 나는 대로 쓰면? (대괄호 없이)",
+    choices: [],
+    answer: '이팍',
+    explanation: "'ㅂ'과 'ㅎ'이 만나 'ㅍ'으로 축약되어 [이팍]으로 발음됩니다. (거센소리되기)",
+  },
+  {
+    id: 'TA011', unitCode: 'tensification-aspiration', type: '단답형', difficulty: '상',
+    passage: '',
+    question: "'축하'를 소리 나는 대로 쓰면? (대괄호 없이)",
+    choices: [],
+    answer: '추카',
+    explanation: "'ㄱ'과 'ㅎ'이 만나 'ㅋ'으로 축약되어 [추카]로 발음됩니다. 학습지의 '국화[구콰]'와 같은 원리입니다.",
+  },
+  {
+    id: 'TA012', unitCode: 'tensification-aspiration', type: '객관식', difficulty: '상',
+    passage: '',
+    question: "'맏형'의 발음으로 알맞은 것은?",
+    choices: ['[맏형]', '[마텽]', '[만형]', '[마뎡]'],
+    answer: '2',
+    explanation: "'ㄷ'과 'ㅎ'이 만나 'ㅌ'으로 축약되어 [마텽]으로 발음됩니다. (거센소리되기)",
+  },
+  {
+    id: 'TA013', unitCode: 'tensification-aspiration', type: 'ox', difficulty: '상',
+    passage: '',
+    question: "'전화'에서는 거센소리되기가 일어난다.",
+    choices: [],
+    answer: 'X',
+    explanation: "거센소리되기는 평음 'ㄱ, ㄷ, ㅂ, ㅈ'과 'ㅎ'이 연속될 때 일어납니다. 'ㄴ'은 평음(파열음·파찰음)이 아니므로 '전화'는 축약 없이 발음됩니다.",
+  },
+  {
+    id: 'TA014', unitCode: 'tensification-aspiration', type: '객관식', difficulty: '상',
+    passage: '',
+    question: "'닫히다'는 거센소리되기와 구개음화를 차례로 거쳐 발음된다. 최종 발음은?",
+    choices: ['[다티다]', '[다치다]', '[닫히다]', '[다디다]'],
+    answer: '2',
+    explanation: "'ㄷ'과 'ㅎ'이 만나 'ㅌ'으로 축약되고(거센소리되기, [다티다]), 'ㅌ'이 ㅣ 앞에서 'ㅊ'으로 바뀌어(구개음화) [다치다]로 발음됩니다.",
+  },
+];

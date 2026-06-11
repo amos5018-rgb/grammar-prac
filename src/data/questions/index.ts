@@ -9,10 +9,26 @@ import { phonemeBasicsQuestions } from './phoneme-basics';
 import { consonantSystemQuestions } from './consonant-system';
 import { finalConsonantsQuestions } from './final-consonants';
 import { morphemeBasicsQuestions } from './morpheme-basics';
+import { phonemeChangeTypesQuestions } from './phoneme-change-types';
+import { nasalLiquidQuestions } from './nasal-liquid';
+import { palatalizationQuestions } from './palatalization';
+import { tensificationAspirationQuestions } from './tensification-aspiration';
+import { deletionAdditionQuestions } from './deletion-addition';
+import { honorificsQuestions } from './honorifics';
+import { timeExpressionQuestions } from './time-expression';
+import { passiveQuotationQuestions } from './passive-quotation';
 
 export const allQuestions: Question[] = [
   ...phonemeBasicsQuestions,
   ...consonantSystemQuestions,
   ...finalConsonantsQuestions,
   ...morphemeBasicsQuestions,
+  ...phonemeChangeTypesQuestions,
+  ...nasalLiquidQuestions,
+  ...palatalizationQuestions,
+  ...tensificationAspirationQuestions,
+  ...deletionAdditionQuestions,
+  ...honorificsQuestions,
+  ...timeExpressionQuestions,
+  ...passiveQuotationQuestions,
 ];
