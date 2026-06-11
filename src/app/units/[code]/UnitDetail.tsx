@@ -15,7 +15,10 @@ export default function UnitDetail({ unit, questionCount }: UnitDetailProps) {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
-      <Link href="/" className="text-sm text-text-secondary hover:text-primary mb-4 inline-block">
+      <Link
+        href={`/category/${unit.category}`}
+        className="text-sm text-text-secondary hover:text-primary mb-4 inline-block"
+      >
         &larr; 단원 목록
       </Link>
 

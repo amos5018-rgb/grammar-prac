@@ -2,8 +2,16 @@ export type QuestionType = '객관식' | 'ox' | '빈칸' | '단답형';
 
 export type Difficulty = '상' | '중' | '하';
 
+export interface Category {
+  code: string;
+  name: string;
+  description: string;
+  order: number;
+}
+
 export interface Unit {
   code: string;
+  category: string; // 중분류 코드 (categories.ts의 code)
   name: string;
   description: string;
   order: number;

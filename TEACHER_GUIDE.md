@@ -11,14 +11,22 @@
 
 ```
 src/data/
-├── units.ts                  ← 단원 목록 (단원 추가/숨기기)
+├── categories.ts             ← 중분류 목록 (첫 화면에 표시되는 큰 묶음)
+├── units.ts                  ← 단원 목록 (단원 추가/숨기기, 중분류 지정)
 └── questions/
     ├── index.ts              ← 문제 파일 등록부
     ├── phoneme-basics.ts     ← [음운의 개념과 환경] 문제
     ├── consonant-system.ts   ← [자음 체계] 문제
     ├── final-consonants.ts   ← [받침의 발음] 문제
-    └── morpheme-basics.ts    ← [형태소·조사·어미] 문제
+    ├── morpheme-basics.ts    ← [형태소·조사·어미] 문제
+    └── ... (단원별 문제 파일)
 ```
+
+### 화면 구조
+
+학생은 **중분류 선택 → 단원 선택 → 문제 풀기** 순서로 이동합니다.
+- 중분류는 `categories.ts`에서 관리 (예: 문법의 기초, 음운의 변동, 문법 요소와 표현)
+- 각 단원이 어느 중분류에 속하는지는 `units.ts`의 `category` 항목으로 지정
 
 ---
 
@@ -75,13 +83,15 @@ src/data/
 1. **`src/data/units.ts`** 열고, 기존 단원 하나를 복사해 추가:
    ```ts
    {
-     code: 'phoneme-change',        // 새 영문 코드 (겹치면 안 됨)
-     name: '음운의 변동',
-     description: '비음화, 유음화 등 음운 변동을 학습합니다.',
-     order: 5,                      // 표시 순서
+     code: 'sentence-structure',    // 새 영문 코드 (겹치면 안 됨)
+     category: 'basics',            // 중분류 코드 (categories.ts 참고)
+     name: '문장 성분',
+     description: '주어, 서술어, 목적어 등 문장 성분을 학습합니다.',
+     order: 13,                     // 표시 순서
      active: true,
    },
    ```
+   새 중분류가 필요하면 `src/data/categories.ts`에 먼저 추가하세요.
 2. **`src/data/questions/`** 폴더에 새 파일 만들기 (예: `phoneme-change.ts`)
    - 기존 파일(예: `phoneme-basics.ts`)을 열어 전체 복사 → 새 파일에 붙여넣기 → 변수 이름과 문제 내용 수정
    - GitHub에서 새 파일 만들기: 폴더 화면에서 **Add file → Create new file**
@@ -108,7 +118,8 @@ src/data/
 파일 수정이 번거롭다면 Google Sheets로도 관리할 수 있습니다.
 
 1. 구글 스프레드시트를 만들고 시트 2개 생성: `단원목록`, `문제`
-   - **단원목록** 열 순서: 단원코드 | 단원명 | 설명 | 순서 | 활성(TRUE/FALSE)
+   - **단원목록** 열 순서: 단원코드 | 단원명 | 설명 | 순서 | 활성(TRUE/FALSE) | 중분류코드
+     (중분류코드를 비우면 '기타'로 분류됩니다. 중분류 목록 자체는 `src/data/categories.ts`에서 관리)
    - **문제** 열 순서: 문제ID | 단원코드 | 유형 | 난이도 | 지문 | 문제 | 보기1 | 보기2 | 보기3 | 보기4 | 정답 | 해설
 2. 시트를 **"링크가 있는 모든 사용자 - 뷰어"**로 공유
 3. Vercel 프로젝트 설정 → Environment Variables에 `GOOGLE_SHEET_ID` 추가

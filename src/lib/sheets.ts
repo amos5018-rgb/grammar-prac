@@ -85,6 +85,7 @@ export async function fetchUnits(): Promise<Unit[]> {
       description: row[2] || '',
       order: parseInt(row[3]) || 0,
       active: row[4]?.toUpperCase() === 'TRUE',
+      category: row[5] || 'etc', // 시트에 중분류 열이 없으면 '기타'로 분류
     }))
     .filter(u => u.active && u.code)
     .sort((a, b) => a.order - b.order);

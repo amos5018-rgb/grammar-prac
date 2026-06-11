@@ -4,6 +4,7 @@
 // 새 단원을 추가하려면 아래 형식대로 한 줄을 추가하세요.
 //
 //   code:        영문 식별자 (다른 단원과 겹치면 안 됨, 띄어쓰기 없이)
+//   category:    중분류 코드 (categories.ts의 code 중 하나)
 //   name:        화면에 표시될 단원 이름
 //   description: 단원 설명 (카드에 표시됨)
 //   order:       표시 순서 (숫자가 작을수록 먼저 나옴)
@@ -18,6 +19,7 @@ import { Unit } from '@/lib/types';
 export const units: Unit[] = [
   {
     code: 'phoneme-basics',
+    category: 'basics',
     name: '음운의 개념과 환경',
     description: '음운의 정의, 말소리의 구조(초성·중성·종성), 음운의 환경, 음운의 분류 체계를 학습합니다.',
     order: 1,
@@ -25,6 +27,7 @@ export const units: Unit[] = [
   },
   {
     code: 'consonant-system',
+    category: 'basics',
     name: '자음 체계',
     description: '자음 체계표(발음 위치, 발음 방법, 소리의 세기)를 이해하고 적용하는 연습을 합니다.',
     order: 2,
@@ -32,6 +35,7 @@ export const units: Unit[] = [
   },
   {
     code: 'final-consonants',
+    category: 'basics',
     name: '받침의 발음',
     description: '음절의 끝소리 규칙과 받침 뒤 모음이 올 때의 발음 변화(실질적/문법적 의미)를 학습합니다.',
     order: 3,
@@ -39,6 +43,7 @@ export const units: Unit[] = [
   },
   {
     code: 'morpheme-basics',
+    category: 'basics',
     name: '형태소·조사·어미',
     description: '형태소의 개념과 분류, 체언과 조사, 용언과 어간·어미를 학습합니다.',
     order: 4,
@@ -46,6 +51,7 @@ export const units: Unit[] = [
   },
   {
     code: 'phoneme-change-types',
+    category: 'phoneme-change',
     name: '음운 변동의 개념과 유형',
     description: '음운 변동의 개념과 네 가지 유형(교체·축약·탈락·첨가)을 구분하는 연습을 합니다.',
     order: 5,
@@ -53,6 +59,7 @@ export const units: Unit[] = [
   },
   {
     code: 'nasal-liquid',
+    category: 'phoneme-change',
     name: '음운의 교체: 비음화와 유음화',
     description: '비음화와 유음화의 개념을 익히고 새로운 단어에 적용하는 연습을 합니다.',
     order: 6,
@@ -60,6 +67,7 @@ export const units: Unit[] = [
   },
   {
     code: 'palatalization',
+    category: 'phoneme-change',
     name: '음운의 교체: 구개음화',
     description: '구개음화의 개념과 적용 환경(형식 형태소)을 익히고 새로운 단어에 적용합니다.',
     order: 7,
@@ -67,6 +75,7 @@ export const units: Unit[] = [
   },
   {
     code: 'tensification-aspiration',
+    category: 'phoneme-change',
     name: '된소리되기와 거센소리되기',
     description: '된소리되기(교체)와 거센소리되기(축약)의 환경을 구분하고 적용하는 연습을 합니다.',
     order: 8,
@@ -74,6 +83,7 @@ export const units: Unit[] = [
   },
   {
     code: 'deletion-addition',
+    category: 'phoneme-change',
     name: '음운의 탈락과 첨가',
     description: '모음 탈락(ㅡ·동일 모음), 자음 탈락(ㄹ·ㅎ), 반모음 첨가를 학습합니다.',
     order: 9,
@@ -81,6 +91,7 @@ export const units: Unit[] = [
   },
   {
     code: 'honorifics',
+    category: 'grammar-elements',
     name: '높임 표현',
     description: '상대·주체·객체 높임의 실현 방법과 직접·간접 높임을 구분하는 연습을 합니다.',
     order: 10,
@@ -88,6 +99,7 @@ export const units: Unit[] = [
   },
   {
     code: 'time-expression',
+    category: 'grammar-elements',
     name: '시간 표현',
     description: '시제(과거·현재·미래)와 동작상(진행상·완료상), -겠-의 의미를 학습합니다.',
     order: 11,
@@ -95,6 +107,7 @@ export const units: Unit[] = [
   },
   {
     code: 'passive-quotation',
+    category: 'grammar-elements',
     name: '피동 표현과 인용 표현',
     description: '능동·피동의 전환, 파생적·통사적 피동, 이중 피동, 직접·간접 인용을 학습합니다.',
     order: 12,
