@@ -142,7 +142,7 @@ export default function QuizRunner({ unitCode, questions }: QuizRunnerProps) {
         </span>
 
         {question.passage && (
-          <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-4 mb-4 text-sm leading-relaxed border border-gray-100 dark:border-white/10">
+          <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-4 mb-4 text-sm leading-relaxed border border-gray-100 dark:border-white/10 whitespace-pre-line">
             {question.passage}
           </div>
         )}

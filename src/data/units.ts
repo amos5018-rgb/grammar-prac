@@ -113,4 +113,33 @@ export const units: Unit[] = [
     order: 12,
     active: true,
   },
+
+  // ── 고난도 문제 (각 중분류의 '고난도 도전' 섹션에 표시됨) ──
+  {
+    code: 'advanced-basics',
+    category: 'basics',
+    name: '고난도: 문법의 기초',
+    description: '수능·모의평가 형식의 자료 제시형·사례 분석형 문제로 기초 개념을 깊이 있게 적용합니다.',
+    order: 90,
+    active: true,
+    advanced: true,
+  },
+  {
+    code: 'advanced-phoneme-change',
+    category: 'phoneme-change',
+    name: '고난도: 음운의 변동',
+    description: '수능·모의평가 형식으로 여러 음운 변동을 통합 분석하고 새로운 단어에 적용합니다.',
+    order: 91,
+    active: true,
+    advanced: true,
+  },
+  {
+    code: 'advanced-grammar',
+    category: 'grammar-elements',
+    name: '고난도: 문법 요소와 표현',
+    description: '수능·모의평가 형식으로 높임·시간·피동·인용 표현을 문장 단위에서 통합 분석합니다.',
+    order: 92,
+    active: true,
+    advanced: true,
+  },
 ];

@@ -16,6 +16,7 @@ export interface Unit {
   description: string;
   order: number;
   active: boolean;
+  advanced?: boolean; // true면 '고난도 도전' 섹션에 표시
 }
 
 export interface Question {

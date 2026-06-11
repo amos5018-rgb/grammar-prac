@@ -17,6 +17,9 @@ import { deletionAdditionQuestions } from './deletion-addition';
 import { honorificsQuestions } from './honorifics';
 import { timeExpressionQuestions } from './time-expression';
 import { passiveQuotationQuestions } from './passive-quotation';
+import { advancedBasicsQuestions } from './advanced-basics';
+import { advancedPhonemeChangeQuestions } from './advanced-phoneme-change';
+import { advancedGrammarQuestions } from './advanced-grammar';
 
 export const allQuestions: Question[] = [
   ...phonemeBasicsQuestions,
@@ -31,4 +34,7 @@ export const allQuestions: Question[] = [
   ...honorificsQuestions,
   ...timeExpressionQuestions,
   ...passiveQuotationQuestions,
+  ...advancedBasicsQuestions,
+  ...advancedPhonemeChangeQuestions,
+  ...advancedGrammarQuestions,
 ];

@@ -86,6 +86,7 @@ export async function fetchUnits(): Promise<Unit[]> {
       order: parseInt(row[3]) || 0,
       active: row[4]?.toUpperCase() === 'TRUE',
       category: row[5] || 'etc', // 시트에 중분류 열이 없으면 '기타'로 분류
+      advanced: row[6]?.toUpperCase() === 'TRUE', // 고난도 열(TRUE/FALSE)
     }))
     .filter(u => u.active && u.code)
     .sort((a, b) => a.order - b.order);
@@ -105,9 +106,9 @@ export async function fetchQuestions(unitCode?: string): Promise<Question[]> {
     difficulty: (row[3] || '중') as Difficulty,
     passage: row[4] || '',
     question: row[5] || '',
-    choices: [row[6], row[7], row[8], row[9]].filter(c => c && c.trim() !== ''),
-    answer: row[10] || '',
-    explanation: row[11] || '',
+    choices: [row[6], row[7], row[8], row[9], row[10]].filter(c => c && c.trim() !== ''),
+    answer: row[11] || '',
+    explanation: row[12] || '',
   }));
 
   if (unitCode) return questions.filter(q => q.unitCode === unitCode);
