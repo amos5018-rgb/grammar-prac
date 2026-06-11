@@ -4,6 +4,9 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { getQuizResults, getUnitProgress, clearAllHistory } from '@/lib/storage';
 import { QuizAttempt } from '@/lib/types';
+import { units } from '@/data/units';
+
+const unitNameMap = Object.fromEntries(units.map(u => [u.code, u.name]));
 
 export default function ProgressPage() {
   const [progress, setProgress] = useState<Record<string, { attempts: number; bestScore: number | null }>>({});
@@ -77,7 +80,7 @@ export default function ProgressPage() {
               return (
                 <div key={code} className="bg-surface rounded-xl border border-border p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="font-medium">{code}</span>
+                    <span className="font-medium">{unitNameMap[code] || code}</span>
                     <span className="text-sm text-text-secondary">{data.attempts}회 풀이</span>
                   </div>
                   <div className="flex items-center gap-3">
@@ -108,7 +111,7 @@ export default function ProgressPage() {
             {[...results].reverse().slice(0, 10).map((result, idx) => (
               <div key={idx} className="flex items-center justify-between bg-surface rounded-xl border border-border px-4 py-3">
                 <div>
-                  <span className="font-medium text-sm">{result.unitCode}</span>
+                  <span className="font-medium text-sm">{unitNameMap[result.unitCode] || result.unitCode}</span>
                   <span className="text-xs text-text-secondary ml-2">
                     {new Date(result.date).toLocaleDateString('ko-KR')}
                   </span>

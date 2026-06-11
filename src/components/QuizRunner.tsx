@@ -2,15 +2,18 @@
 
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Question, AnswerRecord } from '@/lib/types';
-import { saveQuizResult } from '@/lib/storage';
+import { saveQuizResult, markQuestionResolved, unmarkQuestionResolved } from '@/lib/storage';
 
 interface QuizRunnerProps {
   unitCode: string;
   questions: Question[];
+  // 오답 노트 복습 모드: 결과를 저장하지 않고, 맞힌 문제를 오답 노트에서 해결 처리
+  reviewMode?: boolean;
 }
 
-export default function QuizRunner({ unitCode, questions }: QuizRunnerProps) {
+export default function QuizRunner({ unitCode, questions, reviewMode = false }: QuizRunnerProps) {
   const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState('');
@@ -18,6 +21,7 @@ export default function QuizRunner({ unitCode, questions }: QuizRunnerProps) {
   const [showFeedback, setShowFeedback] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [answers, setAnswers] = useState<AnswerRecord[]>([]);
+  const [reviewFinished, setReviewFinished] = useState(false);
 
   const question = questions[currentIndex];
   const progress = ((currentIndex) / questions.length) * 100;
@@ -68,10 +72,21 @@ export default function QuizRunner({ unitCode, questions }: QuizRunnerProps) {
       correctAnswer: question.answer,
       correct,
     }]);
-  }, [question, selectedAnswer, blankAnswers]);
+
+    // 복습 모드: 맞히면 오답 노트에서 해결 처리, 다시 틀리면 해결 취소
+    if (reviewMode) {
+      if (correct) markQuestionResolved(question.id);
+      else unmarkQuestionResolved(question.id);
+    }
+  }, [question, selectedAnswer, blankAnswers, reviewMode]);
 
   const goNext = () => {
     if (currentIndex + 1 >= questions.length) {
+      if (reviewMode) {
+        // 복습 모드는 결과를 저장하지 않고 완료 화면 표시
+        setReviewFinished(true);
+        return;
+      }
       saveQuizResult({
         unitCode,
         date: new Date().toISOString(),
@@ -92,6 +107,14 @@ export default function QuizRunner({ unitCode, questions }: QuizRunnerProps) {
 
   // 조기 종료: 푼 문제가 있으면 결과를 저장해 오답 노트에 반영
   const exitQuiz = () => {
+    if (reviewMode) {
+      // 복습 모드는 문제별로 즉시 해결 처리되므로 저장 없이 종료
+      const message = answers.length > 0
+        ? `복습을 종료할까요?\n지금까지 맞힌 문제는 오답 노트에서 해결 처리되었습니다.`
+        : '복습을 종료할까요?';
+      if (confirm(message)) router.push('/review');
+      return;
+    }
     if (answers.length === 0) {
       if (confirm('퀴즈를 종료할까요?\n아직 푼 문제가 없어 기록이 저장되지 않습니다.')) {
         router.push(`/units/${unitCode}`);
@@ -114,6 +137,40 @@ export default function QuizRunner({ unitCode, questions }: QuizRunnerProps) {
       router.push(`/units/${unitCode}/result`);
     }
   };
+
+  // 복습 모드 완료 화면
+  if (reviewFinished) {
+    const correctCount = answers.filter(a => a.correct).length;
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-12 text-center">
+        <div className="bg-surface rounded-2xl border border-border p-8">
+          <h1 className="text-2xl font-bold mb-3">복습 완료!</h1>
+          <p className="text-lg mb-2">
+            <span className="font-bold">{answers.length}</span>문제 중{' '}
+            <span className="font-bold text-success">{correctCount}</span>문제 정답
+          </p>
+          <p className="text-text-secondary text-sm mb-8">
+            맞힌 문제는 오답 노트에서 해결 처리되었습니다.
+            {correctCount < answers.length && ' 틀린 문제는 오답 노트에 남아 있습니다.'}
+          </p>
+          <div className="flex gap-3">
+            <Link
+              href="/review"
+              className="flex-1 py-3 text-center bg-primary text-white rounded-xl font-semibold hover:bg-primary-dark transition-colors"
+            >
+              오답 노트로
+            </Link>
+            <Link
+              href="/"
+              className="flex-1 py-3 text-center border border-border rounded-xl font-semibold hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
+            >
+              학습 영역 선택
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!question) return null;
 
@@ -273,7 +330,9 @@ export default function QuizRunner({ unitCode, questions }: QuizRunnerProps) {
           onClick={goNext}
           className="w-full py-4 bg-primary text-white rounded-xl font-semibold text-base hover:bg-primary-dark transition-colors"
         >
-          {currentIndex + 1 >= questions.length ? '결과 보기' : '다음 문제'}
+          {currentIndex + 1 >= questions.length
+            ? (reviewMode ? '복습 완료' : '결과 보기')
+            : '다음 문제'}
         </button>
       )}
     </div>

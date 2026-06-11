@@ -2,29 +2,17 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
-import { getAllWrongAnswers, clearAllHistory } from '@/lib/storage';
-import { AnswerRecord } from '@/lib/types';
+import { getDedupedWrongAnswers, clearAllHistory, WrongAnswerRecord } from '@/lib/storage';
+import { units } from '@/data/units';
 
-type WrongAnswer = AnswerRecord & { unitCode: string; date: string };
-
-function deduplicateByQuestion(items: WrongAnswer[]): WrongAnswer[] {
-  return items.reduce<WrongAnswer[]>((acc, curr) => {
-    const existing = acc.findIndex(a => a.questionId === curr.questionId);
-    if (existing >= 0) {
-      if (curr.date > acc[existing].date) acc[existing] = curr;
-    } else {
-      acc.push(curr);
-    }
-    return acc;
-  }, []);
-}
+const unitNameMap = Object.fromEntries(units.map(u => [u.code, u.name]));
 
 export default function ReviewPage() {
-  const [wrongAnswers, setWrongAnswers] = useState<WrongAnswer[]>([]);
+  const [wrongAnswers, setWrongAnswers] = useState<WrongAnswerRecord[]>([]);
   const [filter, setFilter] = useState<string>('all');
 
   useEffect(() => {
-    setWrongAnswers(getAllWrongAnswers());
+    setWrongAnswers(getDedupedWrongAnswers());
   }, []);
 
   const handleReset = () => {
@@ -34,19 +22,17 @@ export default function ReviewPage() {
     setFilter('all');
   };
 
-  const allDeduplicated = useMemo(() => deduplicateByQuestion(wrongAnswers), [wrongAnswers]);
-
-  const unitCodes = [...new Set(allDeduplicated.map(w => w.unitCode))];
+  const unitCodes = useMemo(() => [...new Set(wrongAnswers.map(w => w.unitCode))], [wrongAnswers]);
 
   const filtered = filter === 'all'
-    ? allDeduplicated
-    : allDeduplicated.filter(w => w.unitCode === filter);
+    ? wrongAnswers
+    : wrongAnswers.filter(w => w.unitCode === filter);
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6">
       <div className="flex items-start justify-between mb-1">
         <h1 className="text-2xl font-bold">오답 노트</h1>
-        {allDeduplicated.length > 0 && (
+        {wrongAnswers.length > 0 && (
           <button
             onClick={handleReset}
             className="text-xs text-text-secondary hover:text-error border border-border hover:border-error/50 px-2.5 py-1 rounded-lg transition-colors"
@@ -57,13 +43,21 @@ export default function ReviewPage() {
       </div>
       <p className="text-text-secondary text-sm mb-6">틀린 문제를 다시 확인하세요</p>
 
-      {allDeduplicated.length === 0 ? (
+      {wrongAnswers.length === 0 ? (
         <div className="text-center py-16">
           <p className="text-text-secondary mb-4">아직 오답 기록이 없습니다.</p>
           <Link href="/" className="text-primary font-medium">문제 풀러 가기</Link>
         </div>
       ) : (
         <>
+          {/* Review quiz button */}
+          <Link
+            href="/review/quiz"
+            className="block w-full mb-6 py-3 text-center bg-error text-white rounded-xl font-semibold hover:bg-red-600 transition-colors"
+          >
+            틀린 문제 모아 풀기 ({wrongAnswers.length}문제)
+          </Link>
+
           {/* Filter */}
           <div className="flex gap-2 mb-6 flex-wrap">
             <button
@@ -72,10 +66,10 @@ export default function ReviewPage() {
                 filter === 'all' ? 'bg-primary text-white' : 'bg-gray-100 dark:bg-white/10 text-text-secondary hover:bg-gray-200 dark:hover:bg-white/15'
               }`}
             >
-              전체 ({allDeduplicated.length})
+              전체 ({wrongAnswers.length})
             </button>
             {unitCodes.map(code => {
-              const count = allDeduplicated.filter(w => w.unitCode === code).length;
+              const count = wrongAnswers.filter(w => w.unitCode === code).length;
               return (
                 <button
                   key={code}
@@ -84,7 +78,7 @@ export default function ReviewPage() {
                     filter === code ? 'bg-primary text-white' : 'bg-gray-100 dark:bg-white/10 text-text-secondary hover:bg-gray-200 dark:hover:bg-white/15'
                   }`}
                 >
-                  {code} ({count})
+                  {unitNameMap[code] || code} ({count})
                 </button>
               );
             })}
@@ -98,7 +92,7 @@ export default function ReviewPage() {
                   <span className="text-xs bg-error-light text-error px-2 py-0.5 rounded-full font-medium">
                     오답
                   </span>
-                  <span className="text-xs text-text-secondary">{answer.unitCode}</span>
+                  <span className="text-xs text-text-secondary">{unitNameMap[answer.unitCode] || answer.unitCode}</span>
                   <span className="text-xs text-text-secondary">
                     {new Date(answer.date).toLocaleDateString('ko-KR')}
                   </span>
@@ -123,7 +117,7 @@ export default function ReviewPage() {
             ))}
           </div>
 
-          {/* Re-quiz button */}
+          {/* Re-quiz button for filtered unit */}
           {filtered.length > 0 && filter !== 'all' && (
             <Link
               href={`/units/${filter}/quiz`}
