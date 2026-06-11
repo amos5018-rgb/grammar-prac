@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Unit } from '@/lib/types';
-import { getProfile, getBestScore, getUnitAttemptCount } from '@/lib/storage';
+import { getProfile, getUnitProgress } from '@/lib/storage';
 import LoginForm from '@/components/LoginForm';
 import UnitCard from '@/components/UnitCard';
 
@@ -11,17 +11,28 @@ interface HomeContentProps {
   questionCounts: Record<string, number>;
 }
 
+type Progress = Record<string, { attempts: number; bestScore: number | null }>;
+
 export default function HomeContent({ units, questionCounts }: HomeContentProps) {
   const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
+  const [progress, setProgress] = useState<Progress>({});
 
   useEffect(() => {
     setLoggedIn(!!getProfile());
+    setProgress(getUnitProgress());
   }, []);
 
   if (loggedIn === null) return null;
 
   if (!loggedIn) {
-    return <LoginForm onLogin={() => setLoggedIn(true)} />;
+    return (
+      <LoginForm
+        onLogin={() => {
+          setLoggedIn(true);
+          setProgress(getUnitProgress());
+        }}
+      />
+    );
   }
 
   return (
@@ -34,8 +45,8 @@ export default function HomeContent({ units, questionCounts }: HomeContentProps)
             key={unit.code}
             unit={unit}
             questionCount={questionCounts[unit.code] || 0}
-            bestScore={getBestScore(unit.code)}
-            attempts={getUnitAttemptCount(unit.code)}
+            bestScore={progress[unit.code]?.bestScore ?? null}
+            attempts={progress[unit.code]?.attempts ?? 0}
           />
         ))}
       </div>

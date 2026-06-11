@@ -4,7 +4,7 @@ import ThemeProvider from "@/components/ThemeProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "국어 문법 연습",
+  title: "오남고 1학년 국어: 문법 연습",
   description: "고등학교 국어 문법 인출·적용 연습 웹앱",
 };
 
@@ -17,8 +17,12 @@ export default function RootLayout({
     <html lang="ko" suppressHydrationWarning>
       <head>
         <link
+          rel="preconnect"
+          href="https://cdn.jsdelivr.net"
+          crossOrigin="anonymous"
+        />
+        <link
           rel="stylesheet"
-          as="style"
           crossOrigin="anonymous"
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
         />
