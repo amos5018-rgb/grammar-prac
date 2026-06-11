@@ -1,10 +1,20 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Question, AnswerRecord } from '@/lib/types';
 import { saveQuizResult, markQuestionResolved, unmarkQuestionResolved } from '@/lib/storage';
+
+// 문제 순서 셔플 (학생이 문제 순서를 외우는 것 방지)
+function shuffle<T>(arr: T[]): T[] {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
 
 interface QuizRunnerProps {
   unitCode: string;
@@ -13,8 +23,11 @@ interface QuizRunnerProps {
   reviewMode?: boolean;
 }
 
-export default function QuizRunner({ unitCode, questions, reviewMode = false }: QuizRunnerProps) {
+export default function QuizRunner({ unitCode, questions: initialQuestions, reviewMode = false }: QuizRunnerProps) {
   const router = useRouter();
+  // SSG로 생성된 페이지와의 hydration 불일치를 피하기 위해
+  // 셔플은 마운트 후 useEffect에서 수행
+  const [questions, setQuestions] = useState<Question[] | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState('');
   const [blankAnswers, setBlankAnswers] = useState<string[]>([]);
@@ -23,8 +36,12 @@ export default function QuizRunner({ unitCode, questions, reviewMode = false }: 
   const [answers, setAnswers] = useState<AnswerRecord[]>([]);
   const [reviewFinished, setReviewFinished] = useState(false);
 
-  const question = questions[currentIndex];
-  const progress = ((currentIndex) / questions.length) * 100;
+  useEffect(() => {
+    setQuestions(shuffle(initialQuestions));
+  }, [initialQuestions]);
+
+  const question = questions?.[currentIndex];
+  const progress = questions ? (currentIndex / questions.length) * 100 : 0;
 
   const blankCount = question?.type === '빈칸'
     ? (question.question.match(/\[___\]/g) || []).length || 1
@@ -81,6 +98,7 @@ export default function QuizRunner({ unitCode, questions, reviewMode = false }: 
   }, [question, selectedAnswer, blankAnswers, reviewMode]);
 
   const goNext = () => {
+    if (!questions) return;
     if (currentIndex + 1 >= questions.length) {
       if (reviewMode) {
         // 복습 모드는 결과를 저장하지 않고 완료 화면 표시
@@ -172,7 +190,14 @@ export default function QuizRunner({ unitCode, questions, reviewMode = false }: 
     );
   }
 
-  if (!question) return null;
+  // 셔플 완료 전 (마운트 직후) 로딩 표시
+  if (!questions || !question) {
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-12 text-center">
+        <p className="text-text-secondary">문제를 준비하는 중...</p>
+      </div>
+    );
+  }
 
   const canSubmit =
     question.type === '빈칸'

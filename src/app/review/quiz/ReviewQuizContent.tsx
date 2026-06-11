@@ -25,11 +25,7 @@ export default function ReviewQuizContent({ allQuestions }: { allQuestions: Ques
       return;
     }
 
-    for (let i = matched.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [matched[i], matched[j]] = [matched[j], matched[i]];
-    }
-
+    // 순서 셔플은 QuizRunner가 담당
     setQuestions(matched);
   }, [router, allQuestions]);
 
