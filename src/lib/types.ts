@@ -41,6 +41,7 @@ export interface QuizAttempt {
   date: string;
   score: number;
   total: number;
+  completed?: boolean; // false면 중간 종료한 기록 (최고 점수 집계에서 제외)
   answers: AnswerRecord[];
 }
 

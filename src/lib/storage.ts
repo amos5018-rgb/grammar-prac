@@ -38,7 +38,10 @@ export function getLastQuizResult(): QuizAttempt | null {
 }
 
 export function getBestScore(unitCode: string): number | null {
-  const results = getQuizResults().filter(r => r.unitCode === unitCode);
+  // 중간 종료(completed === false) 기록은 최고 점수 집계에서 제외
+  const results = getQuizResults().filter(
+    r => r.unitCode === unitCode && r.completed !== false
+  );
   if (results.length === 0) return null;
   return Math.max(...results.map(r => Math.round((r.score / r.total) * 100)));
 }
@@ -70,13 +73,16 @@ export function getUnitProgress(): Record<string, { attempts: number; bestScore:
   const results = getQuizResults();
   const progress: Record<string, { attempts: number; bestScore: number | null }> = {};
   for (const result of results) {
-    const pct = Math.round((result.score / result.total) * 100);
     if (!progress[result.unitCode]) {
-      progress[result.unitCode] = { attempts: 1, bestScore: pct };
-    } else {
-      progress[result.unitCode].attempts++;
-      if (progress[result.unitCode].bestScore === null || pct > progress[result.unitCode].bestScore!) {
-        progress[result.unitCode].bestScore = pct;
+      progress[result.unitCode] = { attempts: 0, bestScore: null };
+    }
+    const entry = progress[result.unitCode];
+    entry.attempts++;
+    // 중간 종료(completed === false) 기록은 최고 점수 집계에서 제외
+    if (result.completed !== false) {
+      const pct = Math.round((result.score / result.total) * 100);
+      if (entry.bestScore === null || pct > entry.bestScore) {
+        entry.bestScore = pct;
       }
     }
   }

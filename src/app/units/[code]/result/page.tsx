@@ -30,7 +30,12 @@ export default function ResultPage() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
       <div className="bg-surface rounded-2xl border border-border p-6 text-center mb-6">
-        <h1 className="text-2xl font-bold mb-4">결과</h1>
+        <h1 className="text-2xl font-bold mb-2">결과</h1>
+        {result.completed === false && (
+          <p className="inline-block text-xs bg-warning-light text-warning px-2.5 py-1 rounded-full font-medium mb-3">
+            중간 종료 — {result.total}문제까지 풀이
+          </p>
+        )}
 
         <div className={`inline-flex items-center justify-center w-28 h-28 rounded-full text-3xl font-bold mb-4 ${
           pct >= 80 ? 'bg-success-light text-success' :

@@ -2,7 +2,6 @@
 
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { Question, AnswerRecord } from '@/lib/types';
 import { saveQuizResult } from '@/lib/storage';
 
@@ -73,14 +72,12 @@ export default function QuizRunner({ unitCode, questions }: QuizRunnerProps) {
 
   const goNext = () => {
     if (currentIndex + 1 >= questions.length) {
-      const score = answers.length > 0
-        ? answers.filter(a => a.correct).length
-        : 0;
       saveQuizResult({
         unitCode,
         date: new Date().toISOString(),
-        score,
+        score: answers.filter(a => a.correct).length,
         total: questions.length,
+        completed: true,
         answers,
       });
       router.push(`/units/${unitCode}/result`);
@@ -93,6 +90,31 @@ export default function QuizRunner({ unitCode, questions }: QuizRunnerProps) {
     setIsCorrect(false);
   };
 
+  // 조기 종료: 푼 문제가 있으면 결과를 저장해 오답 노트에 반영
+  const exitQuiz = () => {
+    if (answers.length === 0) {
+      if (confirm('퀴즈를 종료할까요?\n아직 푼 문제가 없어 기록이 저장되지 않습니다.')) {
+        router.push(`/units/${unitCode}`);
+      }
+      return;
+    }
+    const wrongCount = answers.filter(a => !a.correct).length;
+    const message =
+      `지금까지 푼 ${answers.length}문제의 결과를 저장하고 종료할까요?` +
+      (wrongCount > 0 ? `\n틀린 ${wrongCount}문제는 오답 노트에 기록됩니다.` : '');
+    if (confirm(message)) {
+      saveQuizResult({
+        unitCode,
+        date: new Date().toISOString(),
+        score: answers.filter(a => a.correct).length,
+        total: answers.length,
+        completed: false,
+        answers,
+      });
+      router.push(`/units/${unitCode}/result`);
+    }
+  };
+
   if (!question) return null;
 
   const canSubmit =
@@ -102,18 +124,13 @@ export default function QuizRunner({ unitCode, questions }: QuizRunnerProps) {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6">
-      {/* Back link */}
-      <Link
-        href={`/units/${unitCode}`}
-        onClick={e => {
-          if (!confirm('퀴즈를 종료하시겠습니까? 진행 상황이 저장되지 않습니다.')) {
-            e.preventDefault();
-          }
-        }}
+      {/* Exit button (early exit saves partial results) */}
+      <button
+        onClick={exitQuiz}
         className="inline-block text-sm text-text-secondary hover:text-primary mb-4"
       >
         &larr; 나가기
-      </Link>
+      </button>
 
       {/* Progress bar */}
       <div className="mb-6">
