@@ -30,7 +30,6 @@ export default function CategoryContent({ category, units, questionCounts, total
 
   const regularUnits = units.filter(u => !u.advanced);
   const advancedUnits = units.filter(u => u.advanced);
-  const hasStudied = regularUnits.some(u => progress[u.code]?.attempts > 0);
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-6">
@@ -41,7 +40,7 @@ export default function CategoryContent({ category, units, questionCounts, total
       <p className="text-text-secondary text-sm mb-6">{category.description}</p>
 
       {/* 섞어 풀기 버튼 */}
-      {hasStudied && totalQuestions > 0 && (
+      {totalQuestions > 0 && (
         <Link
           href={`/category/${category.code}/mixed`}
           className="flex items-center justify-center gap-2 w-full mb-6 py-3 text-center bg-surface border-2 border-primary text-primary rounded-xl font-semibold hover:bg-primary hover:text-white transition-colors"
