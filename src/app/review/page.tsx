@@ -50,12 +50,14 @@ export default function ReviewPage() {
         </div>
       ) : (
         <>
-          {/* Review quiz button */}
+          {/* Review quiz button — 현재 선택된 필터(전체/소단원)를 따라감 */}
           <Link
-            href="/review/quiz"
+            href={filter === 'all' ? '/review/quiz' : `/review/quiz?unit=${filter}`}
             className="block w-full mb-6 py-3 text-center bg-error text-white rounded-xl font-semibold hover:bg-red-600 transition-colors"
           >
-            틀린 문제 모아 풀기 ({wrongAnswers.length}문제)
+            {filter === 'all'
+              ? `전체 틀린 문제 모아 풀기 (${wrongAnswers.length}문제)`
+              : `'${unitNameMap[filter] || filter}' 틀린 문제 모아 풀기 (${filtered.length}문제)`}
           </Link>
 
           {/* Filter */}

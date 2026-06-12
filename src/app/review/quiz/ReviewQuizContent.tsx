@@ -1,17 +1,23 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { getDedupedWrongAnswers } from '@/lib/storage';
 import { Question } from '@/lib/types';
 import QuizRunner from '@/components/QuizRunner';
 
 export default function ReviewQuizContent({ allQuestions }: { allQuestions: Question[] }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  // ?unit=소단원코드 가 있으면 해당 소단원의 틀린 문제만 복습
+  const unitFilter = searchParams.get('unit');
   const [questions, setQuestions] = useState<Question[] | null>(null);
 
   useEffect(() => {
-    const wrong = getDedupedWrongAnswers();
+    let wrong = getDedupedWrongAnswers();
+    if (unitFilter) {
+      wrong = wrong.filter(w => w.unitCode === unitFilter);
+    }
     if (wrong.length === 0) {
       router.replace('/review');
       return;
@@ -27,7 +33,7 @@ export default function ReviewQuizContent({ allQuestions }: { allQuestions: Ques
 
     // 순서 셔플은 QuizRunner가 담당
     setQuestions(matched);
-  }, [router, allQuestions]);
+  }, [router, allQuestions, unitFilter]);
 
   if (!questions) {
     return (
