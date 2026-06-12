@@ -1,12 +1,11 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Question, AnswerRecord } from '@/lib/types';
 import { saveQuizResult, markQuestionResolved, unmarkQuestionResolved } from '@/lib/storage';
 
-// 문제 순서 셔플 (학생이 문제 순서를 외우는 것 방지)
 function shuffle<T>(arr: T[]): T[] {
   const copy = [...arr];
   for (let i = copy.length - 1; i > 0; i--) {
@@ -19,15 +18,13 @@ function shuffle<T>(arr: T[]): T[] {
 interface QuizRunnerProps {
   unitCode: string;
   questions: Question[];
-  // 오답 노트 복습 모드: 결과를 저장하지 않고, 맞힌 문제를 오답 노트에서 해결 처리
   reviewMode?: boolean;
 }
 
 export default function QuizRunner({ unitCode, questions: initialQuestions, reviewMode = false }: QuizRunnerProps) {
   const router = useRouter();
-  // SSG로 생성된 페이지와의 hydration 불일치를 피하기 위해
-  // 셔플은 마운트 후 useEffect에서 수행
-  const [questions, setQuestions] = useState<Question[] | null>(null);
+  const [shuffled, setShuffled] = useState(false);
+  const [questions, setQuestions] = useState(initialQuestions);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState('');
   const [blankAnswers, setBlankAnswers] = useState<string[]>([]);
@@ -36,12 +33,24 @@ export default function QuizRunner({ unitCode, questions: initialQuestions, revi
   const [answers, setAnswers] = useState<AnswerRecord[]>([]);
   const [reviewFinished, setReviewFinished] = useState(false);
 
-  useEffect(() => {
-    setQuestions(shuffle(initialQuestions));
-  }, [initialQuestions]);
+  const canShuffle = answers.length === 0 && !showFeedback;
 
-  const question = questions?.[currentIndex];
-  const progress = questions ? (currentIndex / questions.length) * 100 : 0;
+  const toggleShuffle = () => {
+    if (!canShuffle) return;
+    if (shuffled) {
+      setQuestions(initialQuestions);
+      setShuffled(false);
+    } else {
+      setQuestions(shuffle(initialQuestions));
+      setShuffled(true);
+    }
+    setCurrentIndex(0);
+    setSelectedAnswer('');
+    setBlankAnswers([]);
+  };
+
+  const question = questions[currentIndex];
+  const progress = (currentIndex / questions.length) * 100;
 
   const blankCount = question?.type === '빈칸'
     ? (question.question.match(/\[___\]/g) || []).length || 1
@@ -98,7 +107,6 @@ export default function QuizRunner({ unitCode, questions: initialQuestions, revi
   }, [question, selectedAnswer, blankAnswers, reviewMode]);
 
   const goNext = () => {
-    if (!questions) return;
     if (currentIndex + 1 >= questions.length) {
       if (reviewMode) {
         // 복습 모드는 결과를 저장하지 않고 완료 화면 표시
@@ -190,14 +198,7 @@ export default function QuizRunner({ unitCode, questions: initialQuestions, revi
     );
   }
 
-  // 셔플 완료 전 (마운트 직후) 로딩 표시
-  if (!questions || !question) {
-    return (
-      <div className="max-w-2xl mx-auto px-4 py-12 text-center">
-        <p className="text-text-secondary">문제를 준비하는 중...</p>
-      </div>
-    );
-  }
+  if (!question) return null;
 
   const canSubmit =
     question.type === '빈칸'
@@ -206,13 +207,32 @@ export default function QuizRunner({ unitCode, questions: initialQuestions, revi
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6">
-      {/* Exit button (early exit saves partial results) */}
-      <button
-        onClick={exitQuiz}
-        className="inline-block text-sm text-text-secondary hover:text-primary mb-4"
-      >
-        &larr; 나가기
-      </button>
+      <div className="flex items-center justify-between mb-4">
+        <button
+          onClick={exitQuiz}
+          className="text-sm text-text-secondary hover:text-primary"
+        >
+          &larr; 나가기
+        </button>
+        <button
+          onClick={toggleShuffle}
+          disabled={!canShuffle}
+          className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border transition-colors ${
+            shuffled
+              ? 'border-primary bg-primary-light text-primary'
+              : 'border-border text-text-secondary hover:border-gray-300 dark:hover:border-white/20'
+          } ${!canShuffle ? 'opacity-40 cursor-not-allowed' : ''}`}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="16 3 21 3 21 8" />
+            <line x1="4" y1="20" x2="21" y2="3" />
+            <polyline points="21 16 21 21 16 21" />
+            <line x1="15" y1="15" x2="21" y2="21" />
+            <line x1="4" y1="4" x2="9" y2="9" />
+          </svg>
+          셔플 {shuffled ? 'ON' : 'OFF'}
+        </button>
+      </div>
 
       {/* Progress bar */}
       <div className="mb-6">
