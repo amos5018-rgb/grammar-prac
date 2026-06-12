@@ -1,4 +1,4 @@
-import { fetchUnits, fetchQuestions } from '@/lib/sheets';
+import { fetchUnits, fetchQuestions, fetchStudyCards } from '@/lib/sheets';
 import { categories } from '@/data/categories';
 import { notFound } from 'next/navigation';
 import CategoryContent from './CategoryContent';
@@ -34,6 +34,12 @@ export default async function CategoryPage({ params }: { params: Promise<{ code:
   for (const q of questions) {
     questionCounts[q.unitCode] = (questionCounts[q.unitCode] || 0) + 1;
     if (catUnitCodes.has(q.unitCode)) totalQuestions++;
+  }
+
+  for (const u of catUnits) {
+    if (u.study) {
+      questionCounts[u.code] = fetchStudyCards(u.code).length;
+    }
   }
 
   return <CategoryContent category={category} units={catUnits} questionCounts={questionCounts} totalQuestions={totalQuestions} />;

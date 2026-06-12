@@ -22,6 +22,17 @@ export interface Unit {
   order: number;
   active: boolean;
   advanced?: boolean; // true면 '고난도 도전' 섹션에 표시
+  study?: boolean;    // true면 퀴즈 대신 인출 연습 UI
+}
+
+export interface StudyCard {
+  id: string;
+  name: string;
+  examples: string[];
+  nonExamples: string[];
+  definition: string;
+  formula: string;
+  nonExampleReason: string;
 }
 
 export interface Question {

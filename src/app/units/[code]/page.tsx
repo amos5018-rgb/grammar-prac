@@ -1,8 +1,7 @@
-import { fetchUnits, fetchQuestions } from '@/lib/sheets';
+import { fetchUnits, fetchQuestions, fetchStudyCards } from '@/lib/sheets';
 import { notFound } from 'next/navigation';
 import UnitDetail from './UnitDetail';
 
-// 빌드 시 단원 페이지를 미리 생성하고, 5분마다 갱신 (빠른 로딩)
 export const revalidate = 300;
 
 export async function generateStaticParams() {
@@ -20,5 +19,7 @@ export default async function UnitPage({ params }: { params: Promise<{ code: str
   const unit = units.find(u => u.code === code);
   if (!unit) notFound();
 
-  return <UnitDetail unit={unit} questionCount={questions.length} />;
+  const count = unit.study ? fetchStudyCards(code).length : questions.length;
+
+  return <UnitDetail unit={unit} questionCount={count} />;
 }

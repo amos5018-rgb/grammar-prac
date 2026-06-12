@@ -123,6 +123,15 @@ export const units: Unit[] = [
     order: 10,
     active: true,
   },
+  {
+    code: 'phoneme-change-study',
+    category: 'phoneme-change',
+    name: '음운 변동 총정리: 복습편',
+    description: '음운 변동의 이름과 예시를 단서로 개념·변화 공식·비예시 이유를 스스로 떠올리는 인출 연습입니다.',
+    order: 10.5,
+    active: true,
+    study: true,
+  },
 
   // ── 고난도 문제 (각 중분류의 '고난도 도전' 섹션에 표시됨) ──
   {

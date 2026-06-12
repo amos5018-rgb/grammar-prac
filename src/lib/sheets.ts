@@ -4,9 +4,10 @@
 // - 선택: 환경변수 GOOGLE_SHEET_ID를 설정하면 Google Sheets 데이터가
 //         로컬 데이터 대신 사용됨 (5분마다 자동 갱신)
 // ============================================================
-import { Unit, Question, QuestionType, Difficulty } from './types';
+import { Unit, Question, QuestionType, Difficulty, StudyCard } from './types';
 import { units as localUnits } from '@/data/units';
 import { allQuestions as localQuestions } from '@/data/questions';
+import { allStudyCards } from '@/data/study';
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID || '';
 
@@ -87,6 +88,7 @@ export async function fetchUnits(): Promise<Unit[]> {
       active: row[4]?.toUpperCase() === 'TRUE',
       category: row[5] || 'etc', // 시트에 중분류 열이 없으면 '기타'로 분류
       advanced: row[6]?.toUpperCase() === 'TRUE', // 고난도 열(TRUE/FALSE)
+      study: row[7]?.toUpperCase() === 'TRUE',
     }))
     .filter(u => u.active && u.code)
     .sort((a, b) => a.order - b.order);
@@ -113,4 +115,8 @@ export async function fetchQuestions(unitCode?: string): Promise<Question[]> {
 
   if (unitCode) return questions.filter(q => q.unitCode === unitCode);
   return questions;
+}
+
+export function fetchStudyCards(unitCode: string): StudyCard[] {
+  return allStudyCards[unitCode] || [];
 }

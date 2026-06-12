@@ -307,3 +307,37 @@ function migrateToReviewSchedule() {
   localStorage.setItem(REVIEW_SCHEDULE_KEY, JSON.stringify(schedule));
   localStorage.setItem(MIGRATED_KEY, '1');
 }
+
+// ── 인출 연습(study) 완료 기록 ──
+
+const STUDY_COMPLETION_KEY = 'grammar_study_completion';
+
+interface StudyCompletionData {
+  dates: string[];
+  lastCompleted: string;
+}
+
+export function saveStudyCompletion(unitCode: string): void {
+  if (typeof window === 'undefined') return;
+  const raw = localStorage.getItem(STUDY_COMPLETION_KEY);
+  const all: Record<string, StudyCompletionData> = raw ? JSON.parse(raw) : {};
+  const today = getToday();
+  const entry = all[unitCode] || { dates: [], lastCompleted: '' };
+  if (!entry.dates.includes(today)) {
+    entry.dates.push(today);
+  }
+  entry.lastCompleted = today;
+  all[unitCode] = entry;
+  localStorage.setItem(STUDY_COMPLETION_KEY, JSON.stringify(all));
+  recordActivity();
+}
+
+export function getStudyCompletion(unitCode: string): { completed: boolean; count: number; lastDate: string | null } {
+  if (typeof window === 'undefined') return { completed: false, count: 0, lastDate: null };
+  const raw = localStorage.getItem(STUDY_COMPLETION_KEY);
+  if (!raw) return { completed: false, count: 0, lastDate: null };
+  const all: Record<string, StudyCompletionData> = JSON.parse(raw);
+  const entry = all[unitCode];
+  if (!entry) return { completed: false, count: 0, lastDate: null };
+  return { completed: true, count: entry.dates.length, lastDate: entry.lastCompleted };
+}

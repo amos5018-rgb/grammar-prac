@@ -31,9 +31,9 @@ export default function UnitCard({ unit, questionCount, bestScore, attempts, mas
           </span>
         )}
         <span className="bg-primary-light text-primary px-2.5 py-1 rounded-full font-medium">
-          {questionCount}문제
+          {unit.study ? `${questionCount}개 카드` : `${questionCount}문제`}
         </span>
-        {bestScore !== null && (
+        {!unit.study && bestScore !== null && (
           <span className={`px-2.5 py-1 rounded-full font-medium ${
             bestScore >= 80 ? 'bg-success-light text-success' :
             bestScore >= 50 ? 'bg-warning-light text-warning' :
@@ -42,7 +42,7 @@ export default function UnitCard({ unit, questionCount, bestScore, attempts, mas
             최고 {bestScore}점
           </span>
         )}
-        {attempts > 0 && (
+        {!unit.study && attempts > 0 && (
           <span className="text-text-secondary">{attempts}회 풀이</span>
         )}
       </div>
