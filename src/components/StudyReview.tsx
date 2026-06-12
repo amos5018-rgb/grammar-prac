@@ -12,6 +12,12 @@ interface StudyReviewProps {
 
 type RevealField = 'definition' | 'formula' | 'reason';
 
+function hasJongseong(str: string): boolean {
+  const last = str.charCodeAt(str.length - 1);
+  if (last < 0xAC00 || last > 0xD7A3) return false;
+  return (last - 0xAC00) % 28 !== 0;
+}
+
 export default function StudyReview({ unitCode, cards }: StudyReviewProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [revealed, setRevealed] = useState<Record<number, Set<RevealField>>>({});
@@ -20,10 +26,14 @@ export default function StudyReview({ unitCode, cards }: StudyReviewProps) {
   const card = cards[currentIndex];
   const cardRevealed = revealed[currentIndex] || new Set<RevealField>();
 
-  function reveal(field: RevealField) {
+  function toggle(field: RevealField) {
     setRevealed(prev => {
       const current = new Set(prev[currentIndex] || []);
-      current.add(field);
+      if (current.has(field)) {
+        current.delete(field);
+      } else {
+        current.add(field);
+      }
       return { ...prev, [currentIndex]: current };
     });
   }
@@ -130,22 +140,22 @@ export default function StudyReview({ unitCode, cards }: StudyReviewProps) {
         {/* 인출 3칸 */}
         <div className="space-y-3">
           <RevealBox
-            label="1. 개념 정의"
+            label={`1. ${card.name}의 개념을 정의하면?`}
             content={card.definition}
             isRevealed={cardRevealed.has('definition')}
-            onReveal={() => reveal('definition')}
+            onToggle={() => toggle('definition')}
           />
           <RevealBox
             label="2. 무엇이 → 무엇으로 / 어디에서"
             content={card.formula}
             isRevealed={cardRevealed.has('formula')}
-            onReveal={() => reveal('formula')}
+            onToggle={() => toggle('formula')}
           />
           <RevealBox
-            label="3. 비예시에 적용되지 않는 이유"
+            label={`3. ${card.name}${hasJongseong(card.name) ? '이' : '가'} 비예시에 적용되지 않는 이유는?`}
             content={card.nonExampleReason}
             isRevealed={cardRevealed.has('reason')}
-            onReveal={() => reveal('reason')}
+            onToggle={() => toggle('reason')}
           />
         </div>
       </div>
@@ -174,25 +184,28 @@ function RevealBox({
   label,
   content,
   isRevealed,
-  onReveal,
+  onToggle,
 }: {
   label: string;
   content: string;
   isRevealed: boolean;
-  onReveal: () => void;
+  onToggle: () => void;
 }) {
   if (isRevealed) {
     return (
-      <div className="rounded-xl border border-border bg-gray-50 dark:bg-white/5 p-4">
+      <button
+        onClick={onToggle}
+        className="w-full rounded-xl border border-border bg-gray-50 dark:bg-white/5 p-4 text-left hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+      >
         <div className="text-xs font-medium text-text-secondary mb-1">{label}</div>
         <p className="text-sm leading-relaxed">{content}</p>
-      </div>
+      </button>
     );
   }
 
   return (
     <button
-      onClick={onReveal}
+      onClick={onToggle}
       className="w-full rounded-xl border-2 border-dashed border-gray-300 dark:border-white/20 p-4 text-left hover:border-primary hover:bg-primary/5 transition-colors group"
     >
       <div className="text-xs font-medium text-text-secondary mb-1">{label}</div>
