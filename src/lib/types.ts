@@ -1,4 +1,9 @@
-export type QuestionType = '객관식' | 'ox' | '빈칸' | '단답형';
+export type QuestionType = '객관식' | 'ox' | '빈칸' | '단답형' | '변동분석';
+
+export interface PhonemeChangeStep {
+  result: string;
+  change: string;
+}
 
 export type Difficulty = '상' | '중' | '하';
 
@@ -29,6 +34,7 @@ export interface Question {
   choices: string[];
   answer: string;
   explanation: string;
+  steps?: PhonemeChangeStep[];
 }
 
 export interface StudentProfile {

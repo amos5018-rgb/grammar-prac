@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Question, AnswerRecord } from '@/lib/types';
 import { saveQuizResult, markQuestionResolved, unmarkQuestionResolved } from '@/lib/storage';
+import PhonemeChangeExercise from './PhonemeChangeExercise';
 
 function shuffle<T>(arr: T[]): T[] {
   const copy = [...arr];
@@ -54,7 +55,9 @@ export default function QuizRunner({ unitCode, questions: initialQuestions, revi
 
   const blankCount = question?.type === '빈칸'
     ? (question.question.match(/\[___\]/g) || []).length || 1
-    : 0;
+    : question?.type === '변동분석'
+      ? (question.steps?.length || 0)
+      : 0;
 
   const checkAnswer = useCallback(() => {
     if (!question) return;
@@ -86,16 +89,27 @@ export default function QuizRunner({ unitCode, questions: initialQuestions, revi
         correct = acceptableAnswers.some(a => a === studentAnswer);
         break;
       }
+      case '변동분석': {
+        studentAnswer = blankAnswers.join(' → ');
+        const expectedSteps = question.steps || [];
+        correct = blankAnswers.length === expectedSteps.length &&
+          blankAnswers.every((a, i) => a === expectedSteps[i].change);
+        break;
+      }
     }
 
     setIsCorrect(correct);
     setShowFeedback(true);
     setAnswers(prev => [...prev, {
       questionId: question.id,
-      questionText: question.question,
+      questionText: question.type === '변동분석'
+        ? `[변동분석] ${question.question}`
+        : question.question,
       explanation: question.explanation,
       studentAnswer,
-      correctAnswer: question.answer,
+      correctAnswer: question.type === '변동분석'
+        ? (question.steps?.map(s => s.change).join(' → ') || question.answer)
+        : question.answer,
       correct,
     }]);
 
@@ -201,7 +215,7 @@ export default function QuizRunner({ unitCode, questions: initialQuestions, revi
   if (!question) return null;
 
   const canSubmit =
-    question.type === '빈칸'
+    question.type === '빈칸' || question.type === '변동분석'
       ? blankAnswers.length >= blankCount && blankAnswers.every(a => a.trim() !== '')
       : selectedAnswer.trim() !== '';
 
@@ -266,7 +280,12 @@ export default function QuizRunner({ unitCode, questions: initialQuestions, revi
           </div>
         )}
 
-        <p className="text-lg font-medium leading-relaxed mb-6">{question.question}</p>
+        {question.type !== '변동분석' && (
+          <p className="text-lg font-medium leading-relaxed mb-6">{question.question}</p>
+        )}
+        {question.type === '변동분석' && (
+          <p className="text-base text-text-secondary mb-4">다음 단어의 음운 변동 과정을 분석하세요. 각 단계에 해당하는 변동 유형을 선택하세요.</p>
+        )}
 
         {/* Answer area */}
         {!showFeedback && (
@@ -339,6 +358,15 @@ export default function QuizRunner({ unitCode, questions: initialQuestions, revi
                 onKeyDown={e => { if (e.key === 'Enter' && canSubmit) checkAnswer(); }}
               />
             )}
+
+            {question.type === '변동분석' && question.steps && (
+              <PhonemeChangeExercise
+                word={question.question}
+                steps={question.steps}
+                value={blankAnswers}
+                onChange={setBlankAnswers}
+              />
+            )}
           </div>
         )}
 
@@ -353,7 +381,9 @@ export default function QuizRunner({ unitCode, questions: initialQuestions, revi
                 <span className="font-medium">정답:</span>{' '}
                 {question.type === '객관식'
                   ? `${question.answer}번 - ${question.choices[parseInt(question.answer) - 1] ?? ''}`
-                  : question.answer}
+                  : question.type === '변동분석'
+                    ? question.steps?.map(s => s.change).join(' → ')
+                    : question.answer}
               </p>
             )}
             <p className="text-sm leading-relaxed text-text">{question.explanation}</p>

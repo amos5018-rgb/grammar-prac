@@ -114,6 +114,16 @@ export const units: Unit[] = [
     active: true,
   },
 
+  // ── 음운 변동 총정리 ──
+  {
+    code: 'phoneme-change-review',
+    category: 'phoneme-change',
+    name: '음운 변동 총정리: 문제편',
+    description: '다양한 단어의 음운 변동 과정을 단계별로 분석합니다. 변동 유형을 빈칸에 드래그하여 넣는 방식입니다.',
+    order: 10,
+    active: true,
+  },
+
   // ── 고난도 문제 (각 중분류의 '고난도 도전' 섹션에 표시됨) ──
   {
     code: 'advanced-basics',
