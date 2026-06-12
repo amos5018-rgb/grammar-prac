@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import { PhonemeChangeStep } from '@/lib/types';
 
+// 연음은 음운 변동이 아니므로 선택지에 포함하지 않음
 const CHANGE_OPTIONS = [
   '음절의 끝소리 규칙',
-  '연음',
   '비음화',
   'ㄹ의 비음화',
   '유음화',

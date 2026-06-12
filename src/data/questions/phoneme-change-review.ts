@@ -243,35 +243,36 @@ export const phonemeChangeReviewQuestions: Question[] = [
     ],
   },
 
-  // ── 연음 + 구개음화 ──
+  // ── 끝소리 규칙 + 비음화 / 된소리되기 ──
+  // ⚠️ 연음은 음운 변동이 아니므로 정답에 포함하지 않습니다.
   {
     id: 'PCR024', unitCode: 'phoneme-change-review', type: '변동분석', difficulty: '하',
-    passage: '', question: '끝이', choices: [],
-    answer: '연음/구개음화',
-    explanation: "받침 ㅌ이 모음 '이' 앞으로 연음됩니다. 형식 형태소 '이' 앞에서 ㅌ → ㅊ으로 교체됩니다(구개음화).",
+    passage: '', question: '앞마당', choices: [],
+    answer: '음절의 끝소리 규칙/비음화',
+    explanation: "'앞'의 받침 ㅍ → ㅂ(음절의 끝소리 규칙). ㅂ이 ㅁ 앞에서 ㅁ으로 교체됩니다(비음화).",
     steps: [
-      { result: '끄티', change: '연음' },
-      { result: '끄치', change: '구개음화' },
+      { result: '압마당', change: '음절의 끝소리 규칙' },
+      { result: '암마당', change: '비음화' },
     ],
   },
   {
     id: 'PCR025', unitCode: 'phoneme-change-review', type: '변동분석', difficulty: '하',
-    passage: '', question: '밭이', choices: [],
-    answer: '연음/구개음화',
-    explanation: "받침 ㅌ이 모음 '이' 앞으로 연음됩니다. 형식 형태소 '이' 앞에서 ㅌ → ㅊ으로 교체됩니다(구개음화).",
+    passage: '', question: '부엌문', choices: [],
+    answer: '음절의 끝소리 규칙/비음화',
+    explanation: "'엌'의 받침 ㅋ → ㄱ(음절의 끝소리 규칙). ㄱ이 ㅁ 앞에서 ㅇ으로 교체됩니다(비음화).",
     steps: [
-      { result: '바티', change: '연음' },
-      { result: '바치', change: '구개음화' },
+      { result: '부억문', change: '음절의 끝소리 규칙' },
+      { result: '부엉문', change: '비음화' },
     ],
   },
   {
     id: 'PCR026', unitCode: 'phoneme-change-review', type: '변동분석', difficulty: '하',
-    passage: '', question: '해돋이', choices: [],
-    answer: '연음/구개음화',
-    explanation: "받침 ㄷ이 모음 '이' 앞으로 연음됩니다. 형식 형태소 '이' 앞에서 ㄷ → ㅈ으로 교체됩니다(구개음화).",
+    passage: '', question: '옆집', choices: [],
+    answer: '음절의 끝소리 규칙/된소리되기',
+    explanation: "'옆'의 받침 ㅍ → ㅂ(음절의 끝소리 규칙). 받침 ㅂ 뒤의 ㅈ이 ㅉ으로 교체됩니다(된소리되기).",
     steps: [
-      { result: '해도디', change: '연음' },
-      { result: '해도지', change: '구개음화' },
+      { result: '엽집', change: '음절의 끝소리 규칙' },
+      { result: '엽찝', change: '된소리되기' },
     ],
   },
 
