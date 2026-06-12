@@ -146,24 +146,26 @@ export const phonemeChangeReviewQuestions: Question[] = [
   },
 
   // ── 끝소리 규칙 + 거센소리되기 ──
+  // ⚠️ 받침 ㅈ + 히 (맞히다, 잊히다 등)는 ㅊ으로 바로 축약되므로
+  //    (거센소리되기 한 번만 적용) 이 유형에 쓰면 안 됩니다.
   {
     id: 'PCR015', unitCode: 'phoneme-change-review', type: '변동분석', difficulty: '중',
-    passage: '', question: '맞히다', choices: [],
+    passage: '', question: '비슷하다', choices: [],
     answer: '음절의 끝소리 규칙/거센소리되기',
-    explanation: "'맞'의 받침 ㅈ → ㄷ(음절의 끝소리 규칙). ㄷ과 ㅎ이 만나 ㅌ으로 축약됩니다(거센소리되기).",
+    explanation: "'슷'의 받침 ㅅ → ㄷ(음절의 끝소리 규칙). ㄷ과 ㅎ이 만나 ㅌ으로 축약됩니다(거센소리되기).",
     steps: [
-      { result: '맏히다', change: '음절의 끝소리 규칙' },
-      { result: '마티다', change: '거센소리되기' },
+      { result: '비슫하다', change: '음절의 끝소리 규칙' },
+      { result: '비스타다', change: '거센소리되기' },
     ],
   },
   {
     id: 'PCR016', unitCode: 'phoneme-change-review', type: '변동분석', difficulty: '중',
-    passage: '', question: '잊히다', choices: [],
+    passage: '', question: '따뜻한', choices: [],
     answer: '음절의 끝소리 규칙/거센소리되기',
-    explanation: "'잊'의 받침 ㅈ → ㄷ(음절의 끝소리 규칙). ㄷ과 ㅎ이 만나 ㅌ으로 축약됩니다(거센소리되기).",
+    explanation: "'뜻'의 받침 ㅅ → ㄷ(음절의 끝소리 규칙). ㄷ과 ㅎ이 만나 ㅌ으로 축약됩니다(거센소리되기).",
     steps: [
-      { result: '읻히다', change: '음절의 끝소리 규칙' },
-      { result: '이티다', change: '거센소리되기' },
+      { result: '따뜯한', change: '음절의 끝소리 규칙' },
+      { result: '따뜨탄', change: '거센소리되기' },
     ],
   },
   {
@@ -173,17 +175,17 @@ export const phonemeChangeReviewQuestions: Question[] = [
     explanation: "'꽃'의 받침 ㅊ → ㄷ(음절의 끝소리 규칙). ㄷ과 ㅎ이 만나 ㅌ으로 축약되어 다음 음절 초성이 됩니다(거센소리되기).",
     steps: [
       { result: '꼳향기', change: '음절의 끝소리 규칙' },
-      { result: '꼬탕기', change: '거센소리되기' },
+      { result: '꼬턍기', change: '거센소리되기' },
     ],
   },
   {
     id: 'PCR018', unitCode: 'phoneme-change-review', type: '변동분석', difficulty: '중',
-    passage: '', question: '젖히다', choices: [],
+    passage: '', question: '깨끗한', choices: [],
     answer: '음절의 끝소리 규칙/거센소리되기',
-    explanation: "'젖'의 받침 ㅈ → ㄷ(음절의 끝소리 규칙). ㄷ과 ㅎ이 만나 ㅌ으로 축약됩니다(거센소리되기).",
+    explanation: "'끗'의 받침 ㅅ → ㄷ(음절의 끝소리 규칙). ㄷ과 ㅎ이 만나 ㅌ으로 축약됩니다(거센소리되기).",
     steps: [
-      { result: '젇히다', change: '음절의 끝소리 규칙' },
-      { result: '저티다', change: '거센소리되기' },
+      { result: '깨끋한', change: '음절의 끝소리 규칙' },
+      { result: '깨끄탄', change: '거센소리되기' },
     ],
   },
 
@@ -273,24 +275,24 @@ export const phonemeChangeReviewQuestions: Question[] = [
     ],
   },
 
-  // ── 비음화 + 비음화 ──
+  // ── ㄹ의 비음화 + 비음화 ──
   {
     id: 'PCR027', unitCode: 'phoneme-change-review', type: '변동분석', difficulty: '상',
     passage: '', question: '독립', choices: [],
-    answer: '비음화/비음화',
-    explanation: "ㄱ 뒤의 ㄹ이 ㄴ으로 교체됩니다(비음화: 유음의 비음화). 이어서 ㄱ이 ㄴ 앞에서 ㅇ으로 교체됩니다(비음화).",
+    answer: 'ㄹ의 비음화/비음화',
+    explanation: "ㄱ 뒤의 ㄹ이 ㄴ으로 교체됩니다(ㄹ의 비음화). 이어서 ㄱ이 ㄴ 앞에서 ㅇ으로 교체됩니다(비음화).",
     steps: [
-      { result: '독닙', change: '비음화' },
+      { result: '독닙', change: 'ㄹ의 비음화' },
       { result: '동닙', change: '비음화' },
     ],
   },
   {
     id: 'PCR028', unitCode: 'phoneme-change-review', type: '변동분석', difficulty: '상',
     passage: '', question: '협력', choices: [],
-    answer: '비음화/비음화',
-    explanation: "ㅂ 뒤의 ㄹ이 ㄴ으로 교체됩니다(비음화: 유음의 비음화). 이어서 ㅂ이 ㄴ 앞에서 ㅁ으로 교체됩니다(비음화).",
+    answer: 'ㄹ의 비음화/비음화',
+    explanation: "ㅂ 뒤의 ㄹ이 ㄴ으로 교체됩니다(ㄹ의 비음화). 이어서 ㅂ이 ㄴ 앞에서 ㅁ으로 교체됩니다(비음화).",
     steps: [
-      { result: '협녁', change: '비음화' },
+      { result: '협녁', change: 'ㄹ의 비음화' },
       { result: '혐녁', change: '비음화' },
     ],
   },
@@ -307,14 +309,14 @@ export const phonemeChangeReviewQuestions: Question[] = [
     ],
   },
 
-  // ── 비음화 + 비음화 ──
+  // ── ㄹ의 비음화 + 비음화 ──
   {
     id: 'PCR030', unitCode: 'phoneme-change-review', type: '변동분석', difficulty: '중',
     passage: '', question: '법률', choices: [],
-    answer: '비음화/비음화',
-    explanation: "ㅂ 뒤의 ㄹ이 ㄴ으로 교체됩니다(비음화: 유음의 비음화). 이어서 ㅂ이 ㄴ 앞에서 ㅁ으로 교체됩니다(비음화).",
+    answer: 'ㄹ의 비음화/비음화',
+    explanation: "ㅂ 뒤의 ㄹ이 ㄴ으로 교체됩니다(ㄹ의 비음화). 이어서 ㅂ이 ㄴ 앞에서 ㅁ으로 교체됩니다(비음화).",
     steps: [
-      { result: '법뉼', change: '비음화' },
+      { result: '법뉼', change: 'ㄹ의 비음화' },
       { result: '범뉼', change: '비음화' },
     ],
   },
