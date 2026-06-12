@@ -6,6 +6,12 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "오남고 1학년 국어: 문법 연습",
   description: "고등학교 국어 문법 인출·적용 연습 웹앱",
+  // iOS '홈 화면에 추가' 시 표시되는 앱 이름
+  appleWebApp: {
+    capable: true,
+    title: "국어 문법 연습",
+    statusBarStyle: "default",
+  },
 };
 
 export default function RootLayout({
