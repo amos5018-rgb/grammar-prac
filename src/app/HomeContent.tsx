@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { getProfile, getUnitProgress, getDueCount, getStreak } from '@/lib/storage';
+import { getProfile, getUnitProgress, getDueCount, getStreak, getExamCalendar, getDday } from '@/lib/storage';
 import { getRecommendation, Recommendation } from '@/lib/recommend';
 import LoginForm from '@/components/LoginForm';
 
@@ -23,6 +23,8 @@ export default function HomeContent({ categories }: { categories: CategoryCardDa
   const [dueCount, setDueCount] = useState(0);
   const [recommendation, setRecommendation] = useState<Recommendation | null>(null);
   const [streak, setStreak] = useState(0);
+  const [calendar, setCalendar] = useState<{ date: string; active: boolean; isToday: boolean; isExam: boolean; isPast: boolean }[]>([]);
+  const [dday, setDday] = useState(0);
 
   useEffect(() => {
     setLoggedIn(!!getProfile());
@@ -30,6 +32,8 @@ export default function HomeContent({ categories }: { categories: CategoryCardDa
     setDueCount(getDueCount());
     setRecommendation(getRecommendation());
     setStreak(getStreak());
+    setCalendar(getExamCalendar());
+    setDday(getDday());
   }, []);
 
   if (loggedIn === null) return null;
@@ -43,20 +47,75 @@ export default function HomeContent({ categories }: { categories: CategoryCardDa
           setDueCount(getDueCount());
           setRecommendation(getRecommendation());
           setStreak(getStreak());
+          setCalendar(getExamCalendar());
+          setDday(getDday());
         }}
       />
     );
   }
 
+  const activeDays = calendar.filter(d => d.active).length;
+  const totalDays = calendar.filter(d => d.isPast || d.isToday).length;
+
   return (
     <div className="max-w-3xl mx-auto px-4 py-6">
-      {/* 학습 스트릭 */}
-      {streak > 0 && (
-        <div className="flex items-center gap-2 mb-4 text-sm">
-          <span className="text-warning text-lg">&#128293;</span>
-          <span className="font-bold text-warning">{streak}일 연속 학습 중!</span>
+      {/* D-day 배너 + 학습 달력 */}
+      <div className="bg-surface rounded-2xl border border-border p-5 mb-5">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <span className="text-lg">&#128293;</span>
+            <div>
+              <span className="font-bold">
+                {streak > 0 ? `${streak}일 연속 학습 중!` : '오늘 학습을 시작해 보세요!'}
+              </span>
+              {totalDays > 0 && (
+                <span className="text-xs text-text-secondary ml-2">
+                  ({activeDays}/{totalDays}일 학습)
+                </span>
+              )}
+            </div>
+          </div>
+          {dday > 0 && (
+            <span className="text-base font-extrabold text-error">
+              D-{dday}
+            </span>
+          )}
+          {dday === 0 && (
+            <span className="text-base font-extrabold text-primary">D-Day</span>
+          )}
         </div>
-      )}
+
+        {calendar.length > 0 && (
+          <div className="flex gap-1">
+            {calendar.map(({ date, active, isToday, isExam, isPast }) => {
+              const day = parseInt(date.split('-')[2]);
+              let bg = 'bg-gray-100 dark:bg-white/10';
+              let text = 'text-text-secondary';
+              if (isExam) {
+                bg = active ? 'bg-error' : 'bg-error/10';
+                text = active ? 'text-white' : 'text-error';
+              } else if (active) {
+                bg = 'bg-primary';
+                text = 'text-white';
+              } else if (isToday) {
+                bg = 'bg-primary/10 ring-1 ring-primary';
+                text = 'text-primary';
+              } else if (isPast) {
+                text = 'text-text-secondary/40';
+              }
+              return (
+                <div
+                  key={date}
+                  className={`flex-1 aspect-square rounded-md flex items-center justify-center text-[10px] font-medium ${bg} ${text} relative`}
+                >
+                  {day}
+                  {isExam && <span className="absolute -top-1 -right-0.5 text-[7px]">&#128680;</span>}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
 
       {/* 다음 학습 추천 카드 */}
       {recommendation && (

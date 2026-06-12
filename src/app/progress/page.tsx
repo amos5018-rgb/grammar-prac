@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { getQuizResults, getUnitProgress, clearAllHistory, getUnitMastery, getStreak, getRecentWeekDates } from '@/lib/storage';
+import { getQuizResults, getUnitProgress, clearAllHistory, getUnitMastery, getStreak, getExamCalendar, getDday } from '@/lib/storage';
 import { QuizAttempt } from '@/lib/types';
 import { units } from '@/data/units';
 
@@ -14,13 +14,15 @@ export default function ProgressPage() {
   const [results, setResults] = useState<QuizAttempt[]>([]);
   const [masteryMap, setMasteryMap] = useState<Record<string, boolean>>({});
   const [streak, setStreak] = useState(0);
-  const [weekDates, setWeekDates] = useState<{ date: string; active: boolean }[]>([]);
+  const [calendar, setCalendar] = useState<{ date: string; active: boolean; isToday: boolean; isExam: boolean; isPast: boolean }[]>([]);
+  const [dday, setDday] = useState(0);
 
   useEffect(() => {
     setProgress(getUnitProgress());
     setResults(getQuizResults());
     setStreak(getStreak());
-    setWeekDates(getRecentWeekDates());
+    setCalendar(getExamCalendar());
+    setDday(getDday());
     const m: Record<string, boolean> = {};
     for (const u of units) {
       m[u.code] = getUnitMastery(u.code).mastered;
@@ -35,7 +37,7 @@ export default function ProgressPage() {
     setResults([]);
     setMasteryMap({});
     setStreak(0);
-    setWeekDates([]);
+    setCalendar(getExamCalendar());
   };
 
   const unitCodes = Object.keys(progress);
@@ -67,31 +69,59 @@ export default function ProgressPage() {
         </div>
       ) : (
         <>
-          {/* 학습 스트릭 + 주간 캘린더 */}
+          {/* 기말고사 D-day 캘린더 */}
           <div className="bg-surface rounded-xl border border-border p-4 mb-6">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-lg">&#128293;</span>
-              <span className="font-bold">
-                {streak > 0 ? `${streak}일 연속 학습 중!` : '오늘 학습을 시작해 보세요!'}
-              </span>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">&#128293;</span>
+                <span className="font-bold">
+                  {streak > 0 ? `${streak}일 연속 학습 중!` : '오늘 학습을 시작해 보세요!'}
+                </span>
+              </div>
+              {dday > 0 && (
+                <span className="text-sm font-bold text-error">
+                  D-{dday}
+                </span>
+              )}
+              {dday === 0 && (
+                <span className="text-sm font-bold text-primary">D-Day</span>
+              )}
             </div>
-            <div className="flex justify-between gap-1">
-              {weekDates.map(({ date, active }) => {
-                const dayIdx = new Date(date + 'T00:00:00').getDay();
-                return (
-                  <div key={date} className="flex flex-col items-center gap-1 flex-1">
-                    <span className="text-xs text-text-secondary">{DAY_LABELS[dayIdx]}</span>
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium ${
-                      active
-                        ? 'bg-primary text-white'
-                        : 'bg-gray-100 dark:bg-white/10 text-text-secondary'
-                    }`}>
-                      {parseInt(date.split('-')[2])}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+
+            {calendar.length > 0 && (
+              <>
+                <div className="grid grid-cols-6 gap-1.5 mb-1.5">
+                  {calendar.slice(0, 6).map(({ date }) => {
+                    const dayIdx = new Date(date + 'T00:00:00').getDay();
+                    return (
+                      <div key={date + '-label'} className="text-center">
+                        <span className="text-[10px] text-text-secondary">{DAY_LABELS[dayIdx]}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="grid grid-cols-6 gap-1.5 mb-2">
+                  {calendar.slice(0, 6).map(day => (
+                    <CalendarCell key={day.date} {...day} />
+                  ))}
+                </div>
+                <div className="grid grid-cols-6 gap-1.5 mb-1.5">
+                  {calendar.slice(6).map(({ date }) => {
+                    const dayIdx = new Date(date + 'T00:00:00').getDay();
+                    return (
+                      <div key={date + '-label'} className="text-center">
+                        <span className="text-[10px] text-text-secondary">{DAY_LABELS[dayIdx]}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="grid grid-cols-6 gap-1.5">
+                  {calendar.slice(6).map(day => (
+                    <CalendarCell key={day.date} {...day} />
+                  ))}
+                </div>
+              </>
+            )}
           </div>
 
           {/* Summary cards */}
@@ -178,6 +208,32 @@ export default function ProgressPage() {
           </div>
         </>
       )}
+    </div>
+  );
+}
+
+function CalendarCell({ date, active, isToday, isExam, isPast }: {
+  date: string; active: boolean; isToday: boolean; isExam: boolean; isPast: boolean;
+}) {
+  const day = parseInt(date.split('-')[2]);
+  let className = 'w-full aspect-square rounded-lg flex items-center justify-center text-xs font-medium relative ';
+  if (isExam) {
+    className += active
+      ? 'bg-error text-white ring-2 ring-error ring-offset-1'
+      : 'bg-error/10 text-error ring-2 ring-error/50 ring-offset-1';
+  } else if (active) {
+    className += 'bg-primary text-white';
+  } else if (isToday) {
+    className += 'bg-primary/10 text-primary ring-2 ring-primary ring-offset-1';
+  } else if (isPast) {
+    className += 'bg-gray-100 dark:bg-white/10 text-text-secondary/50';
+  } else {
+    className += 'bg-gray-100 dark:bg-white/10 text-text-secondary';
+  }
+  return (
+    <div className={className}>
+      {day}
+      {isExam && <span className="absolute -top-1.5 -right-0.5 text-[8px]">&#128680;</span>}
     </div>
   );
 }

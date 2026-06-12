@@ -35,10 +35,10 @@ export const units: Unit[] = [
   },
   {
     code: 'final-consonants',
-    category: 'basics',
-    name: '받침의 발음',
+    category: 'phoneme-change',
+    name: '음절의 끝소리 규칙',
     description: '음절의 끝소리 규칙과 받침 뒤 모음이 올 때의 발음 변화(실질적/문법적 의미)를 학습합니다.',
-    order: 3,
+    order: 5.5,
     active: true,
   },
   {

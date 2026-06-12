@@ -238,15 +238,37 @@ export function getStreak(): number {
   return streak;
 }
 
-export function getRecentWeekDates(): { date: string; active: boolean }[] {
+const EXAM_START = '2026-06-15';
+const EXAM_DATE = '2026-06-26';
+
+export function getExamCalendar(): { date: string; active: boolean; isToday: boolean; isExam: boolean; isPast: boolean }[] {
   const dates = new Set(getActivityDates());
   const today = getToday();
-  const week: { date: string; active: boolean }[] = [];
-  for (let i = 6; i >= 0; i--) {
-    const d = dateOffset(today, -i);
-    week.push({ date: d, active: dates.has(d) });
+  const calendar: { date: string; active: boolean; isToday: boolean; isExam: boolean; isPast: boolean }[] = [];
+  let current = EXAM_START;
+  while (current <= EXAM_DATE) {
+    calendar.push({
+      date: current,
+      active: dates.has(current),
+      isToday: current === today,
+      isExam: current === EXAM_DATE,
+      isPast: current < today,
+    });
+    current = dateOffset(current, 1);
   }
-  return week;
+  return calendar;
+}
+
+export function getDday(): number {
+  const today = getToday();
+  if (today >= EXAM_DATE) return 0;
+  let count = 0;
+  let current = today;
+  while (current < EXAM_DATE) {
+    count++;
+    current = dateOffset(current, 1);
+  }
+  return count;
 }
 
 // ── 진도 ──
