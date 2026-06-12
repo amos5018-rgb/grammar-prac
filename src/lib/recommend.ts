@@ -20,7 +20,7 @@ export function getRecommendation(): Recommendation | null {
   }
 
   const progress = getUnitProgress();
-  const activeUnits = units.filter(u => u.active && !u.advanced && !u.study);
+  const activeUnits = units.filter(u => u.active && !u.advanced && !u.summary);
 
   const weakUnit = activeUnits
     .filter(u => {

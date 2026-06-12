@@ -10,16 +10,19 @@ const MIGRATED_KEY = 'grammar_review_migrated';
 
 export type WrongAnswerRecord = AnswerRecord & { unitCode: string; date: string };
 
-// ── 날짜 유틸 ──
+// ── 날짜 유틸 (로컬 타임존 기준) ──
+
+function formatLocalDate(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
 
 function getToday(): string {
-  return new Date().toISOString().split('T')[0];
+  return formatLocalDate(new Date());
 }
 
 function dateOffset(dateStr: string, days: number): string {
-  const d = new Date(dateStr + 'T00:00:00');
-  d.setDate(d.getDate() + days);
-  return d.toISOString().split('T')[0];
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return formatLocalDate(new Date(y, m - 1, d + days));
 }
 
 // ── 프로필 ──

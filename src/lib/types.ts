@@ -22,6 +22,7 @@ export interface Unit {
   order: number;
   active: boolean;
   advanced?: boolean; // true면 '고난도 도전' 섹션에 표시
+  summary?: boolean;  // true면 '총정리' 섹션에 표시
   study?: boolean;    // true면 퀴즈 대신 인출 연습 UI
 }
 

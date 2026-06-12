@@ -114,22 +114,24 @@ export const units: Unit[] = [
     active: true,
   },
 
-  // ── 음운 변동 총정리 ──
+  // ── 음운 변동 총정리 (카테고리 내 별도 섹션) ──
   {
     code: 'phoneme-change-review',
     category: 'phoneme-change',
     name: '음운 변동 총정리: 문제편',
     description: '다양한 단어의 음운 변동 과정을 단계별로 분석합니다. 변동 유형을 빈칸에 드래그하여 넣는 방식입니다.',
-    order: 10,
+    order: 50,
     active: true,
+    summary: true,
   },
   {
     code: 'phoneme-change-study',
     category: 'phoneme-change',
     name: '음운 변동 총정리: 복습편',
     description: '음운 변동의 이름과 예시를 단서로 개념·변화 공식·비예시 이유를 스스로 떠올리는 인출 연습입니다.',
-    order: 10.5,
+    order: 51,
     active: true,
+    summary: true,
     study: true,
   },
 

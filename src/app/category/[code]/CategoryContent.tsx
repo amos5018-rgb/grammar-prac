@@ -28,7 +28,8 @@ export default function CategoryContent({ category, units, questionCounts, total
     setMasteryMap(m);
   }, [units]);
 
-  const regularUnits = units.filter(u => !u.advanced);
+  const regularUnits = units.filter(u => !u.advanced && !u.summary);
+  const summaryUnits = units.filter(u => u.summary);
   const advancedUnits = units.filter(u => u.advanced);
 
   return (
@@ -68,6 +69,27 @@ export default function CategoryContent({ category, units, questionCounts, total
           />
         ))}
       </div>
+
+      {summaryUnits.length > 0 && (
+        <>
+          <h2 className="text-lg font-bold mt-8 mb-1">&#128209; 총정리</h2>
+          <p className="text-text-secondary text-sm mb-4">
+            배운 내용을 종합하여 복습하고 실력을 점검하세요
+          </p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {summaryUnits.map(unit => (
+              <UnitCard
+                key={unit.code}
+                unit={unit}
+                questionCount={questionCounts[unit.code] || 0}
+                bestScore={progress[unit.code]?.bestScore ?? null}
+                attempts={progress[unit.code]?.attempts ?? 0}
+                mastered={masteryMap[unit.code]}
+              />
+            ))}
+          </div>
+        </>
+      )}
 
       {advancedUnits.length > 0 && (
         <>
