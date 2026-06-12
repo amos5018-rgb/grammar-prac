@@ -79,12 +79,12 @@ export default function ProgressPage() {
                 </span>
               </div>
               {dday > 0 && (
-                <span className="text-sm font-bold text-error">
+                <span className="text-sm font-bold text-success">
                   D-{dday}
                 </span>
               )}
               {dday === 0 && (
-                <span className="text-sm font-bold text-primary">D-Day</span>
+                <span className="text-sm font-bold text-success">D-Day</span>
               )}
             </div>
 
@@ -219,8 +219,8 @@ function CalendarCell({ date, active, isToday, isExam, isPast }: {
   let className = 'w-full aspect-square rounded-lg flex items-center justify-center text-xs font-medium relative ';
   if (isExam) {
     className += active
-      ? 'bg-error text-white ring-2 ring-error ring-offset-1'
-      : 'bg-error/10 text-error ring-2 ring-error/50 ring-offset-1';
+      ? 'bg-success text-white ring-2 ring-success ring-offset-1'
+      : 'bg-success/10 text-success ring-2 ring-success/50 ring-offset-1';
   } else if (active) {
     className += 'bg-primary text-white';
   } else if (isToday) {
@@ -233,7 +233,7 @@ function CalendarCell({ date, active, isToday, isExam, isPast }: {
   return (
     <div className={className}>
       {day}
-      {isExam && <span className="absolute -top-1.5 -right-0.5 text-[8px]">&#127808;</span>}
+      {isExam && <span className="absolute -top-4 -right-2 text-[24px]">&#127808;</span>}
     </div>
   );
 }
