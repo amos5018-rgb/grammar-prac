@@ -3,7 +3,6 @@ import { categories } from '@/data/categories';
 import { notFound } from 'next/navigation';
 import CategoryContent from './CategoryContent';
 
-// 빌드 시 중분류 페이지를 미리 생성하고, 5분마다 갱신 (빠른 로딩)
 export const revalidate = 300;
 
 export async function generateStaticParams() {
@@ -29,10 +28,13 @@ export default async function CategoryPage({ params }: { params: Promise<{ code:
     order: 999,
   };
 
+  const catUnitCodes = new Set(catUnits.map(u => u.code));
   const questionCounts: Record<string, number> = {};
+  let totalQuestions = 0;
   for (const q of questions) {
     questionCounts[q.unitCode] = (questionCounts[q.unitCode] || 0) + 1;
+    if (catUnitCodes.has(q.unitCode)) totalQuestions++;
   }
 
-  return <CategoryContent category={category} units={catUnits} questionCounts={questionCounts} />;
+  return <CategoryContent category={category} units={catUnits} questionCounts={questionCounts} totalQuestions={totalQuestions} />;
 }

@@ -6,9 +6,10 @@ interface UnitCardProps {
   questionCount: number;
   bestScore: number | null;
   attempts: number;
+  mastered?: boolean;
 }
 
-export default function UnitCard({ unit, questionCount, bestScore, attempts }: UnitCardProps) {
+export default function UnitCard({ unit, questionCount, bestScore, attempts, mastered }: UnitCardProps) {
   return (
     <Link
       href={`/units/${unit.code}`}
@@ -18,7 +19,10 @@ export default function UnitCard({ unit, questionCount, bestScore, attempts }: U
           : 'border-border hover:border-primary/30'
       }`}
     >
-      <h3 className="font-bold text-lg mb-1">{unit.name}</h3>
+      <div className="flex items-center gap-2 mb-1">
+        <h3 className="font-bold text-lg">{unit.name}</h3>
+        {mastered && <span title="마스터 달성">&#128081;</span>}
+      </div>
       <p className="text-text-secondary text-sm mb-4 line-clamp-2">{unit.description}</p>
       <div className="flex items-center gap-3 text-xs flex-wrap">
         {unit.advanced && (

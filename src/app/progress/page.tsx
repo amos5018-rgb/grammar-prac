@@ -2,19 +2,30 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { getQuizResults, getUnitProgress, clearAllHistory } from '@/lib/storage';
+import { getQuizResults, getUnitProgress, clearAllHistory, getUnitMastery, getStreak, getRecentWeekDates } from '@/lib/storage';
 import { QuizAttempt } from '@/lib/types';
 import { units } from '@/data/units';
 
 const unitNameMap = Object.fromEntries(units.map(u => [u.code, u.name]));
+const DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'];
 
 export default function ProgressPage() {
   const [progress, setProgress] = useState<Record<string, { attempts: number; bestScore: number | null }>>({});
   const [results, setResults] = useState<QuizAttempt[]>([]);
+  const [masteryMap, setMasteryMap] = useState<Record<string, boolean>>({});
+  const [streak, setStreak] = useState(0);
+  const [weekDates, setWeekDates] = useState<{ date: string; active: boolean }[]>([]);
 
   useEffect(() => {
     setProgress(getUnitProgress());
     setResults(getQuizResults());
+    setStreak(getStreak());
+    setWeekDates(getRecentWeekDates());
+    const m: Record<string, boolean> = {};
+    for (const u of units) {
+      m[u.code] = getUnitMastery(u.code).mastered;
+    }
+    setMasteryMap(m);
   }, []);
 
   const handleReset = () => {
@@ -22,6 +33,9 @@ export default function ProgressPage() {
     clearAllHistory();
     setProgress({});
     setResults([]);
+    setMasteryMap({});
+    setStreak(0);
+    setWeekDates([]);
   };
 
   const unitCodes = Object.keys(progress);
@@ -29,6 +43,7 @@ export default function ProgressPage() {
   const avgScore = results.length > 0
     ? Math.round(results.reduce((sum, r) => sum + (r.score / r.total) * 100, 0) / results.length)
     : 0;
+  const masteredCount = Object.values(masteryMap).filter(Boolean).length;
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6">
@@ -52,6 +67,33 @@ export default function ProgressPage() {
         </div>
       ) : (
         <>
+          {/* 학습 스트릭 + 주간 캘린더 */}
+          <div className="bg-surface rounded-xl border border-border p-4 mb-6">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-lg">&#128293;</span>
+              <span className="font-bold">
+                {streak > 0 ? `${streak}일 연속 학습 중!` : '오늘 학습을 시작해 보세요!'}
+              </span>
+            </div>
+            <div className="flex justify-between gap-1">
+              {weekDates.map(({ date, active }) => {
+                const dayIdx = new Date(date + 'T00:00:00').getDay();
+                return (
+                  <div key={date} className="flex flex-col items-center gap-1 flex-1">
+                    <span className="text-xs text-text-secondary">{DAY_LABELS[dayIdx]}</span>
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium ${
+                      active
+                        ? 'bg-primary text-white'
+                        : 'bg-gray-100 dark:bg-white/10 text-text-secondary'
+                    }`}>
+                      {parseInt(date.split('-')[2])}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
           {/* Summary cards */}
           <div className="grid grid-cols-3 gap-3 mb-8">
             <div className="bg-surface rounded-xl border border-border p-4 text-center">
@@ -71,6 +113,12 @@ export default function ProgressPage() {
             </div>
           </div>
 
+          {masteredCount > 0 && (
+            <p className="text-sm text-text-secondary mb-4">
+              &#128081; {masteredCount}개 단원 마스터 달성
+            </p>
+          )}
+
           {/* Per-unit progress */}
           <h2 className="font-bold text-lg mb-4">단원별 현황</h2>
           <div className="space-y-3">
@@ -80,7 +128,10 @@ export default function ProgressPage() {
               return (
                 <div key={code} className="bg-surface rounded-xl border border-border p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="font-medium">{unitNameMap[code] || code}</span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-medium">{unitNameMap[code] || code}</span>
+                      {masteryMap[code] && <span title="마스터">&#128081;</span>}
+                    </div>
                     <span className="text-sm text-text-secondary">{data.attempts}회 풀이</span>
                   </div>
                   <div className="flex items-center gap-3">

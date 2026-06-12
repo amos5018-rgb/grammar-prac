@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { getProfile, getUnitProgress } from '@/lib/storage';
+import { getProfile, getUnitProgress, getDueCount, getStreak } from '@/lib/storage';
+import { getRecommendation, Recommendation } from '@/lib/recommend';
 import LoginForm from '@/components/LoginForm';
 
 export interface CategoryCardData {
@@ -19,10 +20,16 @@ type Progress = Record<string, { attempts: number; bestScore: number | null }>;
 export default function HomeContent({ categories }: { categories: CategoryCardData[] }) {
   const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
   const [progress, setProgress] = useState<Progress>({});
+  const [dueCount, setDueCount] = useState(0);
+  const [recommendation, setRecommendation] = useState<Recommendation | null>(null);
+  const [streak, setStreak] = useState(0);
 
   useEffect(() => {
     setLoggedIn(!!getProfile());
     setProgress(getUnitProgress());
+    setDueCount(getDueCount());
+    setRecommendation(getRecommendation());
+    setStreak(getStreak());
   }, []);
 
   if (loggedIn === null) return null;
@@ -33,6 +40,9 @@ export default function HomeContent({ categories }: { categories: CategoryCardDa
         onLogin={() => {
           setLoggedIn(true);
           setProgress(getUnitProgress());
+          setDueCount(getDueCount());
+          setRecommendation(getRecommendation());
+          setStreak(getStreak());
         }}
       />
     );
@@ -40,6 +50,39 @@ export default function HomeContent({ categories }: { categories: CategoryCardDa
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-6">
+      {/* 학습 스트릭 */}
+      {streak > 0 && (
+        <div className="flex items-center gap-2 mb-4 text-sm">
+          <span className="text-warning text-lg">&#128293;</span>
+          <span className="font-bold text-warning">{streak}일 연속 학습 중!</span>
+        </div>
+      )}
+
+      {/* 다음 학습 추천 카드 */}
+      {recommendation && (
+        <Link
+          href={recommendation.href}
+          className={`block w-full mb-5 p-5 rounded-2xl border-2 transition-all hover:shadow-md active:scale-[0.99] ${
+            recommendation.type === 'review'
+              ? 'border-primary bg-primary-light'
+              : recommendation.type === 'retry'
+                ? 'border-warning bg-warning-light'
+                : 'border-success bg-success-light'
+          }`}
+        >
+          <p className="text-xs font-medium text-text-secondary mb-1">
+            {recommendation.type === 'review' ? '오늘의 복습' : recommendation.type === 'retry' ? '약점 보강' : '새 단원'}
+          </p>
+          <p className={`font-bold text-lg ${
+            recommendation.type === 'review' ? 'text-primary' :
+            recommendation.type === 'retry' ? 'text-warning' : 'text-success'
+          }`}>
+            {recommendation.title}
+          </p>
+          <p className="text-sm text-text-secondary mt-0.5">{recommendation.subtitle}</p>
+        </Link>
+      )}
+
       <h1 className="text-2xl font-bold mb-1">학습 영역 선택</h1>
       <p className="text-text-secondary text-sm mb-6">학습할 영역을 먼저 선택하세요</p>
       <div className="grid gap-4">

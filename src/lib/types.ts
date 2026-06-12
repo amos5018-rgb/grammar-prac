@@ -58,4 +58,12 @@ export interface AnswerRecord {
   studentAnswer: string;
   correctAnswer: string;
   correct: boolean;
+  unitCode?: string;
+}
+
+export interface ReviewScheduleEntry {
+  box: number;
+  due: string;
+  wrongCount: number;
+  unitCode: string;
 }

@@ -2,15 +2,15 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { getDedupedWrongAnswers } from '@/lib/storage';
+import { getDedupedWrongAnswers, getDueQuestionIds } from '@/lib/storage';
 import { Question } from '@/lib/types';
 import QuizRunner from '@/components/QuizRunner';
 
 export default function ReviewQuizContent({ allQuestions }: { allQuestions: Question[] }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  // ?unit=소단원코드 가 있으면 해당 소단원의 틀린 문제만 복습
   const unitFilter = searchParams.get('unit');
+  const dueOnly = searchParams.get('due') === '1';
   const [questions, setQuestions] = useState<Question[] | null>(null);
 
   useEffect(() => {
@@ -18,22 +18,28 @@ export default function ReviewQuizContent({ allQuestions }: { allQuestions: Ques
     if (unitFilter) {
       wrong = wrong.filter(w => w.unitCode === unitFilter);
     }
-    if (wrong.length === 0) {
+
+    let wrongIds: Set<string>;
+    if (dueOnly) {
+      const dueIds = new Set(getDueQuestionIds());
+      wrongIds = new Set(wrong.map(w => w.questionId).filter(id => dueIds.has(id)));
+    } else {
+      wrongIds = new Set(wrong.map(w => w.questionId));
+    }
+
+    if (wrongIds.size === 0) {
       router.replace('/review');
       return;
     }
 
-    const wrongIds = new Set(wrong.map(w => w.questionId));
     const matched = allQuestions.filter(q => wrongIds.has(q.id));
-
     if (matched.length === 0) {
       router.replace('/review');
       return;
     }
 
-    // 순서 셔플은 QuizRunner가 담당
     setQuestions(matched);
-  }, [router, allQuestions, unitFilter]);
+  }, [router, allQuestions, unitFilter, dueOnly]);
 
   if (!questions) {
     return (

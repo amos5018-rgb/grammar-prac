@@ -4,7 +4,7 @@ import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Question, AnswerRecord } from '@/lib/types';
-import { saveQuizResult, markQuestionResolved, unmarkQuestionResolved } from '@/lib/storage';
+import { saveQuizResult, updateReviewState } from '@/lib/storage';
 import PhonemeChangeExercise from './PhonemeChangeExercise';
 
 function shuffle<T>(arr: T[]): T[] {
@@ -111,12 +111,11 @@ export default function QuizRunner({ unitCode, questions: initialQuestions, revi
         ? (question.steps?.map(s => s.change).join(' → ') || question.answer)
         : question.answer,
       correct,
+      unitCode: question.unitCode,
     }]);
 
-    // 복습 모드: 맞히면 오답 노트에서 해결 처리, 다시 틀리면 해결 취소
     if (reviewMode) {
-      if (correct) markQuestionResolved(question.id);
-      else unmarkQuestionResolved(question.id);
+      updateReviewState(question.id, correct);
     }
   }, [question, selectedAnswer, blankAnswers, reviewMode]);
 

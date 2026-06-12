@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Unit } from '@/lib/types';
-import { getBestScore, getUnitAttemptCount } from '@/lib/storage';
+import { getBestScore, getUnitAttemptCount, getUnitMastery } from '@/lib/storage';
 
 interface UnitDetailProps {
   unit: Unit;
@@ -12,6 +12,7 @@ interface UnitDetailProps {
 export default function UnitDetail({ unit, questionCount }: UnitDetailProps) {
   const bestScore = getBestScore(unit.code);
   const attempts = getUnitAttemptCount(unit.code);
+  const mastery = getUnitMastery(unit.code);
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
@@ -23,10 +24,13 @@ export default function UnitDetail({ unit, questionCount }: UnitDetailProps) {
       </Link>
 
       <div className="bg-surface rounded-2xl border border-border p-6 mb-6">
-        <h1 className="text-2xl font-bold mb-2">{unit.name}</h1>
+        <div className="flex items-center gap-2 mb-2">
+          <h1 className="text-2xl font-bold">{unit.name}</h1>
+          {mastery.mastered && <span className="text-2xl" title="마스터 달성">&#128081;</span>}
+        </div>
         <p className="text-text-secondary mb-6">{unit.description}</p>
 
-        <div className="flex flex-wrap gap-3 text-sm mb-6">
+        <div className="flex flex-wrap gap-3 text-sm mb-4">
           <span className="bg-primary-light text-primary px-3 py-1.5 rounded-full font-medium">
             {questionCount}문제
           </span>
@@ -45,6 +49,13 @@ export default function UnitDetail({ unit, questionCount }: UnitDetailProps) {
             </span>
           )}
         </div>
+
+        {/* 마스터 상태 안내 */}
+        {!mastery.mastered && mastery.hint && (
+          <p className="text-sm text-text-secondary mb-4 bg-gray-50 dark:bg-white/5 rounded-lg px-4 py-2.5">
+            &#128081; 마스터까지: {mastery.hint}
+          </p>
+        )}
 
         <Link
           href={`/units/${unit.code}/quiz`}

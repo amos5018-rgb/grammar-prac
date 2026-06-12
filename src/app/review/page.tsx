@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
-import { getDedupedWrongAnswers, clearAllHistory, WrongAnswerRecord } from '@/lib/storage';
+import { getDedupedWrongAnswers, clearAllHistory, WrongAnswerRecord, getDueCount, getWrongCounts } from '@/lib/storage';
 import { units } from '@/data/units';
 
 const unitNameMap = Object.fromEntries(units.map(u => [u.code, u.name]));
@@ -10,9 +10,14 @@ const unitNameMap = Object.fromEntries(units.map(u => [u.code, u.name]));
 export default function ReviewPage() {
   const [wrongAnswers, setWrongAnswers] = useState<WrongAnswerRecord[]>([]);
   const [filter, setFilter] = useState<string>('all');
+  const [dueCount, setDueCount] = useState(0);
+  const [wrongCounts, setWrongCounts] = useState<Record<string, number>>({});
+  const [sortByCount, setSortByCount] = useState(false);
 
   useEffect(() => {
     setWrongAnswers(getDedupedWrongAnswers());
+    setDueCount(getDueCount());
+    setWrongCounts(getWrongCounts());
   }, []);
 
   const handleReset = () => {
@@ -20,6 +25,8 @@ export default function ReviewPage() {
     clearAllHistory();
     setWrongAnswers([]);
     setFilter('all');
+    setDueCount(0);
+    setWrongCounts({});
   };
 
   const unitCodes = useMemo(() => [...new Set(wrongAnswers.map(w => w.unitCode))], [wrongAnswers]);
@@ -27,6 +34,10 @@ export default function ReviewPage() {
   const filtered = filter === 'all'
     ? wrongAnswers
     : wrongAnswers.filter(w => w.unitCode === filter);
+
+  const sorted = sortByCount
+    ? [...filtered].sort((a, b) => (wrongCounts[b.questionId] ?? 0) - (wrongCounts[a.questionId] ?? 0))
+    : filtered;
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6">
@@ -43,6 +54,19 @@ export default function ReviewPage() {
       </div>
       <p className="text-text-secondary text-sm mb-6">틀린 문제를 다시 확인하세요</p>
 
+      {/* 오늘의 복습 배너 */}
+      {dueCount > 0 && (
+        <Link
+          href="/review/quiz?due=1"
+          className="block w-full mb-4 py-4 text-center bg-primary text-white rounded-xl font-semibold hover:bg-primary-dark transition-colors"
+        >
+          오늘의 복습 {dueCount}문제
+          <span className="block text-xs font-normal mt-0.5 opacity-80">
+            간격 반복으로 장기 기억을 만들어요
+          </span>
+        </Link>
+      )}
+
       {wrongAnswers.length === 0 ? (
         <div className="text-center py-16">
           <p className="text-text-secondary mb-4">아직 오답 기록이 없습니다.</p>
@@ -50,7 +74,7 @@ export default function ReviewPage() {
         </div>
       ) : (
         <>
-          {/* Review quiz button — 현재 선택된 필터(전체/소단원)를 따라감 */}
+          {/* 전체 틀린 문제 모아 풀기 */}
           <Link
             href={filter === 'all' ? '/review/quiz' : `/review/quiz?unit=${filter}`}
             className="block w-full mb-6 py-3 text-center bg-error text-white rounded-xl font-semibold hover:bg-red-600 transition-colors"
@@ -60,8 +84,8 @@ export default function ReviewPage() {
               : `'${unitNameMap[filter] || filter}' 틀린 문제 모아 풀기 (${filtered.length}문제)`}
           </Link>
 
-          {/* Filter */}
-          <div className="flex gap-2 mb-6 flex-wrap">
+          {/* Filter + Sort */}
+          <div className="flex items-center gap-2 mb-4 flex-wrap">
             <button
               onClick={() => setFilter('all')}
               className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
@@ -86,14 +110,32 @@ export default function ReviewPage() {
             })}
           </div>
 
+          <div className="flex justify-end mb-3">
+            <button
+              onClick={() => setSortByCount(prev => !prev)}
+              className={`text-xs px-2.5 py-1 rounded-lg border transition-colors ${
+                sortByCount
+                  ? 'border-primary bg-primary-light text-primary'
+                  : 'border-border text-text-secondary hover:border-gray-300 dark:hover:border-white/20'
+              }`}
+            >
+              {sortByCount ? '오답 횟수순' : '최근순'}
+            </button>
+          </div>
+
           {/* Wrong answers list */}
           <div className="space-y-3">
-            {filtered.map((answer, idx) => (
+            {sorted.map((answer, idx) => (
               <div key={idx} className="bg-surface rounded-xl border border-border p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-xs bg-error-light text-error px-2 py-0.5 rounded-full font-medium">
                     오답
                   </span>
+                  {(wrongCounts[answer.questionId] ?? 0) >= 2 && (
+                    <span className="text-xs bg-warning-light text-warning px-2 py-0.5 rounded-full font-medium">
+                      {wrongCounts[answer.questionId]}회 오답
+                    </span>
+                  )}
                   <span className="text-xs text-text-secondary">{unitNameMap[answer.unitCode] || answer.unitCode}</span>
                   <span className="text-xs text-text-secondary">
                     {new Date(answer.date).toLocaleDateString('ko-KR')}
