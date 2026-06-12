@@ -50,7 +50,7 @@ export default function ProgressPage() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-6">
       <div className="flex items-start justify-between mb-1">
-        <h1 className="text-2xl font-bold">학습 진도</h1>
+        <h1 className="text-2xl font-bold">학습 기록</h1>
         {totalAttempts > 0 && (
           <button
             onClick={handleReset}
@@ -233,7 +233,7 @@ function CalendarCell({ date, active, isToday, isExam, isPast }: {
   return (
     <div className={className}>
       {day}
-      {isExam && <span className="absolute -top-1.5 -right-0.5 text-[8px]">&#128680;</span>}
+      {isExam && <span className="absolute -top-1.5 -right-0.5 text-[8px]">&#127808;</span>}
     </div>
   );
 }
