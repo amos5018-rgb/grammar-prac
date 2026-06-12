@@ -24,8 +24,8 @@ interface QuizRunnerProps {
 
 export default function QuizRunner({ unitCode, questions: initialQuestions, reviewMode = false }: QuizRunnerProps) {
   const router = useRouter();
-  const [shuffled, setShuffled] = useState(false);
-  const [questions, setQuestions] = useState(initialQuestions);
+  const [shuffled, setShuffled] = useState(reviewMode);
+  const [questions, setQuestions] = useState(() => reviewMode ? shuffle(initialQuestions) : initialQuestions);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState('');
   const [blankAnswers, setBlankAnswers] = useState<string[]>([]);

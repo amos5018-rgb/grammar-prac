@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Category, Unit } from '@/lib/types';
-import { getUnitProgress, getUnitMastery } from '@/lib/storage';
+import { getUnitProgress, getUnitTier, TierLevel } from '@/lib/storage';
 import UnitCard from '@/components/UnitCard';
 
 interface CategoryContentProps {
@@ -17,15 +17,16 @@ type Progress = Record<string, { attempts: number; bestScore: number | null }>;
 
 export default function CategoryContent({ category, units, questionCounts, totalQuestions }: CategoryContentProps) {
   const [progress, setProgress] = useState<Progress>({});
-  const [masteryMap, setMasteryMap] = useState<Record<string, boolean>>({});
+  const [tierMap, setTierMap] = useState<Record<string, { level: TierLevel; label: string; emoji: string }>>({});
 
   useEffect(() => {
     setProgress(getUnitProgress());
-    const m: Record<string, boolean> = {};
+    const t: Record<string, { level: TierLevel; label: string; emoji: string }> = {};
     for (const u of units) {
-      m[u.code] = getUnitMastery(u.code).mastered;
+      const tier = getUnitTier(u.code);
+      t[u.code] = { level: tier.level, label: tier.label, emoji: tier.emoji };
     }
-    setMasteryMap(m);
+    setTierMap(t);
   }, [units]);
 
   const regularUnits = units.filter(u => !u.advanced && !u.summary);
@@ -65,7 +66,7 @@ export default function CategoryContent({ category, units, questionCounts, total
             questionCount={questionCounts[unit.code] || 0}
             bestScore={progress[unit.code]?.bestScore ?? null}
             attempts={progress[unit.code]?.attempts ?? 0}
-            mastered={masteryMap[unit.code]}
+            tier={tierMap[unit.code]}
           />
         ))}
       </div>
@@ -84,7 +85,7 @@ export default function CategoryContent({ category, units, questionCounts, total
                 questionCount={questionCounts[unit.code] || 0}
                 bestScore={progress[unit.code]?.bestScore ?? null}
                 attempts={progress[unit.code]?.attempts ?? 0}
-                mastered={masteryMap[unit.code]}
+                tier={tierMap[unit.code]}
               />
             ))}
           </div>
@@ -105,7 +106,7 @@ export default function CategoryContent({ category, units, questionCounts, total
                 questionCount={questionCounts[unit.code] || 0}
                 bestScore={progress[unit.code]?.bestScore ?? null}
                 attempts={progress[unit.code]?.attempts ?? 0}
-                mastered={masteryMap[unit.code]}
+                tier={tierMap[unit.code]}
               />
             ))}
           </div>

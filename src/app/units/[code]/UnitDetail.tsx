@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Unit } from '@/lib/types';
-import { getBestScore, getUnitAttemptCount, getUnitMastery, getStudyCompletion } from '@/lib/storage';
+import { getBestScore, getUnitAttemptCount, getUnitTier, getStudyCompletion } from '@/lib/storage';
 
 interface UnitDetailProps {
   unit: Unit;
@@ -16,7 +16,7 @@ export default function UnitDetail({ unit, questionCount }: UnitDetailProps) {
 
   const bestScore = getBestScore(unit.code);
   const attempts = getUnitAttemptCount(unit.code);
-  const mastery = getUnitMastery(unit.code);
+  const tier = getUnitTier(unit.code);
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
@@ -30,7 +30,8 @@ export default function UnitDetail({ unit, questionCount }: UnitDetailProps) {
       <div className="bg-surface rounded-2xl border border-border p-6 mb-6">
         <div className="flex items-center gap-2 mb-2">
           <h1 className="text-2xl font-bold">{unit.name}</h1>
-          {mastery.mastered && <span className="text-2xl" title="마스터 달성">&#128081;</span>}
+          <span className="text-2xl" title={tier.label}>{tier.emoji}</span>
+          <span className="text-sm font-medium text-text-secondary">{tier.label}</span>
         </div>
         <p className="text-text-secondary mb-6">{unit.description}</p>
 
@@ -54,10 +55,9 @@ export default function UnitDetail({ unit, questionCount }: UnitDetailProps) {
           )}
         </div>
 
-        {/* 마스터 상태 안내 */}
-        {!mastery.mastered && mastery.hint && (
+        {tier.hint && (
           <p className="text-sm text-text-secondary mb-4 bg-gray-50 dark:bg-white/5 rounded-lg px-4 py-2.5">
-            &#128081; 마스터까지: {mastery.hint}
+            {tier.level === 'challenger' ? '⭐' : '\u{1F4AA}'} 다음 칭호까지: {tier.hint}
           </p>
         )}
 

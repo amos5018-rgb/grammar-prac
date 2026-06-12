@@ -18,13 +18,13 @@ export const categories: Category[] = [
   {
     code: 'basics',
     name: '문법의 기초',
-    description: '음운의 개념, 자음 체계, 받침의 발음, 형태소 등 문법 탐구의 기초 개념을 학습합니다.',
+    description: '음운의 개념, 자음 체계, 형태소·조사·어미 등 문법 탐구의 기초 개념을 학습합니다.',
     order: 1,
   },
   {
     code: 'phoneme-change',
     name: '음운의 변동',
-    description: '교체(비음화·유음화·구개음화·된소리되기), 축약, 탈락, 첨가를 학습합니다.',
+    description: '음절의 끝소리 규칙부터 교체·축약·탈락·첨가까지, 음운 변동을 체계적으로 학습합니다.',
     order: 2,
   },
   {

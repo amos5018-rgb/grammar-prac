@@ -184,19 +184,51 @@ export function getWrongCounts(): Record<string, number> {
   return counts;
 }
 
-// ── 단원 마스터 ──
+// ── 단원 칭호 ──
 
-export function getUnitMastery(unitCode: string): { mastered: boolean; hint?: string } {
+export type TierLevel = 'beginner' | 'challenger' | 'skilled' | 'master';
+
+export interface UnitTier {
+  level: TierLevel;
+  label: string;
+  emoji: string;
+  mastered: boolean;
+  hint?: string;
+}
+
+const TIERS: Record<TierLevel, { label: string; emoji: string }> = {
+  beginner:   { label: '비기너',  emoji: '\u{1F331}' },
+  challenger: { label: '도전자',  emoji: '⭐' },
+  skilled:    { label: '숙련자',  emoji: '\u{1F4AA}' },
+  master:     { label: '마스터',  emoji: '\u{1F451}' },
+};
+
+export function getUnitTier(unitCode: string): UnitTier {
   const results = getQuizResults().filter(r => r.unitCode === unitCode && r.completed !== false);
-  if (results.length === 0) return { mastered: false };
+  if (results.length === 0) {
+    return { ...TIERS.beginner, level: 'beginner', mastered: false };
+  }
 
   const bestScore = Math.max(...results.map(r => Math.round((r.score / r.total) * 100)));
-  if (bestScore < 90) return { mastered: false, hint: `최고 점수 ${bestScore}% → 90% 이상 필요` };
-
   const dates = new Set(results.map(r => r.date.split('T')[0]));
-  if (dates.size < 2) return { mastered: false, hint: '다른 날 한 번 더 도전하면 마스터!' };
 
-  return { mastered: true };
+  if (bestScore >= 90 && dates.size >= 2) {
+    return { ...TIERS.master, level: 'master', mastered: true };
+  }
+
+  if (bestScore >= 80) {
+    const hint = bestScore < 90
+      ? `최고 점수 ${bestScore}% → 90% 이상 필요`
+      : '다른 날 한 번 더 도전하면 마스터!';
+    return { ...TIERS.skilled, level: 'skilled', mastered: false, hint };
+  }
+
+  return { ...TIERS.challenger, level: 'challenger', mastered: false, hint: `최고 점수 ${bestScore}% → 80% 이상이면 숙련자!` };
+}
+
+export function getUnitMastery(unitCode: string): { mastered: boolean; hint?: string } {
+  const tier = getUnitTier(unitCode);
+  return { mastered: tier.mastered, hint: tier.hint };
 }
 
 // ── 학습 스트릭 ──
