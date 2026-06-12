@@ -82,8 +82,8 @@ export const phonemeChangeTypesQuestions: Question[] = [
     id: 'PC010', unitCode: 'phoneme-change-types', type: '객관식', difficulty: '상',
     passage: '',
     question: "'칼날[칼랄]'에서 일어난 음운 변동의 유형은?",
-    choices: ['교체', '축약', '탈락', '첨가'],
-    answer: '1',
+    choices: ['첨가', '축약', '탈락', '교체'],
+    answer: '4',
     explanation: "'ㄴ'이 'ㄹ'의 뒤에서 'ㄹ'로 바뀌어 소리 나므로(유음화) 교체입니다.",
   },
   {
@@ -99,12 +99,12 @@ export const phonemeChangeTypesQuestions: Question[] = [
     passage: '',
     question: '교체에 해당하는 음운 변동끼리 바르게 묶인 것은?',
     choices: [
-      '비음화, 유음화, 구개음화, 된소리되기',
-      '거센소리되기, 반모음 첨가',
       '모음 탈락, 비음화',
+      '거센소리되기, 반모음 첨가',
+      '비음화, 유음화, 구개음화, 된소리되기',
       '반모음 첨가, 된소리되기',
     ],
-    answer: '1',
+    answer: '3',
     explanation: '교체: 비음화, 유음화, 구개음화, 된소리되기 / 축약: 거센소리되기 / 탈락: 모음 탈락 / 첨가: 반모음 첨가',
   },
 ];

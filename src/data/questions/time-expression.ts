@@ -32,12 +32,12 @@ export const timeExpressionQuestions: Question[] = [
     passage: '그 집 초밥이 맛있더라.',
     question: "위 문장의 '-더-'가 나타내는 의미는?",
     choices: [
-      '과거 어느 때의 일이나 경험을 돌이켜 회상함',
+      '주체의 의지를 나타냄',
       '미래의 일을 추측함',
       '현재 진행 중인 동작을 나타냄',
-      '주체의 의지를 나타냄',
+      '과거 어느 때의 일이나 경험을 돌이켜 회상함',
     ],
-    answer: '1',
+    answer: '4',
     explanation: "선어말 어미 '-더-'는 과거 어느 때의 일이나 경험을 돌이켜 회상하는 의미를 나타냅니다.",
   },
   {
@@ -52,8 +52,8 @@ export const timeExpressionQuestions: Question[] = [
     id: 'TE005', unitCode: 'time-expression', type: '객관식', difficulty: '상',
     passage: '지금쯤 제주도에는 비가 내리겠다.',
     question: "위 문장에서 '-겠-'이 나타내는 의미는?",
-    choices: ['추측', '주체의 의지', '가능성(능력)', '과거 회상'],
-    answer: '1',
+    choices: ['가능성(능력)', '주체의 의지', '추측', '과거 회상'],
+    answer: '3',
     explanation: "직접 보지 않은 제주도의 상황을 헤아려 말하고 있으므로 추측입니다. 학습지의 '철수는 이미 숙제를 끝냈겠다'와 같은 용법입니다.",
   },
   {

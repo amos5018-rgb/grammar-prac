@@ -39,8 +39,8 @@ export const nasalLiquidQuestions: Question[] = [
     id: 'NL004', unitCode: 'nasal-liquid', type: '객관식', difficulty: '중',
     passage: '',
     question: "'잡는[잠는]'에서 일어난 음운의 변화는?",
-    choices: ['ㅂ → ㅁ', 'ㄴ → ㄹ', 'ㅂ → ㅃ', 'ㄴ → ㅁ'],
-    answer: '1',
+    choices: ['ㄴ → ㅁ', 'ㄴ → ㄹ', 'ㅂ → ㅃ', 'ㅂ → ㅁ'],
+    answer: '4',
     explanation: "'ㅂ'이 비음 'ㄴ'의 앞에서 비음 'ㅁ'으로 바뀌었습니다. (비음화)",
   },
   {
@@ -72,12 +72,12 @@ export const nasalLiquidQuestions: Question[] = [
     passage: '',
     question: '유음화에 대한 설명으로 알맞은 것은?',
     choices: [
-      'ㄴ이 ㄹ의 앞이나 뒤에서 ㄹ로 바뀐다',
       'ㄹ이 ㄴ의 앞에서 ㄴ으로 바뀐다',
+      'ㄴ이 ㄹ의 앞이나 뒤에서 ㄹ로 바뀐다',
       'ㅂ, ㄷ, ㄱ이 비음으로 바뀐다',
       '두 음운이 합쳐져 거센소리가 된다',
     ],
-    answer: '1',
+    answer: '2',
     explanation: '유음화: ㄴ → ㄹ(유음) / ㄹ의 앞이나 뒤(유음의 앞이나 뒤). (예: 신라[실라], 설날[설랄])',
   },
   {

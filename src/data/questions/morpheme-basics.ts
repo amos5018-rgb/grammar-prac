@@ -18,8 +18,8 @@ export const morphemeBasicsQuestions: Question[] = [
     id: 'MB002', unitCode: 'morpheme-basics', type: '객관식', difficulty: '하',
     passage: '',
     question: '실질적인 의미가 없고 문법적 기능을 하는 형태소를 무엇이라고 하는가?',
-    choices: ['실질 형태소', '형식 형태소', '자립 형태소', '단일 형태소'],
-    answer: '2',
+    choices: ['실질 형태소', '단일 형태소', '자립 형태소', '형식 형태소'],
+    answer: '4',
     explanation: '형식 형태소는 실질적인 의미가 없고 문법적 기능을 하는 형태소입니다. (예: 조사, 어미, 접사)',
   },
   {
@@ -34,8 +34,8 @@ export const morphemeBasicsQuestions: Question[] = [
     id: 'MB004', unitCode: 'morpheme-basics', type: '객관식', difficulty: '상',
     passage: '',
     question: "'헛소리'에서 '헛-'은 어떤 형태소인가?",
-    choices: ['실질 형태소', '형식 형태소', '자립 형태소', '명사'],
-    answer: '2',
+    choices: ['실질 형태소', '명사', '자립 형태소', '형식 형태소'],
+    answer: '4',
     explanation: "'헛-'은 홀로 쓰이지 못하고 다른 말에 붙어 의미를 더하는 접두사로, 형식 형태소입니다. '소리'가 실질 형태소입니다.",
   },
   {
@@ -66,8 +66,8 @@ export const morphemeBasicsQuestions: Question[] = [
     id: 'MB008', unitCode: 'morpheme-basics', type: '객관식', difficulty: '하',
     passage: '',
     question: "'도서관에서'에서 조사는?",
-    choices: ['도서관', '에서', '서', '관에서'],
-    answer: '2',
+    choices: ['도서관', '관에서', '서', '에서'],
+    answer: '4',
     explanation: "조사는 주로 체언에 결합하여 문법적 의미를 나타내는 말로, '도서관' 뒤에 붙은 '에서'가 조사입니다.",
   },
   {
@@ -82,8 +82,8 @@ export const morphemeBasicsQuestions: Question[] = [
     id: 'MB010', unitCode: 'morpheme-basics', type: '객관식', difficulty: '하',
     passage: '',
     question: '용언에 해당하는 품사끼리 바르게 묶인 것은?',
-    choices: ['명사와 대명사', '동사와 형용사', '조사와 어미', '수사와 부사'],
-    answer: '2',
+    choices: ['동사와 형용사', '명사와 대명사', '조사와 어미', '수사와 부사'],
+    answer: '1',
     explanation: '용언은 문장의 주어를 서술하는 말로, 동사와 형용사가 해당합니다. 어간과 어미의 결합인 활용을 합니다.',
   },
   {

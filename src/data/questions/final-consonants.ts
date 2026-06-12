@@ -148,8 +148,8 @@ export const finalConsonantsQuestions: Question[] = [
     id: 'FC017', unitCode: 'final-consonants', type: '객관식', difficulty: '상',
     passage: '',
     question: "'꽃 위'의 발음으로 알맞은 것은?",
-    choices: ['[꼬치]', '[꼬뒤]', '[꼳위]', '[꼬쥐]'],
-    answer: '2',
+    choices: ['[꼬치]', '[꼬쥐]', '[꼳위]', '[꼬뒤]'],
+    answer: '4',
     explanation: "'위'는 실질 형태소이므로 받침 'ㅊ'이 대표음 [ㄷ]으로 바뀐 후 연음되어 [꼬뒤]로 발음됩니다. 반면 '꽃이'는 조사(형식 형태소)가 와서 [꼬치]로 발음됩니다.",
   },
 ];

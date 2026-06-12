@@ -34,8 +34,8 @@ export const consonantSystemQuestions: Question[] = [
     id: 'CS004', unitCode: 'consonant-system', type: '객관식', difficulty: '중',
     passage: '',
     question: 'ㅂ과 ㅁ의 차이점으로 알맞은 것은?',
-    choices: ['입술소리와 잇몸소리', '파열음과 비음', '평음과 경음', '파찰음과 마찰음'],
-    answer: '2',
+    choices: ['입술소리와 잇몸소리', '파찰음과 마찰음', '평음과 경음', '파열음과 비음'],
+    answer: '4',
     explanation: '발음 위치(입술소리)는 같지만, ㅂ은 파열음이고 ㅁ은 비음으로 발음 방법이 다릅니다.',
   },
   {
@@ -82,8 +82,8 @@ export const consonantSystemQuestions: Question[] = [
     id: 'CS010', unitCode: 'consonant-system', type: '객관식', difficulty: '상',
     passage: '',
     question: 'ㄱ과 ㅂ의 차이점은?',
-    choices: ['연구개음과 순음', '경구개음과 치조음', '파열음과 마찰음', '평음과 격음'],
-    answer: '1',
+    choices: ['파열음과 마찰음', '경구개음과 치조음', '연구개음과 순음', '평음과 격음'],
+    answer: '3',
     explanation: 'ㄱ은 여린입천장소리(연구개음), ㅂ은 입술소리(순음)로 발음 위치가 다릅니다. 둘 다 파열음이고 평음이라는 점은 같습니다.',
   },
   {
@@ -115,12 +115,12 @@ export const consonantSystemQuestions: Question[] = [
     passage: '',
     question: '파열음의 정의로 알맞은 것은?',
     choices: [
-      '공기의 흐름을 완전히 막았다가 순간적으로 터뜨리면서 내는 소리',
+      '혀 옆으로 공기를 흘려보내며 내는 소리',
       '공간을 최대한 좁혀 마찰을 일으키면서 내는 소리',
       '코로 공기를 통과시키며 내는 소리',
-      '혀 옆으로 공기를 흘려보내며 내는 소리',
+      '공기의 흐름을 완전히 막았다가 순간적으로 터뜨리면서 내는 소리',
     ],
-    answer: '1',
+    answer: '4',
     explanation: '파열음은 공기의 흐름을 완전히 막았다가 순간적으로 터뜨리면서 내는 소리입니다. ②는 마찰음, ③은 비음, ④는 유음입니다.',
   },
   {

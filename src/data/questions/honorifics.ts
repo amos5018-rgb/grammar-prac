@@ -31,8 +31,8 @@ export const honorificsQuestions: Question[] = [
     id: 'HN003', unitCode: 'honorifics', type: '객관식', difficulty: '중',
     passage: '',
     question: '객체 높임에 쓰이는 특수 어휘가 아닌 것은?',
-    choices: ['뵙다', '드리다', '모시다', '주무시다'],
-    answer: '4',
+    choices: ['뵙다', '드리다', '주무시다', '모시다'],
+    answer: '3',
     explanation: "객체 높임의 특수 어휘는 '뵙다(뵈다), 드리다, 모시다, 여쭙다(여쭈다)'입니다. '주무시다'는 주체를 높이는 특수 어휘입니다.",
   },
   {
@@ -52,8 +52,8 @@ export const honorificsQuestions: Question[] = [
     id: 'HN005', unitCode: 'honorifics', type: '객관식', difficulty: '중',
     passage: '',
     question: "객체 높임에서 조사 '에게' 대신 사용하는 조사는?",
-    choices: ['께서', '께', '한테', '보고'],
-    answer: '2',
+    choices: ['께서', '한테', '께', '보고'],
+    answer: '3',
     explanation: "객체 높임에서 부사어를 높일 때 '에게' 대신 '께'를 사용합니다. (예: 나는 선생님께 과일을 드렸다.) '께서'는 주체 높임의 주격 조사입니다.",
   },
   {

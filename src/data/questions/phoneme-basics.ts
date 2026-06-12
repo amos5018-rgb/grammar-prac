@@ -40,8 +40,8 @@ export const phonemeBasicsQuestions: Question[] = [
     id: 'PB003', unitCode: 'phoneme-basics', type: '객관식', difficulty: '하',
     passage: '',
     question: "'남 : 님'에서 두 단어의 뜻을 구별해 주는 음운의 짝은?",
-    choices: ['ㄴ, ㄴ', 'ㅏ, ㅣ', 'ㅁ, ㅁ', 'ㄴ, ㅁ'],
-    answer: '2',
+    choices: ['ㅏ, ㅣ', 'ㄴ, ㄴ', 'ㅁ, ㅁ', 'ㄴ, ㅁ'],
+    answer: '1',
     explanation: "'남'과 '님'은 가운뎃소리(중성) 'ㅏ'와 'ㅣ'만 다릅니다. 모음도 뜻을 구별해 주는 음운입니다.",
   },
   {
@@ -56,8 +56,8 @@ export const phonemeBasicsQuestions: Question[] = [
     id: 'PB005', unitCode: 'phoneme-basics', type: '객관식', difficulty: '중',
     passage: '',
     question: "문법에서 '환경'이란 무엇을 뜻하는가?",
-    choices: ['단어의 뜻', '어떤 소리가 놓인 위치', '발음 기관의 모양', '소리의 세기'],
-    answer: '2',
+    choices: ['단어의 뜻', '발음 기관의 모양', '어떤 소리가 놓인 위치', '소리의 세기'],
+    answer: '3',
     explanation: "문법에서 '환경'이란 어떤 소리가 놓인 위치를 뜻합니다. (예: '감'에서 'ㄱ'의 환경은 'ㅏ의 앞')",
   },
   {
@@ -88,8 +88,8 @@ export const phonemeBasicsQuestions: Question[] = [
     id: 'PB009', unitCode: 'phoneme-basics', type: '객관식', difficulty: '중',
     passage: '',
     question: "'문장'에서 'ㅇ'(받침)의 환경은?",
-    choices: ['ㅏ의 앞', 'ㅏ의 뒤', 'ㅈ의 앞', 'ㅁ의 뒤'],
-    answer: '2',
+    choices: ['ㅏ의 앞', 'ㅁ의 뒤', 'ㅈ의 앞', 'ㅏ의 뒤'],
+    answer: '4',
     explanation: "'문장'에서 'ㅇ'은 '장'의 받침(종성)으로, 모음 'ㅏ'의 뒤에 놓여 있습니다.",
   },
   {
@@ -98,11 +98,11 @@ export const phonemeBasicsQuestions: Question[] = [
     question: '자음의 정의로 알맞은 것은?',
     choices: [
       '공기가 발음 기관의 방해를 받지 않고 나는 소리',
-      '공기가 발음 기관에 의해 방해를 받으며 나는 소리',
       '소리의 길이나 높이로 뜻을 구별하는 소리',
+      '공기가 발음 기관에 의해 방해를 받으며 나는 소리',
       '홀로 음절을 이루지 못하는 소리',
     ],
-    answer: '2',
+    answer: '3',
     explanation: '자음은 소리를 낼 때 공기가 발음 기관에 의해 방해를 받으며 나는 소리이고, 모음은 방해를 받지 않고 나는 소리입니다.',
   },
   {

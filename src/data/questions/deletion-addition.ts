@@ -63,8 +63,8 @@ export const deletionAdditionQuestions: Question[] = [
     id: 'DA007', unitCode: 'deletion-addition', type: '객관식', difficulty: '상',
     passage: '',
     question: "'솔+나무'가 '소나무'가 되는 음운 변동은?",
-    choices: ['ㄹ 탈락', 'ㅎ 탈락', 'ㅡ 탈락', '비음화'],
-    answer: '1',
+    choices: ['ㅡ 탈락', 'ㅎ 탈락', 'ㄹ 탈락', '비음화'],
+    answer: '3',
     explanation: "합성어가 만들어질 때 'ㄴ' 앞에서 'ㄹ'이 탈락했습니다. 학습지의 '아들+님 → 아드님', '바늘+질 → 바느질'과 같은 원리입니다.",
   },
   {
@@ -111,8 +111,8 @@ export const deletionAdditionQuestions: Question[] = [
     id: 'DA013', unitCode: 'deletion-addition', type: '객관식', difficulty: '상',
     passage: '그는 시험에 붙어서 기뻐서 어쩔 줄 몰랐다.',
     question: "위 문장의 '기뻐서'에서 일어난 음운 변동은?",
-    choices: ['ㅡ 탈락 (기쁘-+-어서)', '동일 모음 탈락', 'ㅎ 탈락', '반모음 첨가'],
-    answer: '1',
+    choices: ['반모음 첨가', '동일 모음 탈락', 'ㅎ 탈락', 'ㅡ 탈락 (기쁘-+-어서)'],
+    answer: '4',
     explanation: "'기쁘-'의 어간 말음 'ㅡ'가 'ㅓ'로 시작하는 어미 앞에서 탈락하여 '기뻐서'가 되었습니다.",
   },
 ];
