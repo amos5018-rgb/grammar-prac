@@ -79,19 +79,3 @@ export interface ReviewScheduleEntry {
   wrongCount: number;
   unitCode: string;
 }
-
-// 학습지 묶음 (학생용/교사용 통합본)
-export interface Worksheet {
-  title: string;        // 화면에 표시될 이름
-  studentFile?: string; // public/materials/ 안의 학생용 파일명
-  teacherFile?: string; // public/materials/ 안의 교사용 파일명
-  order: number;
-}
-
-// 추가 자료 (개별 파일)
-export interface Supplement {
-  title: string;       // 자료 제목
-  fileName: string;    // public/materials/ 안의 파일명
-  description?: string; // 간단한 설명 (선택)
-  order: number;
-}
