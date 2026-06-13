@@ -9,14 +9,33 @@ function DownloadInner() {
   const file = searchParams.get('file') ?? '';
   const [status, setStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle');
 
+  const apiUrl = `/api/download?file=${encodeURIComponent(file)}`;
+
+  const isIOS = () =>
+    typeof navigator !== 'undefined' &&
+    (/iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1));
+
   const handleDownload = async () => {
     if (status === 'loading') return;
+
+    // iOS 외 환경: 서버 Content-Disposition 헤더가 파일명을 처리(한글 정상)
+    if (!isIOS()) {
+      const a = document.createElement('a');
+      a.href = apiUrl; // download 속성 없음 → 서버 filename* 사용
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setStatus('done');
+      return;
+    }
+
+    // iOS: Safari가 PDF를 인라인으로 열어버리므로 Blob으로 받아 강제 다운로드
     setStatus('loading');
     try {
-      const res = await fetch(`/api/download?file=${encodeURIComponent(file)}`);
+      const res = await fetch(apiUrl);
       if (!res.ok) throw new Error('download failed');
       const blob = await res.blob();
-      // octet-stream으로 강제하여 iOS가 인라인 미리보기 대신 다운로드하도록 함
       const forced = new Blob([blob], { type: 'application/octet-stream' });
       const url = URL.createObjectURL(forced);
       const a = document.createElement('a');
