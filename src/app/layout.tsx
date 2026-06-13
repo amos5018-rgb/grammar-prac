@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import ThemeProvider from "@/components/ThemeProvider";
+import SyncOnLoad from "@/components/SyncOnLoad";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -42,6 +43,7 @@ export default function RootLayout({
       </head>
       <body className="antialiased">
         <ThemeProvider>
+          <SyncOnLoad />
           <Header />
           <main className="pb-32">{children}</main>
           <BottomNav />

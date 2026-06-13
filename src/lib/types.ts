@@ -61,6 +61,7 @@ export interface QuizAttempt {
   total: number;
   completed?: boolean; // false면 중간 종료한 기록 (최고 점수 집계에서 제외)
   answers: AnswerRecord[];
+  attemptId?: string;  // 동기화 멱등키 (신규 기록은 uuid, 레거시는 sync 시 해시 폴백)
 }
 
 export interface AnswerRecord {

@@ -16,6 +16,9 @@ export default function Header() {
     if (profile) setName(profile.name);
   }, [pathname]);
 
+  // 교사 대시보드에서는 학생 헤더 숨김
+  if (pathname.startsWith('/teacher')) return null;
+
   return (
     <header className="bg-surface border-b border-border sticky top-0 z-50">
       <div className="max-w-3xl mx-auto px-4">

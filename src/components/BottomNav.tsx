@@ -13,6 +13,9 @@ const navItems = [
 export default function BottomNav() {
   const pathname = usePathname();
 
+  // 교사 대시보드에서는 학생 네비게이션 숨김
+  if (pathname.startsWith('/teacher')) return null;
+
   const isActive = (href: string) => {
     if (href === '/') return pathname === '/' || pathname.startsWith('/category') || pathname.startsWith('/units');
     return pathname.startsWith(href);

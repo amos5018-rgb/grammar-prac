@@ -7,8 +7,31 @@ const RESOLVED_KEY = 'grammar_resolved_questions';
 const REVIEW_SCHEDULE_KEY = 'grammar_review_schedule';
 const ACTIVITY_KEY = 'grammar_activity_dates';
 const MIGRATED_KEY = 'grammar_review_migrated';
+const CLIENT_ID_KEY = 'grammar_client_id';
 
 export type WrongAnswerRecord = AnswerRecord & { unitCode: string; date: string };
+
+// ── 기기 식별자 (서버 동기화용, clearAllHistory로 지워지지 않음) ──
+
+export function getClientId(): string {
+  if (typeof window === 'undefined') return '';
+  let id = localStorage.getItem(CLIENT_ID_KEY);
+  if (!id) {
+    id = (crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`);
+    localStorage.setItem(CLIENT_ID_KEY, id);
+  }
+  return id;
+}
+
+// 학생 데이터를 서버로 동기화 (fire-and-forget, 학생 흐름에 영향 없음)
+function triggerSync() {
+  if (typeof window === 'undefined') return;
+  try {
+    import('./sync').then(m => m.syncNow()).catch(() => {});
+  } catch {
+    /* 동기화 실패는 무시 */
+  }
+}
 
 // ── 날짜 유틸 (로컬 타임존 기준) ──
 
@@ -35,6 +58,7 @@ export function getProfile(): StudentProfile | null {
 
 export function saveProfile(profile: StudentProfile) {
   localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+  triggerSync();
 }
 
 export function clearProfile() {
@@ -50,6 +74,9 @@ export function getQuizResults(): QuizAttempt[] {
 }
 
 export function saveQuizResult(result: QuizAttempt) {
+  if (!result.attemptId) {
+    result.attemptId = crypto?.randomUUID?.() ?? `${result.date}-${Math.random().toString(36).slice(2)}`;
+  }
   const results = getQuizResults();
   results.push(result);
   localStorage.setItem(RESULTS_KEY, JSON.stringify(results));
@@ -73,6 +100,7 @@ export function saveQuizResult(result: QuizAttempt) {
   localStorage.setItem(REVIEW_SCHEDULE_KEY, JSON.stringify(schedule));
 
   recordActivity();
+  triggerSync();
 }
 
 export function getLastQuizResult(): QuizAttempt | null {
@@ -387,6 +415,7 @@ export function saveStudyCompletion(unitCode: string): void {
   all[unitCode] = entry;
   localStorage.setItem(STUDY_COMPLETION_KEY, JSON.stringify(all));
   recordActivity();
+  triggerSync();
 }
 
 export function getStudyCompletion(unitCode: string): { completed: boolean; count: number; lastDate: string | null } {
