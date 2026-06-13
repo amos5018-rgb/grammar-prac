@@ -42,9 +42,15 @@ export default function ReviewContent({ allQuestions }: Props) {
     ? wrongAnswers
     : wrongAnswers.filter(w => w.unitCode === filter);
 
-  const sorted = sortByCount
-    ? [...filtered].sort((a, b) => (wrongCounts[b.questionId] ?? 0) - (wrongCounts[a.questionId] ?? 0))
-    : filtered;
+  const sorted = useMemo(() => {
+    if (sortByCount) {
+      return [...filtered].sort((a, b) =>
+        (wrongCounts[b.questionId] ?? 0) - (wrongCounts[a.questionId] ?? 0)
+        || b.date.localeCompare(a.date)
+      );
+    }
+    return [...filtered].sort((a, b) => b.date.localeCompare(a.date));
+  }, [filtered, sortByCount, wrongCounts]);
 
   const questionMap = useMemo(() => {
     const m = new Map<string, Question>();
