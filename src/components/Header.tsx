@@ -16,13 +16,6 @@ export default function Header() {
     if (profile) setName(profile.name);
   }, [pathname]);
 
-  const navItems = [
-    { href: '/', label: '단원 목록' },
-    { href: '/review', label: '오답 노트' },
-    { href: '/progress', label: '학습 기록' },
-    { href: '/materials', label: '학습 자료' },
-  ];
-
   return (
     <header className="bg-surface border-b border-border sticky top-0 z-50">
       <div className="max-w-3xl mx-auto px-4">
@@ -31,6 +24,9 @@ export default function Header() {
             오남고 1학년 국어: 문법 연습&#128218;
           </Link>
           <div className="flex items-center gap-2">
+            {name && (
+              <span className="text-sm text-text-secondary">{name}</span>
+            )}
             <button
               onClick={toggleTheme}
               className="p-2 rounded-lg text-text-secondary hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
@@ -48,26 +44,6 @@ export default function Header() {
             </button>
           </div>
         </div>
-        <nav className="flex items-center gap-1 pb-2">
-          {navItems.map(item => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                pathname === item.href
-                  ? 'bg-primary-light text-primary'
-                  : 'text-text-secondary hover:bg-gray-100 dark:hover:bg-white/10'
-              }`}
-            >
-              {item.label}
-            </Link>
-          ))}
-          {name && (
-            <span className="ml-auto px-3 py-1.5 text-sm text-text-secondary">
-              {name}
-            </span>
-          )}
-        </nav>
       </div>
     </header>
   );

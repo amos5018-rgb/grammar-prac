@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Header from "@/components/Header";
+import BottomNav from "@/components/BottomNav";
 import ThemeProvider from "@/components/ThemeProvider";
 import "./globals.css";
 
@@ -42,6 +43,7 @@ export default function RootLayout({
         <ThemeProvider>
           <Header />
           <main className="pb-20">{children}</main>
+          <BottomNav />
         </ThemeProvider>
       </body>
     </html>
