@@ -20,6 +20,7 @@ export default function Header() {
     { href: '/', label: '단원 목록' },
     { href: '/review', label: '오답 노트' },
     { href: '/progress', label: '학습 기록' },
+    { href: '/materials', label: '학습 자료' },
   ];
 
   return (
