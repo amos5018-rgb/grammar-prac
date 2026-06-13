@@ -68,7 +68,7 @@ function ChartIcon({ className, active }: { className?: string; active?: boolean
 function FileIcon({ className, active }: { className?: string; active?: boolean }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 2.5 : 1.8}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16" />
     </svg>
   );
 }
