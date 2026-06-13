@@ -43,7 +43,7 @@ export default function RootLayout({
       <body className="antialiased">
         <ThemeProvider>
           <Header />
-          <main className="pb-28">{children}</main>
+          <main className="pb-32">{children}</main>
           <BottomNav />
         </ThemeProvider>
       </body>
