@@ -130,8 +130,8 @@ export default function ProgressPage() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-bold text-lg">단원별 현황</h2>
             {masteredCount > 0 && (
-              <span className="text-sm text-text-secondary">
-                &#128081; {masteredCount}개 단원 마스터 달성
+              <span className="bg-warning-light text-warning px-2.5 py-1 rounded-full text-sm font-medium whitespace-nowrap">
+                &#128081; {masteredCount}개 마스터
               </span>
             )}
           </div>
