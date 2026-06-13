@@ -19,19 +19,19 @@ export default function BottomNav() {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-surface border-t border-border">
-      <div className="max-w-3xl mx-auto flex">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-surface border-t border-border pb-[env(safe-area-inset-bottom)]">
+      <div className="max-w-3xl mx-auto flex px-2">
         {navItems.map(item => {
           const active = isActive(item.href);
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`flex-1 flex flex-col items-center gap-1 py-3 text-xs font-medium transition-colors ${
+              className={`flex-1 flex flex-col items-center gap-1.5 pt-3 pb-2 text-[11px] font-medium transition-colors ${
                 active ? 'text-primary' : 'text-text-secondary'
               }`}
             >
-              <item.icon className="w-7 h-7" active={active} />
+              <item.icon className="w-6 h-6" active={active} />
               {item.label}
             </Link>
           );
