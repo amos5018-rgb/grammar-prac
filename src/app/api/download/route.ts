@@ -16,14 +16,13 @@ export async function GET(request: NextRequest) {
   }
 
   const fileBuffer = fs.readFileSync(filePath);
-  const ext = path.extname(safeName).toLowerCase();
-  const mime = ext === '.pdf' ? 'application/pdf' : 'application/octet-stream';
 
   return new NextResponse(fileBuffer, {
     headers: {
-      'Content-Type': mime,
+      'Content-Type': 'application/octet-stream',
       'Content-Disposition': `attachment; filename*=UTF-8''${encodeURIComponent(safeName)}`,
       'Content-Length': String(fileBuffer.length),
+      'Cache-Control': 'no-store',
     },
   });
 }
