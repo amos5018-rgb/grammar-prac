@@ -64,5 +64,5 @@ export default function MixedQuizContent({ questions, categoryCode, categoryName
     );
   }
 
-  return <QuizRunner unitCode={`mixed-${categoryCode}`} questions={selected} />;
+  return <QuizRunner unitCode={`mixed-${categoryCode}`} questions={selected} exitHref={`/category/${categoryCode}`} />;
 }

@@ -20,9 +20,10 @@ interface QuizRunnerProps {
   unitCode: string;
   questions: Question[];
   reviewMode?: boolean;
+  exitHref?: string;
 }
 
-export default function QuizRunner({ unitCode, questions: initialQuestions, reviewMode = false }: QuizRunnerProps) {
+export default function QuizRunner({ unitCode, questions: initialQuestions, reviewMode = false, exitHref }: QuizRunnerProps) {
   const router = useRouter();
   const [shuffled, setShuffled] = useState(reviewMode);
   const [questions, setQuestions] = useState(() => reviewMode ? shuffle(initialQuestions) : initialQuestions);
@@ -33,6 +34,10 @@ export default function QuizRunner({ unitCode, questions: initialQuestions, revi
   const [isCorrect, setIsCorrect] = useState(false);
   const [answers, setAnswers] = useState<AnswerRecord[]>([]);
   const [reviewFinished, setReviewFinished] = useState(false);
+  const [quizFinished, setQuizFinished] = useState(false);
+
+  const backHref = exitHref ?? `/units/${unitCode}`;
+  const hasResultPage = !exitHref;
 
   const canShuffle = answers.length === 0 && !showFeedback;
 
@@ -122,7 +127,6 @@ export default function QuizRunner({ unitCode, questions: initialQuestions, revi
   const goNext = () => {
     if (currentIndex + 1 >= questions.length) {
       if (reviewMode) {
-        // 복습 모드는 결과를 저장하지 않고 완료 화면 표시
         setReviewFinished(true);
         return;
       }
@@ -134,7 +138,11 @@ export default function QuizRunner({ unitCode, questions: initialQuestions, revi
         completed: true,
         answers,
       });
-      router.push(`/units/${unitCode}/result`);
+      if (hasResultPage) {
+        router.push(`/units/${unitCode}/result`);
+      } else {
+        setQuizFinished(true);
+      }
       return;
     }
     setCurrentIndex(prev => prev + 1);
@@ -147,7 +155,6 @@ export default function QuizRunner({ unitCode, questions: initialQuestions, revi
   // 조기 종료: 푼 문제가 있으면 결과를 저장해 오답 노트에 반영
   const exitQuiz = () => {
     if (reviewMode) {
-      // 복습 모드는 문제별로 즉시 해결 처리되므로 저장 없이 종료
       const message = answers.length > 0
         ? `복습을 종료할까요?\n지금까지 맞힌 문제는 오답 노트에서 해결 처리되었습니다.`
         : '복습을 종료할까요?';
@@ -156,7 +163,7 @@ export default function QuizRunner({ unitCode, questions: initialQuestions, revi
     }
     if (answers.length === 0) {
       if (confirm('퀴즈를 종료할까요?\n아직 푼 문제가 없어 기록이 저장되지 않습니다.')) {
-        router.push(`/units/${unitCode}`);
+        router.push(backHref);
       }
       return;
     }
@@ -173,7 +180,11 @@ export default function QuizRunner({ unitCode, questions: initialQuestions, revi
         completed: false,
         answers,
       });
-      router.push(`/units/${unitCode}/result`);
+      if (hasResultPage) {
+        router.push(`/units/${unitCode}/result`);
+      } else {
+        setQuizFinished(true);
+      }
     }
   };
 
@@ -198,6 +209,49 @@ export default function QuizRunner({ unitCode, questions: initialQuestions, revi
               className="flex-1 py-3 text-center bg-primary text-white rounded-xl font-semibold hover:bg-primary-dark transition-colors"
             >
               오답 노트로
+            </Link>
+            <Link
+              href="/"
+              className="flex-1 py-3 text-center border border-border rounded-xl font-semibold hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
+            >
+              학습 영역 선택
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 섞어풀기 등 별도 결과 페이지가 없는 퀴즈의 인라인 결과 화면
+  if (quizFinished) {
+    const correctCount = answers.filter(a => a.correct).length;
+    const pct = Math.round((correctCount / answers.length) * 100);
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-12 text-center">
+        <div className="bg-surface rounded-2xl border border-border p-8">
+          <h1 className="text-2xl font-bold mb-4">결과</h1>
+          <div className={`inline-flex items-center justify-center w-28 h-28 rounded-full text-3xl font-bold mb-4 ${
+            pct >= 80 ? 'bg-success-light text-success' :
+            pct >= 50 ? 'bg-warning-light text-warning' :
+            'bg-error-light text-error'
+          }`}>
+            {pct}점
+          </div>
+          <p className="text-lg mb-1">
+            <span className="font-bold">{answers.length}</span>문제 중{' '}
+            <span className="font-bold text-success">{correctCount}</span>문제 정답
+          </p>
+          {answers.length - correctCount > 0 && (
+            <p className="text-sm text-error mb-6">
+              {answers.length - correctCount}문제 오답 — 오답 노트에 기록됨
+            </p>
+          )}
+          <div className="flex gap-3 mt-6">
+            <Link
+              href={backHref}
+              className="flex-1 py-3 text-center bg-primary text-white rounded-xl font-semibold hover:bg-primary-dark transition-colors"
+            >
+              돌아가기
             </Link>
             <Link
               href="/"
