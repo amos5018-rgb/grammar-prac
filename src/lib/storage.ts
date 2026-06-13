@@ -24,13 +24,14 @@ export function getClientId(): string {
 }
 
 // 학생 데이터를 서버로 동기화 (fire-and-forget, 학생 흐름에 영향 없음)
+let syncInFlight = false;
 function triggerSync() {
-  if (typeof window === 'undefined') return;
-  try {
-    import('./sync').then(m => m.syncNow()).catch(() => {});
-  } catch {
-    /* 동기화 실패는 무시 */
-  }
+  if (typeof window === 'undefined' || syncInFlight) return;
+  syncInFlight = true;
+  import('./sync')
+    .then(m => m.syncNow())
+    .catch(() => {})
+    .finally(() => { syncInFlight = false; });
 }
 
 // ── 날짜 유틸 (로컬 타임존 기준) ──
@@ -192,15 +193,14 @@ export function getAllWrongAnswers(): WrongAnswerRecord[] {
 }
 
 export function getDedupedWrongAnswers(): WrongAnswerRecord[] {
-  return getAllWrongAnswers().reduce<WrongAnswerRecord[]>((acc, curr) => {
-    const existing = acc.findIndex(a => a.questionId === curr.questionId);
-    if (existing >= 0) {
-      if (curr.date > acc[existing].date) acc[existing] = curr;
-    } else {
-      acc.push(curr);
+  const map = new Map<string, WrongAnswerRecord>();
+  for (const item of getAllWrongAnswers()) {
+    const existing = map.get(item.questionId);
+    if (!existing || item.date > existing.date) {
+      map.set(item.questionId, item);
     }
-    return acc;
-  }, []);
+  }
+  return Array.from(map.values());
 }
 
 export function getWrongCounts(): Record<string, number> {

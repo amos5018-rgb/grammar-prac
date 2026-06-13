@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { getQuizResults, getUnitProgress, clearAllHistory, getUnitTier, TierLevel, getStreak, getExamCalendar, getDday } from '@/lib/storage';
+import { getQuizResults, clearAllHistory, TierLevel, getStreak, getExamCalendar, getDday } from '@/lib/storage';
 import { QuizAttempt } from '@/lib/types';
 import { units } from '@/data/units';
 
@@ -19,17 +19,53 @@ export default function ProgressPage() {
   const [dday, setDday] = useState(0);
 
   useEffect(() => {
-    setProgress(getUnitProgress());
-    setResults(getQuizResults());
+    const allResults = getQuizResults();
+    setResults(allResults);
     setStreak(getStreak());
     setCalendar(getExamCalendar());
     setDday(getDday());
+
+    // 단일 순회로 progress + tier 동시 계산 (getUnitTier 반복 호출 회피)
+    const prog: Record<string, { attempts: number; bestScore: number | null }> = {};
+    const unitData: Record<string, { bestScore: number | null; dates: Set<string> }> = {};
+    for (const r of allResults) {
+      if (!prog[r.unitCode]) prog[r.unitCode] = { attempts: 0, bestScore: null };
+      const p = prog[r.unitCode];
+      p.attempts++;
+      if (r.completed !== false) {
+        const pct = Math.round((r.score / r.total) * 100);
+        if (p.bestScore === null || pct > p.bestScore) p.bestScore = pct;
+        if (!unitData[r.unitCode]) unitData[r.unitCode] = { bestScore: null, dates: new Set() };
+        const d = unitData[r.unitCode];
+        if (d.bestScore === null || pct > d.bestScore) d.bestScore = pct;
+        d.dates.add(r.date.split('T')[0]);
+      }
+    }
+    setProgress(prog);
+
+    const TIERS: Record<TierLevel, { label: string; emoji: string }> = {
+      beginner:   { label: '비기너',  emoji: '\u{1F331}' },
+      challenger: { label: '도전자',  emoji: '\u{2B50}' },
+      skilled:    { label: '숙련자',  emoji: '\u{1F4AA}' },
+      master:     { label: '마스터',  emoji: '\u{1F451}' },
+    };
     let mc = 0;
     const t: Record<string, { level: TierLevel; label: string; emoji: string }> = {};
     for (const u of units) {
-      const tier = getUnitTier(u.code);
-      t[u.code] = { level: tier.level, label: tier.label, emoji: tier.emoji };
-      if (tier.mastered) mc++;
+      const d = unitData[u.code];
+      let level: TierLevel = 'beginner';
+      let mastered = false;
+      if (d) {
+        if (d.bestScore !== null && d.bestScore >= 90 && d.dates.size >= 2) {
+          level = 'master'; mastered = true;
+        } else if (d.bestScore !== null && d.bestScore >= 80) {
+          level = 'skilled';
+        } else if (d.bestScore !== null) {
+          level = 'challenger';
+        }
+      }
+      t[u.code] = { level, ...TIERS[level] };
+      if (mastered) mc++;
     }
     setMasteredCount(mc);
     setTierMap(t);

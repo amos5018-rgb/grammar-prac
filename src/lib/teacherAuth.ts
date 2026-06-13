@@ -6,7 +6,9 @@ export const TEACHER_COOKIE = 'teacher_session';
 const SESSION_HOURS = 12;
 
 function getSecret(): string {
-  return process.env.TEACHER_SESSION_SECRET || process.env.TEACHER_PASSWORD || '';
+  const s = process.env.TEACHER_SESSION_SECRET || process.env.TEACHER_PASSWORD;
+  if (!s) throw new Error('TEACHER_PASSWORD 환경변수가 설정되지 않았습니다');
+  return s;
 }
 
 function b64url(buf: Buffer): string {

@@ -4,8 +4,6 @@ import {
   getQuizResults,
   getStreak,
   getActivityDates,
-  getUnitProgress,
-  getUnitTier,
 } from './storage';
 
 const PENDING_KEY = 'grammar_sync_pending';
@@ -38,23 +36,53 @@ function fallbackAttemptId(unitCode: string, date: string, total: number): strin
   return `legacy:${date}|${unitCode}|${total}`;
 }
 
+const TIER_LABELS: Record<string, { label: string }> = {
+  beginner:   { label: '비기너' },
+  challenger: { label: '도전자' },
+  skilled:    { label: '숙련자' },
+  master:     { label: '마스터' },
+};
+
 export function buildSnapshot(): SyncSnapshot | null {
   if (typeof window === 'undefined') return null;
   const profile = getProfile();
   if (!profile) return null;
 
   const results = getQuizResults();
-  const progress = getUnitProgress();
+
+  // 한 번의 순회로 progress + tier 정보를 동시에 계산
+  const unitData: Record<string, { attempts: number; bestScore: number | null; dates: Set<string> }> = {};
+  for (const r of results) {
+    let entry = unitData[r.unitCode];
+    if (!entry) {
+      entry = { attempts: 0, bestScore: null, dates: new Set() };
+      unitData[r.unitCode] = entry;
+    }
+    entry.attempts++;
+    if (r.completed !== false) {
+      const pct = Math.round((r.score / r.total) * 100);
+      if (entry.bestScore === null || pct > entry.bestScore) entry.bestScore = pct;
+      entry.dates.add(r.date.split('T')[0]);
+    }
+  }
 
   const unitTiers: SyncSnapshot['unitTiers'] = {};
-  for (const code of Object.keys(progress)) {
-    const tier = getUnitTier(code);
-    unitTiers[code] = {
-      level: tier.level,
-      label: tier.label,
-      mastered: tier.mastered,
-      bestScore: progress[code].bestScore,
-    };
+  const unitProgress: SyncSnapshot['unitProgress'] = {};
+  for (const [code, d] of Object.entries(unitData)) {
+    unitProgress[code] = { attempts: d.attempts, bestScore: d.bestScore };
+    let level: string;
+    let mastered = false;
+    if (d.bestScore === null) {
+      level = 'beginner';
+    } else if (d.bestScore >= 90 && d.dates.size >= 2) {
+      level = 'master';
+      mastered = true;
+    } else if (d.bestScore >= 80) {
+      level = 'skilled';
+    } else {
+      level = 'challenger';
+    }
+    unitTiers[code] = { level, label: TIER_LABELS[level].label, mastered, bestScore: d.bestScore };
   }
 
   const attempts = results.map(r => ({
@@ -77,7 +105,7 @@ export function buildSnapshot(): SyncSnapshot | null {
     streak: getStreak(),
     activityDates: getActivityDates(),
     unitTiers,
-    unitProgress: progress,
+    unitProgress,
     attempts,
   };
 }

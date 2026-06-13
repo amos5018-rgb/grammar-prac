@@ -15,6 +15,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }
 
+  const stat = fs.statSync(filePath);
+  if (stat.size > 100 * 1024 * 1024) {
+    return NextResponse.json({ error: 'File too large' }, { status: 413 });
+  }
+
   const fileBuffer = fs.readFileSync(filePath);
   const ext = path.extname(safeName).toLowerCase();
   const mime = ext === '.pdf' ? 'application/pdf' : 'application/octet-stream';
