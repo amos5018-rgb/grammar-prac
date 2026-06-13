@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Category, Unit } from '@/lib/types';
-import { getUnitProgress, getUnitTier, TierLevel } from '@/lib/storage';
+import { getUnitProgress } from '@/lib/storage';
 import UnitCard from '@/components/UnitCard';
 
 interface CategoryContentProps {
@@ -17,16 +17,8 @@ type Progress = Record<string, { attempts: number; bestScore: number | null }>;
 
 export default function CategoryContent({ category, units, questionCounts, totalQuestions }: CategoryContentProps) {
   const [progress, setProgress] = useState<Progress>({});
-  const [tierMap, setTierMap] = useState<Record<string, { level: TierLevel; label: string; emoji: string }>>({});
-
   useEffect(() => {
     setProgress(getUnitProgress());
-    const t: Record<string, { level: TierLevel; label: string; emoji: string }> = {};
-    for (const u of units) {
-      const tier = getUnitTier(u.code);
-      t[u.code] = { level: tier.level, label: tier.label, emoji: tier.emoji };
-    }
-    setTierMap(t);
   }, [units]);
 
   const regularUnits = units.filter(u => !u.advanced && !u.summary);
@@ -66,7 +58,6 @@ export default function CategoryContent({ category, units, questionCounts, total
             questionCount={questionCounts[unit.code] || 0}
             bestScore={progress[unit.code]?.bestScore ?? null}
             attempts={progress[unit.code]?.attempts ?? 0}
-            tier={tierMap[unit.code]}
           />
         ))}
       </div>
@@ -85,8 +76,7 @@ export default function CategoryContent({ category, units, questionCounts, total
                 questionCount={questionCounts[unit.code] || 0}
                 bestScore={progress[unit.code]?.bestScore ?? null}
                 attempts={progress[unit.code]?.attempts ?? 0}
-                tier={tierMap[unit.code]}
-              />
+                  />
             ))}
           </div>
         </>
@@ -106,8 +96,7 @@ export default function CategoryContent({ category, units, questionCounts, total
                 questionCount={questionCounts[unit.code] || 0}
                 bestScore={progress[unit.code]?.bestScore ?? null}
                 attempts={progress[unit.code]?.attempts ?? 0}
-                tier={tierMap[unit.code]}
-              />
+                  />
             ))}
           </div>
         </>

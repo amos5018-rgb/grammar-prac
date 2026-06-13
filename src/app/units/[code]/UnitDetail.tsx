@@ -57,7 +57,7 @@ export default function UnitDetail({ unit, questionCount }: UnitDetailProps) {
 
         {tier.hint && (
           <p className="text-sm text-text-secondary mb-4 bg-gray-50 dark:bg-white/5 rounded-lg px-4 py-2.5">
-            {tier.level === 'challenger' ? '⭐' : '\u{1F4AA}'} 다음 칭호까지: {tier.hint}
+            {tier.level === 'beginner' ? '⭐' : tier.level === 'challenger' ? '\u{1F4AA}' : '\u{1F451}'} 다음 칭호까지: {tier.hint}
           </p>
         )}
 

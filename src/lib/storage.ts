@@ -206,7 +206,7 @@ const TIERS: Record<TierLevel, { label: string; emoji: string }> = {
 export function getUnitTier(unitCode: string): UnitTier {
   const results = getQuizResults().filter(r => r.unitCode === unitCode && r.completed !== false);
   if (results.length === 0) {
-    return { ...TIERS.beginner, level: 'beginner', mastered: false };
+    return { ...TIERS.beginner, level: 'beginner', mastered: false, hint: '문제를 풀면 도전자!' };
   }
 
   const bestScore = Math.max(...results.map(r => Math.round((r.score / r.total) * 100)));
