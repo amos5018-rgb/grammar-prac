@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { getQuizResults, getUnitProgress, clearAllHistory, getUnitTier, getStreak, getExamCalendar, getDday } from '@/lib/storage';
+import { getQuizResults, getUnitProgress, clearAllHistory, getUnitTier, TierLevel, getStreak, getExamCalendar, getDday } from '@/lib/storage';
 import { QuizAttempt } from '@/lib/types';
 import { units } from '@/data/units';
 
@@ -13,6 +13,7 @@ export default function ProgressPage() {
   const [progress, setProgress] = useState<Record<string, { attempts: number; bestScore: number | null }>>({});
   const [results, setResults] = useState<QuizAttempt[]>([]);
   const [masteredCount, setMasteredCount] = useState(0);
+  const [tierMap, setTierMap] = useState<Record<string, { level: TierLevel; label: string; emoji: string }>>({});
   const [streak, setStreak] = useState(0);
   const [calendar, setCalendar] = useState<{ date: string; active: boolean; isToday: boolean; isExam: boolean; isPast: boolean }[]>([]);
   const [dday, setDday] = useState(0);
@@ -24,10 +25,14 @@ export default function ProgressPage() {
     setCalendar(getExamCalendar());
     setDday(getDday());
     let mc = 0;
+    const t: Record<string, { level: TierLevel; label: string; emoji: string }> = {};
     for (const u of units) {
-      if (getUnitTier(u.code).mastered) mc++;
+      const tier = getUnitTier(u.code);
+      t[u.code] = { level: tier.level, label: tier.label, emoji: tier.emoji };
+      if (tier.mastered) mc++;
     }
     setMasteredCount(mc);
+    setTierMap(t);
   }, []);
 
   const handleReset = () => {
@@ -36,15 +41,13 @@ export default function ProgressPage() {
     setProgress({});
     setResults([]);
     setMasteredCount(0);
+    setTierMap({});
     setStreak(0);
     setCalendar(getExamCalendar());
   };
 
   const unitCodes = Object.keys(progress);
   const totalAttempts = results.length;
-  const avgScore = results.length > 0
-    ? Math.round(results.reduce((sum, r) => sum + (r.score / r.total) * 100, 0) / results.length)
-    : 0;
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6">
@@ -123,25 +126,6 @@ export default function ProgressPage() {
             )}
           </div>
 
-          {/* Summary cards */}
-          <div className="grid grid-cols-3 gap-3 mb-8">
-            <div className="bg-surface rounded-xl border border-border p-4 text-center">
-              <p className="text-2xl font-bold text-primary">{unitCodes.length}</p>
-              <p className="text-xs text-text-secondary mt-1">학습한 단원</p>
-            </div>
-            <div className="bg-surface rounded-xl border border-border p-4 text-center">
-              <p className="text-2xl font-bold text-primary">{totalAttempts}</p>
-              <p className="text-xs text-text-secondary mt-1">총 풀이 횟수</p>
-            </div>
-            <div className="bg-surface rounded-xl border border-border p-4 text-center">
-              <p className={`text-2xl font-bold ${
-                avgScore >= 80 ? 'text-success' :
-                avgScore >= 50 ? 'text-warning' : 'text-error'
-              }`}>{avgScore}%</p>
-              <p className="text-xs text-text-secondary mt-1">평균 점수</p>
-            </div>
-          </div>
-
           {masteredCount > 0 && (
             <p className="text-sm text-text-secondary mb-4">
               &#128081; {masteredCount}개 단원 마스터 달성
@@ -159,6 +143,9 @@ export default function ProgressPage() {
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-1.5">
                       <span className="font-medium">{unitNameMap[code] || code}</span>
+                      {tierMap[code] && (
+                        <span title={tierMap[code].label}>{tierMap[code].emoji}</span>
+                      )}
                     </div>
                     <span className="text-sm text-text-secondary">{data.attempts}회 풀이</span>
                   </div>
