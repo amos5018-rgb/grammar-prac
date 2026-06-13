@@ -206,11 +206,11 @@ function RevealBox({
   return (
     <button
       onClick={onToggle}
-      className="w-full rounded-xl border-2 border-dashed border-gray-300 dark:border-white/20 p-4 text-left hover:border-primary hover:bg-primary/5 transition-colors group"
+      className="w-full rounded-xl border-2 border-primary/40 bg-primary-light p-4 text-left hover:border-primary hover:bg-primary/10 transition-colors group"
     >
-      <div className="text-xs font-medium text-text-secondary mb-1">{label}</div>
-      <p className="text-sm text-text-secondary group-hover:text-primary transition-colors">
-        탭하여 확인
+      <div className="text-sm font-semibold text-text mb-1">{label}</div>
+      <p className="text-sm font-medium text-primary group-hover:text-primary-dark transition-colors">
+        탭하여 확인 &rarr;
       </p>
     </button>
   );
