@@ -171,7 +171,7 @@ export default function ReviewContent({ allQuestions }: Props) {
                   </span>
                   {(wrongCounts[answer.questionId] ?? 0) >= 2 && (
                     <span className="text-xs bg-warning-light text-warning px-2 py-0.5 rounded-full font-medium">
-                      {wrongCounts[answer.questionId]}회 오답
+                      {(wrongCounts[answer.questionId] ?? 0) > 5 ? '5+' : wrongCounts[answer.questionId]}회 오답
                     </span>
                   )}
                   <span className="text-xs text-text-secondary">{unitNameMap[answer.unitCode] || answer.unitCode}</span>
