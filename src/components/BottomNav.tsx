@@ -27,11 +27,11 @@ export default function BottomNav() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex-1 flex flex-col items-center gap-0.5 py-2 text-[11px] font-medium transition-colors ${
+              className={`flex-1 flex flex-col items-center gap-1 py-3 text-xs font-medium transition-colors ${
                 active ? 'text-primary' : 'text-text-secondary'
               }`}
             >
-              <item.icon className="w-5 h-5" active={active} />
+              <item.icon className="w-7 h-7" active={active} />
               {item.label}
             </Link>
           );
