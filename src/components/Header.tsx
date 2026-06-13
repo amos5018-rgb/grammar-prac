@@ -3,19 +3,17 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { getProfile, getStreak } from '@/lib/storage';
+import { getProfile } from '@/lib/storage';
 import { useTheme } from './ThemeProvider';
 
 export default function Header() {
   const pathname = usePathname();
   const [name, setName] = useState<string | null>(null);
-  const [streak, setStreak] = useState(0);
   const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     const profile = getProfile();
     if (profile) setName(profile.name);
-    setStreak(getStreak());
   }, [pathname]);
 
   const navItems = [
@@ -32,11 +30,6 @@ export default function Header() {
             오남고 1학년 국어: 문법 연습&#128218;
           </Link>
           <div className="flex items-center gap-2">
-            {streak > 0 && (
-              <span className="text-xs font-medium text-warning flex items-center gap-0.5">
-                &#128293;{streak}일
-              </span>
-            )}
             <button
               onClick={toggleTheme}
               className="p-2 rounded-lg text-text-secondary hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
