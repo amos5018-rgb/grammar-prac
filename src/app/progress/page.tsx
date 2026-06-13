@@ -126,14 +126,15 @@ export default function ProgressPage() {
             )}
           </div>
 
-          {masteredCount > 0 && (
-            <p className="text-sm text-text-secondary mb-4">
-              &#128081; {masteredCount}개 단원 마스터 달성
-            </p>
-          )}
-
           {/* Per-unit progress */}
-          <h2 className="font-bold text-lg mb-4">단원별 현황</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-bold text-lg">단원별 현황</h2>
+            {masteredCount > 0 && (
+              <span className="text-sm text-text-secondary">
+                &#128081; {masteredCount}개 단원 마스터 달성
+              </span>
+            )}
+          </div>
           <div className="space-y-3">
             {unitCodes.map(code => {
               const data = progress[code];
