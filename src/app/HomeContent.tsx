@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { getProfile, getUnitProgress, getDueCount } from '@/lib/storage';
-import { getRecommendation, Recommendation } from '@/lib/recommend';
+import { getRecommendation, Recommendation, RecommendationType } from '@/lib/recommend';
 import LoginForm from '@/components/LoginForm';
 
 export interface CategoryCardData {
@@ -49,29 +49,7 @@ export default function HomeContent({ categories }: { categories: CategoryCardDa
     <div className="max-w-3xl mx-auto px-4 py-6">
 
       {/* 다음 학습 추천 카드 */}
-      {recommendation && (
-        <Link
-          href={recommendation.href}
-          className={`block w-full mb-5 p-5 rounded-2xl border-2 transition-all hover:shadow-md active:scale-[0.99] ${
-            recommendation.type === 'review'
-              ? 'border-primary bg-primary-light'
-              : recommendation.type === 'retry'
-                ? 'border-warning bg-warning-light'
-                : 'border-success bg-success-light'
-          }`}
-        >
-          <p className="text-xs font-medium text-text-secondary mb-1">
-            {recommendation.type === 'review' ? '오늘의 복습' : recommendation.type === 'retry' ? '약점 보강' : '새 단원'}
-          </p>
-          <p className={`font-bold text-lg ${
-            recommendation.type === 'review' ? 'text-primary' :
-            recommendation.type === 'retry' ? 'text-warning' : 'text-success'
-          }`}>
-            {recommendation.title}
-          </p>
-          <p className="text-sm text-text-secondary mt-0.5">{recommendation.subtitle}</p>
-        </Link>
-      )}
+      {recommendation && <RecommendationCard rec={recommendation} />}
 
       <h1 className="text-2xl font-bold mb-1">학습 영역 선택</h1>
       <p className="text-text-secondary text-sm mb-6">학습할 영역을 먼저 선택하세요</p>
@@ -104,5 +82,31 @@ export default function HomeContent({ categories }: { categories: CategoryCardDa
         })}
       </div>
     </div>
+  );
+}
+
+const REC_STYLE: Record<RecommendationType, { wrap: string; title: string; eyebrow: string }> = {
+  review:        { wrap: 'border-primary bg-primary-light', title: 'text-primary', eyebrow: '오늘의 복습' },
+  retry:         { wrap: 'border-warning bg-warning-light', title: 'text-warning', eyebrow: '약점 보강' },
+  'master-push': { wrap: 'border-primary bg-primary-light', title: 'text-primary', eyebrow: '마스터 도전' },
+  new:           { wrap: 'border-success bg-success-light', title: 'text-success', eyebrow: '새 단원' },
+  summary:       { wrap: 'border-primary bg-primary-light', title: 'text-primary', eyebrow: '총정리' },
+  study:         { wrap: 'border-success bg-success-light', title: 'text-success', eyebrow: '인출 연습' },
+  advanced:      { wrap: 'border-warning bg-warning-light', title: 'text-warning', eyebrow: '고난도 도전' },
+  done:          { wrap: 'border-success bg-success-light', title: 'text-success', eyebrow: '완료' },
+};
+const URGENT_STYLE = { wrap: 'border-error bg-error-light', title: 'text-error', eyebrow: '\u{1F525} 시험 임박' };
+
+function RecommendationCard({ rec }: { rec: Recommendation }) {
+  const s = rec.urgent ? URGENT_STYLE : REC_STYLE[rec.type];
+  return (
+    <Link
+      href={rec.href}
+      className={`block w-full mb-5 p-5 rounded-2xl border-2 transition-all hover:shadow-md active:scale-[0.99] ${s.wrap}`}
+    >
+      <p className="text-xs font-medium text-text-secondary mb-1">{s.eyebrow}</p>
+      <p className={`font-bold text-lg ${s.title}`}>{rec.title}</p>
+      <p className="text-sm text-text-secondary mt-0.5">{rec.subtitle}</p>
+    </Link>
   );
 }
