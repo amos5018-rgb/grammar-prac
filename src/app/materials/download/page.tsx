@@ -1,20 +1,16 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { useEffect, Suspense } from 'react';
+import { Suspense } from 'react';
 import Link from 'next/link';
 
 function DownloadInner() {
   const searchParams = useSearchParams();
   const file = searchParams.get('file') ?? '';
 
-  useEffect(() => {
-    if (!file) return;
-    const timer = setTimeout(() => {
-      window.location.assign(`/api/download?file=${encodeURIComponent(file)}`);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [file]);
+  const handleDownload = () => {
+    window.open(`/api/download?file=${encodeURIComponent(file)}`, '_blank');
+  };
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-16 text-center">
@@ -23,12 +19,23 @@ function DownloadInner() {
           <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
         </svg>
         <p className="text-lg font-bold mb-2">파일 다운로드</p>
-        <p className="text-sm text-text-secondary">{file}</p>
+        <p className="text-sm text-text-secondary mb-6">{file}</p>
+
+        <button
+          type="button"
+          onClick={handleDownload}
+          className="inline-flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-xl font-semibold text-base hover:bg-primary-dark transition-colors mb-4"
+        >
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          다운로드
+        </button>
       </div>
 
       <Link
         href="/materials"
-        className="inline-flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-xl font-semibold text-base hover:bg-primary-dark transition-colors"
+        className="inline-flex items-center gap-2 text-text-secondary hover:text-primary px-6 py-3 rounded-xl font-medium text-base border border-border hover:border-primary/40 transition-colors"
       >
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -43,7 +50,7 @@ export default function DownloadPage() {
   return (
     <Suspense fallback={
       <div className="max-w-2xl mx-auto px-4 py-16 text-center">
-        <p className="text-text-secondary">다운로드 준비 중...</p>
+        <p className="text-text-secondary">준비 중...</p>
       </div>
     }>
       <DownloadInner />
