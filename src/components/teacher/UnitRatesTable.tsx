@@ -25,6 +25,9 @@ const UNIT_NAMES: Record<string, string> = {
   'advanced-basics': '고난도: 문법의 기초',
   'advanced-phoneme-change': '고난도: 음운의 변동',
   'advanced-grammar': '고난도: 문법 요소와 표현',
+  'mixed-basics': '문법의 기초 섞어풀기',
+  'mixed-phoneme-change': '음운의 변동 섞어풀기',
+  'mixed-grammar-elements': '문법 요소와 표현 섞어풀기',
 };
 
 function rateColor(rate: number) {

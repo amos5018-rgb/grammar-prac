@@ -5,9 +5,11 @@ import Link from 'next/link';
 import { getDedupedWrongAnswers, clearAllHistory, WrongAnswerRecord, getDueCount, getWrongCounts } from '@/lib/storage';
 import { Question } from '@/lib/types';
 import { units } from '@/data/units';
+import { categories } from '@/data/categories';
 import PhonemeChangeExercise from '@/components/PhonemeChangeExercise';
 
-const unitNameMap = Object.fromEntries(units.map(u => [u.code, u.name]));
+const unitNameMap: Record<string, string> = Object.fromEntries(units.map(u => [u.code, u.name]));
+for (const c of categories) unitNameMap[`mixed-${c.code}`] = `${c.name} 섞어풀기`;
 
 interface Props {
   allQuestions: Question[];

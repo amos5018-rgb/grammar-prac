@@ -5,8 +5,10 @@ import Link from 'next/link';
 import { getQuizResults, clearAllHistory, TierLevel, getStreak, getExamCalendar, getDday } from '@/lib/storage';
 import { QuizAttempt } from '@/lib/types';
 import { units } from '@/data/units';
+import { categories } from '@/data/categories';
 
-const unitNameMap = Object.fromEntries(units.map(u => [u.code, u.name]));
+const unitNameMap: Record<string, string> = Object.fromEntries(units.map(u => [u.code, u.name]));
+for (const c of categories) unitNameMap[`mixed-${c.code}`] = `${c.name} 섞어풀기`;
 const DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'];
 
 export default function ProgressPage() {
