@@ -18,5 +18,5 @@ export default async function QuizPage({ params }: { params: Promise<{ code: str
 
   const unit = units.find(u => u.code === code);
 
-  return <QuizRunner unitCode={code} questions={questions} shuffleOnly={unit?.shuffleOnly} />;
+  return <QuizRunner unitCode={code} questions={questions} shuffleOnly={unit?.shuffleOnly || unit?.advanced} />;
 }
