@@ -39,8 +39,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ code:
   for (const u of catUnits) {
     if (u.study) {
       questionCounts[u.code] = fetchStudyCards(u.code).length;
-    }
-    if (u.parentCode != null && u.partIndex != null) {
+    } else if (u.parentCode != null && u.partIndex != null) {
       const parentCount = questionCounts[u.parentCode] || 0;
       questionCounts[u.code] = u.partIndex < 2
         ? Math.min(8, parentCount)

@@ -11,6 +11,10 @@ function isUuid(s: unknown): s is string {
   return typeof s === 'string' && /^[0-9a-f-]{8,64}$/i.test(s);
 }
 
+function isIsoDate(s: string): boolean {
+  return /^\d{4}-\d{2}-\d{2}(T[\d:.Z+-]*)?$/.test(s) && !isNaN(Date.parse(s));
+}
+
 export async function POST(request: NextRequest) {
   const supabase = getSupabaseAdmin();
   if (!supabase) {
@@ -72,7 +76,7 @@ export async function POST(request: NextRequest) {
     const attemptId = att.attemptId;
     const unitCode = att.unitCode;
     const date = att.date;
-    if (typeof attemptId !== 'string' || typeof unitCode !== 'string' || typeof date !== 'string') continue;
+    if (typeof attemptId !== 'string' || typeof unitCode !== 'string' || typeof date !== 'string' || !isIsoDate(date)) continue;
     const answers = Array.isArray(att.answers) ? att.answers.slice(0, MAX_ANSWERS_PER_ATTEMPT) : [];
     for (const a of answers as Array<Record<string, unknown>>) {
       if (typeof a.questionId !== 'string') continue;

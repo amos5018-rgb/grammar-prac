@@ -173,7 +173,7 @@ export function getDueQuestionIds(): string[] {
 export function getTopWrongQuestionIds(limit: number): string[] {
   const schedule = getReviewSchedule();
   return Object.entries(schedule)
-    .sort(([, a], [, b]) => b.wrongCount - a.wrongCount)
+    .sort(([idA, a], [idB, b]) => b.wrongCount - a.wrongCount || idA.localeCompare(idB))
     .slice(0, limit)
     .map(([id]) => id);
 }
