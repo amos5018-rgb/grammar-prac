@@ -17,6 +17,9 @@ export default async function MixedQuizPage({ params }: { params: Promise<{ code
   if (catUnits.length === 0) notFound();
 
   const catUnitCodes = new Set(catUnits.map(u => u.code));
+  for (const u of catUnits) {
+    if (u.parentCode) catUnitCodes.add(u.parentCode);
+  }
   const catQuestions = questions.filter(q => catUnitCodes.has(q.unitCode));
 
   const categoryName = categories.find(c => c.code === code)?.name ?? code;

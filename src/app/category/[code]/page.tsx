@@ -40,6 +40,13 @@ export default async function CategoryPage({ params }: { params: Promise<{ code:
     if (u.study) {
       questionCounts[u.code] = fetchStudyCards(u.code).length;
     }
+    if (u.parentCode != null && u.partIndex != null) {
+      const parentCount = questionCounts[u.parentCode] || 0;
+      questionCounts[u.code] = u.partIndex < 2
+        ? Math.min(8, parentCount)
+        : Math.max(0, parentCount - 16);
+      totalQuestions += questionCounts[u.code];
+    }
   }
 
   return <CategoryContent category={category} units={catUnits} questionCounts={questionCounts} totalQuestions={totalQuestions} />;

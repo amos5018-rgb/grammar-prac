@@ -8,6 +8,7 @@ import { Unit, Question, QuestionType, Difficulty, StudyCard } from './types';
 import { units as localUnits } from '@/data/units';
 import { allQuestions as localQuestions } from '@/data/questions';
 import { allStudyCards } from '@/data/study';
+import { splitQuestions } from '@/data/questions/split';
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID || '';
 
@@ -96,6 +97,14 @@ export async function fetchUnits(): Promise<Unit[]> {
 }
 
 export async function fetchQuestions(unitCode?: string): Promise<Question[]> {
+  if (unitCode) {
+    const unit = localUnits.find(u => u.code === unitCode);
+    if (unit?.parentCode != null && unit.partIndex != null) {
+      const parentQs = await fetchQuestions(unit.parentCode);
+      return splitQuestions(parentQs, unit.partIndex);
+    }
+  }
+
   const rows = await fetchSheet('문제');
   if (rows.length <= 1) {
     if (unitCode) return localQuestions.filter(q => q.unitCode === unitCode);

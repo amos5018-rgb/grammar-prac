@@ -12,9 +12,11 @@ export async function generateStaticParams() {
 
 export default async function QuizPage({ params }: { params: Promise<{ code: string }> }) {
   const { code } = await params;
-  const questions = await fetchQuestions(code);
+  const [units, questions] = await Promise.all([fetchUnits(), fetchQuestions(code)]);
 
   if (questions.length === 0) notFound();
 
-  return <QuizRunner unitCode={code} questions={questions} />;
+  const unit = units.find(u => u.code === code);
+
+  return <QuizRunner unitCode={code} questions={questions} shuffleOnly={unit?.shuffleOnly} />;
 }
