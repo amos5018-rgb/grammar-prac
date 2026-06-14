@@ -373,7 +373,7 @@ function QuestionPreview({
                     <span className={isWrong ? 'text-error font-medium' : 'text-success'}>
                       {step || '(미입력)'}
                     </span>
-                    {isWrong && (
+                    {isWrong && correctSteps[idx] && (
                       <span className="text-success ml-2">
                         → {correctSteps[idx]}
                       </span>

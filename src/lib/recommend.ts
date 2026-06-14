@@ -1,5 +1,7 @@
-import { getUnitProgress, getDueCount, getUnitTier, getDday, getStudyCompletion, getBestScore } from './storage';
+import { getUnitProgress, getDueCount, getUnitTierMap, getDday, getStudyCompletion, UnitTier } from './storage';
 import { units } from '@/data/units';
+
+type TierMap = Record<string, UnitTier>;
 
 export type RecommendationType = 'review' | 'retry' | 'master-push' | 'new' | 'summary' | 'study' | 'advanced' | 'done';
 
@@ -11,7 +13,7 @@ export interface Recommendation {
   urgent?: boolean;
 }
 
-const CORE = units.filter(u => u.active && !u.advanced && !u.summary);
+const CORE = units.filter(u => u.active && !u.advanced && !u.summary).sort((a, b) => a.order - b.order);
 const ADVANCED_UNITS = units.filter(u => u.advanced && u.active).sort((a, b) => a.order - b.order);
 const SUMMARY_QUIZ = 'phoneme-change-review';
 const SUMMARY_STUDY = 'phoneme-change-study';
@@ -36,6 +38,7 @@ export function getRecommendation(): Recommendation | null {
   }
 
   const progress = getUnitProgress();
+  const tiers = getUnitTierMap();
 
   // 2. retry — 약점 핵심 단원 (<80%)
   const weakUnit = CORE
@@ -60,13 +63,13 @@ export function getRecommendation(): Recommendation | null {
 
   // 3·4. new ↔ master-push (urgent면 new 먼저, 아니면 master-push 먼저)
   const newRec = getNewRecommendation(progress, dday, urgent);
-  const masterPushRec = getMasterPushRecommendation(progress, dday, urgent);
+  const masterPushRec = getMasterPushRecommendation(progress, tiers, dday, urgent);
 
   const first = urgent ? (newRec ?? masterPushRec) : (masterPushRec ?? newRec);
   if (first) return first;
 
   // 5. summary — 총정리 문제편
-  if (!getUnitTier(SUMMARY_QUIZ).mastered) {
+  if (!tiers[SUMMARY_QUIZ]?.mastered) {
     return {
       type: 'summary',
       title: '음운 변동 총정리에 도전',
@@ -89,7 +92,7 @@ export function getRecommendation(): Recommendation | null {
   }
 
   // 7. advanced — 고난도 도전
-  const nextAdvanced = ADVANCED_UNITS.find(u => !getUnitTier(u.code).mastered);
+  const nextAdvanced = ADVANCED_UNITS.find(u => !tiers[u.code]?.mastered);
   if (nextAdvanced) {
     return {
       type: 'advanced',
@@ -119,7 +122,6 @@ function getNewRecommendation(
   urgent: boolean,
 ): Recommendation | null {
   const nextUnit = CORE
-    .sort((a, b) => a.order - b.order)
     .find(u => !progress[u.code] || progress[u.code].bestScore === null);
 
   if (!nextUnit) return null;
@@ -136,16 +138,17 @@ function getNewRecommendation(
 
 function getMasterPushRecommendation(
   progress: Record<string, { attempts: number; bestScore: number | null }>,
+  tiers: TierMap,
   dday: number,
   urgent: boolean,
 ): Recommendation | null {
   const skilledUnit = CORE
-    .filter(u => getUnitTier(u.code).level === 'skilled')
+    .filter(u => tiers[u.code]?.level === 'skilled')
     .sort((a, b) => (progress[b.code]?.bestScore ?? 0) - (progress[a.code]?.bestScore ?? 0))[0];
 
   if (!skilledUnit) return null;
 
-  const best = getBestScore(skilledUnit.code) ?? 0;
+  const best = progress[skilledUnit.code]?.bestScore ?? 0;
   const needsScore = best < 90;
   const prefix = urgent ? `D-${dday} · ` : '';
 
