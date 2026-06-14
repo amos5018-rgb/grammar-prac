@@ -169,6 +169,15 @@ export function getDueQuestionIds(): string[] {
     .map(([id]) => id);
 }
 
+// 오답 횟수가 많은 순으로 문항 id 반환 (최다 오답 best N)
+export function getTopWrongQuestionIds(limit: number): string[] {
+  const schedule = getReviewSchedule();
+  return Object.entries(schedule)
+    .sort(([, a], [, b]) => b.wrongCount - a.wrongCount)
+    .slice(0, limit)
+    .map(([id]) => id);
+}
+
 // ── 오답 노트 ──
 
 export function getResolvedQuestionIds(): string[] {

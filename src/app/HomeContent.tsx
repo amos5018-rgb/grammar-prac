@@ -87,6 +87,7 @@ export default function HomeContent({ categories }: { categories: CategoryCardDa
 
 const REC_STYLE: Record<RecommendationType, { wrap: string; title: string; eyebrow: string }> = {
   review:        { wrap: 'border-primary bg-primary-light', title: 'text-primary', eyebrow: '오늘의 복습' },
+  'wrong-top':   { wrap: 'border-error bg-error-light', title: 'text-error', eyebrow: '오답 집중' },
   retry:         { wrap: 'border-warning bg-warning-light', title: 'text-warning', eyebrow: '약점 보강' },
   'master-push': { wrap: 'border-primary bg-primary-light', title: 'text-primary', eyebrow: '마스터 도전' },
   new:           { wrap: 'border-success bg-success-light', title: 'text-success', eyebrow: '새 단원' },

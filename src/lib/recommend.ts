@@ -1,9 +1,10 @@
-import { getUnitProgress, getDueCount, getUnitTierMap, getDday, getStudyCompletion, UnitTier } from './storage';
+import { getUnitProgress, getDueCount, getWrongCounts, getUnitTierMap, getDday, getStudyCompletion, UnitTier } from './storage';
 import { units } from '@/data/units';
 
 type TierMap = Record<string, UnitTier>;
+type Progress = Record<string, { attempts: number; bestScore: number | null }>;
 
-export type RecommendationType = 'review' | 'retry' | 'master-push' | 'new' | 'summary' | 'study' | 'advanced' | 'done';
+export type RecommendationType = 'review' | 'wrong-top' | 'retry' | 'master-push' | 'new' | 'summary' | 'study' | 'advanced' | 'done';
 
 export interface Recommendation {
   type: RecommendationType;
@@ -18,57 +19,68 @@ const ADVANCED_UNITS = units.filter(u => u.advanced && u.active).sort((a, b) => 
 const SUMMARY_QUIZ = 'phoneme-change-review';
 const SUMMARY_STUDY = 'phoneme-change-study';
 const DDAY_URGENT = 5;
+const REVIEW_BATCH = 5;
 
 export function getRecommendation(): Recommendation | null {
   const dday = getDday();
   const urgent = dday > 0 && dday <= DDAY_URGENT;
-
-  // 1. review — 복습 대상 최우선
-  const dueCount = getDueCount();
-  if (dueCount > 0) {
-    return {
-      type: 'review',
-      title: `복습할 문제 ${dueCount}개`,
-      subtitle: urgent
-        ? `시험이 ${dday}일 남았어요 — 틀린 문제부터 다지세요`
-        : '간격 반복 복습으로 장기 기억을 만들어요',
-      href: '/review/quiz?due=1',
-      urgent,
-    };
-  }
-
   const progress = getUnitProgress();
   const tiers = getUnitTierMap();
 
-  // 2. retry — 약점 핵심 단원 (<80%)
-  const weakUnit = CORE
-    .filter(u => {
-      const p = progress[u.code];
-      return p && p.bestScore !== null && p.bestScore < 80;
-    })
-    .sort((a, b) => (progress[a.code].bestScore ?? 0) - (progress[b.code].bestScore ?? 0))[0];
+  // ── 1~5위: 단조로움 방지를 위해 적용 가능한 추천을 모아 랜덤으로 하나 노출 ──
+  const pool: Recommendation[] = [];
 
-  if (weakUnit) {
-    const best = progress[weakUnit.code].bestScore;
-    return {
-      type: 'retry',
-      title: `'${weakUnit.name}' 재도전`,
+  // 1. review — 복습 예정 문제 중 무작위 5개
+  const dueCount = getDueCount();
+  if (dueCount > 0) {
+    const n = Math.min(REVIEW_BATCH, dueCount);
+    pool.push({
+      type: 'review',
+      title: '부담 없는 5문제 복습',
       subtitle: urgent
-        ? `D-${dday} · 최고 ${best}% — 약한 단원부터 끌어올리세요`
-        : `최고 점수 ${best}% — 80% 이상을 목표로!`,
-      href: `/units/${weakUnit.code}`,
+        ? `D-${dday} · 복습 예정 ${dueCount}개 중 ${n}개만 가볍게`
+        : `복습 예정 ${dueCount}개 중 ${n}개를 무작위로 풀어요`,
+      href: '/review/quiz?due=1',
       urgent,
-    };
+    });
   }
 
-  // 3·4. new ↔ master-push (urgent면 new 먼저, 아니면 master-push 먼저)
+  // 2. wrong-top — 오답 횟수가 많은 문제 best 5
+  const wrongCounts = getWrongCounts();
+  const wrongTotal = Object.keys(wrongCounts).length;
+  const maxWrong = wrongTotal > 0 ? Math.max(...Object.values(wrongCounts)) : 0;
+  if (maxWrong >= 2) {
+    const n = Math.min(REVIEW_BATCH, wrongTotal);
+    pool.push({
+      type: 'wrong-top',
+      title: '자주 틀린 문제 집중 복습',
+      subtitle: urgent
+        ? `D-${dday} · 가장 많이 틀린 ${n}문제로 약점 해결`
+        : `가장 많이 틀린 ${n}문제를 모았어요 — 약점을 콕 집어요`,
+      href: '/review/quiz?wrong=1',
+      urgent,
+    });
+  }
+
+  // 3. retry — 약점 핵심 단원 (<80%)
+  const retryRec = getRetryRecommendation(progress, dday, urgent);
+  if (retryRec) pool.push(retryRec);
+
+  // 4. new — 아직 안 푼 단원
   const newRec = getNewRecommendation(progress, dday, urgent);
+  if (newRec) pool.push(newRec);
+
+  // 5. master-push — 숙련자 단원 마스터 도전
   const masterPushRec = getMasterPushRecommendation(progress, tiers, dday, urgent);
+  if (masterPushRec) pool.push(masterPushRec);
 
-  const first = urgent ? (newRec ?? masterPushRec) : (masterPushRec ?? newRec);
-  if (first) return first;
+  if (pool.length > 0) {
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
 
-  // 5. summary — 총정리 문제편
+  // ── 6위 이하: 순차 폴백 ──
+
+  // 6. summary — 총정리 문제편
   if (!tiers[SUMMARY_QUIZ]?.mastered) {
     return {
       type: 'summary',
@@ -81,7 +93,7 @@ export function getRecommendation(): Recommendation | null {
     };
   }
 
-  // 6. study — 복습편 인출 연습 (urgent면 건너뜀)
+  // 7. study — 복습편 인출 연습 (urgent면 건너뜀)
   if (!urgent && getStudyCompletion(SUMMARY_STUDY).count < 2) {
     return {
       type: 'study',
@@ -91,7 +103,7 @@ export function getRecommendation(): Recommendation | null {
     };
   }
 
-  // 7. advanced — 고난도 도전
+  // 8. advanced — 고난도 도전
   const nextAdvanced = ADVANCED_UNITS.find(u => !tiers[u.code]?.mastered);
   if (nextAdvanced) {
     return {
@@ -105,7 +117,7 @@ export function getRecommendation(): Recommendation | null {
     };
   }
 
-  // 8. done — 완주 축하
+  // 9. done — 완주 축하
   return {
     type: 'done',
     title: dday > 0 ? '모든 단원 마스터 완료! \u{1F451}' : '수고했어요! \u{1F389}',
@@ -116,8 +128,34 @@ export function getRecommendation(): Recommendation | null {
   };
 }
 
+function getRetryRecommendation(
+  progress: Progress,
+  dday: number,
+  urgent: boolean,
+): Recommendation | null {
+  const weakUnit = CORE
+    .filter(u => {
+      const p = progress[u.code];
+      return p && p.bestScore !== null && p.bestScore < 80;
+    })
+    .sort((a, b) => (progress[a.code].bestScore ?? 0) - (progress[b.code].bestScore ?? 0))[0];
+
+  if (!weakUnit) return null;
+
+  const best = progress[weakUnit.code].bestScore;
+  return {
+    type: 'retry',
+    title: `'${weakUnit.name}' 재도전`,
+    subtitle: urgent
+      ? `D-${dday} · 최고 ${best}% — 약한 단원부터 끌어올리세요`
+      : `최고 점수 ${best}% — 80% 이상을 목표로!`,
+    href: `/units/${weakUnit.code}`,
+    urgent,
+  };
+}
+
 function getNewRecommendation(
-  progress: Record<string, { attempts: number; bestScore: number | null }>,
+  progress: Progress,
   dday: number,
   urgent: boolean,
 ): Recommendation | null {
@@ -137,7 +175,7 @@ function getNewRecommendation(
 }
 
 function getMasterPushRecommendation(
-  progress: Record<string, { attempts: number; bestScore: number | null }>,
+  progress: Progress,
   tiers: TierMap,
   dday: number,
   urgent: boolean,
