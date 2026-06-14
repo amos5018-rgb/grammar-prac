@@ -277,28 +277,29 @@ export const phonemeChangeReviewQuestions: Question[] = [
     ],
   },
 
-  // ── 3회 변동: 끝소리 규칙 + 비음화 + 거센소리되기 ──
+  // ── 4회 변동: 끝소리 규칙 + 거센소리되기 + 자음군 단순화 + 유음화 ──
   {
     id: 'PCR027', unitCode: 'phoneme-change-review', type: '변동분석', difficulty: '상',
     passage: '', question: '겉핥는', choices: [],
-    answer: '음절의 끝소리 규칙/거센소리되기/비음화',
-    explanation: "'겉'의 받침 ㅌ → ㄷ(음절의 끝소리 규칙). ㄷ과 ㅎ이 만나 ㅌ으로 축약됩니다(거센소리되기). 이어서 ㄹ이 ㄴ 앞에서 ㄴ으로 바뀌고(비음화).",
+    answer: '음절의 끝소리 규칙/거센소리되기/자음군 단순화/유음화',
+    explanation: "'겉'의 받침 ㅌ → ㄷ(음절의 끝소리 규칙). ㄷ과 '핥'의 ㅎ이 만나 ㅌ으로 축약됩니다(거센소리되기). 겹받침 ㄾ에서 ㅌ이 탈락하여 ㄹ만 남습니다(자음군 단순화). 이어서 ㄹ 뒤의 ㄴ이 ㄹ로 교체됩니다(유음화).",
     steps: [
       { result: '걷핥는', change: '음절의 끝소리 규칙' },
-      { result: '거탈는', change: '거센소리되기' },
-      { result: '거탄는', change: '비음화' },
+      { result: '거탍는', change: '거센소리되기' },
+      { result: '거탈는', change: '자음군 단순화' },
+      { result: '거탈른', change: '유음화' },
     ],
   },
 
-  // ── 자음군 단순화 + 거센소리되기 ──
+  // ── 거센소리되기 + 구개음화 ──
   {
     id: 'PCR028', unitCode: 'phoneme-change-review', type: '변동분석', difficulty: '상',
-    passage: '', question: '읽히다', choices: [],
-    answer: '자음군 단순화/거센소리되기',
-    explanation: "겹받침 ㄺ에서 ㄹ이 탈락하여 ㄱ만 남습니다(자음군 단순화). ㄱ과 ㅎ이 만나 ㅋ으로 축약됩니다(거센소리되기).",
+    passage: '', question: '굳히다', choices: [],
+    answer: '거센소리되기/구개음화',
+    explanation: "'굳'의 받침 ㄷ과 '히'의 ㅎ이 만나 ㅌ으로 축약됩니다(거센소리되기). 이어서 ㅌ이 모음 ㅣ 앞에서 ㅊ으로 교체됩니다(구개음화).",
     steps: [
-      { result: '익히다', change: '자음군 단순화' },
-      { result: '이키다', change: '거센소리되기' },
+      { result: '구티다', change: '거센소리되기' },
+      { result: '구치다', change: '구개음화' },
     ],
   },
 
