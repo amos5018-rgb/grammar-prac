@@ -23,6 +23,7 @@ export default function ReviewQuizContent({ allQuestions }: { allQuestions: Ques
   const unitFilter = searchParams.get('unit');
   const dueOnly = searchParams.get('due') === '1';
   const wrongTop = searchParams.get('wrong') === '1';
+  const nParam = searchParams.get('n');
   const [questions, setQuestions] = useState<Question[] | null>(null);
 
   useEffect(() => {
@@ -42,7 +43,13 @@ export default function ReviewQuizContent({ allQuestions }: { allQuestions: Ques
         const dueWrong = wrong.map(w => w.questionId).filter(id => dueIds.has(id));
         targetIds = shuffle(dueWrong).slice(0, REVIEW_BATCH);
       } else {
-        targetIds = wrong.map(w => w.questionId);
+        // 오답 모아풀기 (n 지정 시 무작위 n개)
+        let ids = wrong.map(w => w.questionId);
+        const n = nParam ? parseInt(nParam, 10) : 0;
+        if (Number.isFinite(n) && n > 0 && n < ids.length) {
+          ids = shuffle(ids).slice(0, n);
+        }
+        targetIds = ids;
       }
     }
 
@@ -62,7 +69,7 @@ export default function ReviewQuizContent({ allQuestions }: { allQuestions: Ques
     }
 
     setQuestions(matched);
-  }, [router, allQuestions, unitFilter, dueOnly, wrongTop]);
+  }, [router, allQuestions, unitFilter, dueOnly, wrongTop, nParam]);
 
   if (!questions) {
     return (

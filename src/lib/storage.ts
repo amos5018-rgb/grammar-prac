@@ -212,6 +212,13 @@ export function getDedupedWrongAnswers(): WrongAnswerRecord[] {
   return Array.from(map.values());
 }
 
+// 특정 소단원의 미해결 오답 문항 id (오답 노트와 동일 집합)
+export function getUnitWrongQuestionIds(unitCode: string): string[] {
+  return getDedupedWrongAnswers()
+    .filter(w => w.unitCode === unitCode)
+    .map(w => w.questionId);
+}
+
 export function getWrongCounts(): Record<string, number> {
   const schedule = getReviewSchedule();
   const counts: Record<string, number> = {};

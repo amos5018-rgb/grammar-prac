@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Unit } from '@/lib/types';
-import { getBestScore, getUnitAttemptCount, getUnitTier, getStudyCompletion } from '@/lib/storage';
+import { getBestScore, getUnitAttemptCount, getUnitTier, getStudyCompletion, getUnitWrongQuestionIds } from '@/lib/storage';
 
 interface UnitDetailProps {
   unit: Unit;
@@ -31,6 +31,15 @@ export default function UnitDetail({ unit, questionCount }: UnitDetailProps) {
     if (questionCount > 5) modes.push({ label: '랜덤 5문제 풀기', href: `${base}?n=5` });
     if (isReview && questionCount > 10) modes.push({ label: '랜덤 10문제 풀기', href: `${base}?n=10` });
     modes.push({ label: `전부 풀기 (${questionCount}문제)`, href: base });
+
+    // 틀린 문제 모아풀기 (오답 노트 기반)
+    const wrongCount = getUnitWrongQuestionIds(unit.code).length;
+    if (wrongCount >= 1) {
+      modes.push({ label: `틀린 문제 모아풀기 (${wrongCount}문제)`, href: `/review/quiz?unit=${unit.code}` });
+    }
+    if (wrongCount >= 6) {
+      modes.push({ label: '틀린 문제 랜덤 5문제 풀기', href: `/review/quiz?unit=${unit.code}&n=5` });
+    }
   }
 
   return (
