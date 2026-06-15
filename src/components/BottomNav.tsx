@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useState, useEffect } from 'react';
 
 const navItems = [
   { href: '/', label: '단원 목록', icon: BookIcon },
@@ -11,7 +12,12 @@ const navItems = [
 ];
 
 export default function BottomNav() {
-  const pathname = usePathname();
+  const rawPathname = usePathname();
+  const [pathname, setPathname] = useState(rawPathname || '/');
+
+  useEffect(() => {
+    setPathname(rawPathname || '/');
+  }, [rawPathname]);
 
   // 교사 대시보드에서는 학생 네비게이션 숨김
   if (pathname.startsWith('/teacher')) return null;

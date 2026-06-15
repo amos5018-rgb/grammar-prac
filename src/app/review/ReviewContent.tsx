@@ -102,17 +102,30 @@ export default function ReviewContent({ allQuestions }: Props) {
       </div>
       <p className="text-text-secondary text-sm mb-6">틀린 문제를 다시 확인하세요</p>
 
-      {/* 오늘의 복습 배너 */}
-      {dueCount > 0 && (
-        <Link
-          href="/review/quiz?due=1"
-          className="block w-full mb-4 py-4 text-center bg-primary text-white rounded-xl font-semibold shadow-[var(--shadow-sm)] hover:bg-primary-dark hover:shadow-[var(--shadow-md)] active:scale-[0.99] transition-all"
-        >
-          오늘의 복습 {dueCount}문제
-          <span className="block text-xs font-normal mt-0.5 opacity-80">
-            간격 반복으로 장기 기억을 만들어요
-          </span>
-        </Link>
+      {/* 복습 모드 버튼 */}
+      {wrongAnswers.length > 0 && (
+        <div className="flex gap-3 mb-4">
+          {dueCount > 0 && (
+            <Link
+              href="/review/quiz?due=1"
+              className="flex-1 py-3.5 text-center bg-primary text-white rounded-xl font-semibold shadow-[var(--shadow-sm)] hover:bg-primary-dark hover:shadow-[var(--shadow-md)] active:scale-[0.99] transition-all"
+            >
+              간격 복습 {Math.min(dueCount, 5)}문제
+              <span className="block text-xs font-normal mt-0.5 opacity-80">
+                간격 반복 학습
+              </span>
+            </Link>
+          )}
+          <Link
+            href="/review/quiz?n=3"
+            className="flex-1 py-3.5 text-center border-2 border-primary text-primary rounded-xl font-semibold hover:bg-primary hover:text-white active:scale-[0.99] transition-all"
+          >
+            랜덤 3문제 풀기
+            <span className="block text-xs font-normal mt-0.5 opacity-80">
+              오답 중 무작위
+            </span>
+          </Link>
+        </div>
       )}
 
       {wrongAnswers.length === 0 ? (
