@@ -153,49 +153,38 @@ export default function ProgressPage() {
               </span>
             )}
           </div>
-          <div className="space-y-3">
+          <div className="space-y-2">
             {unitCodes.map(code => {
               const data = progress[code];
               const score = data.bestScore ?? 0;
+              const covered = coveredMap[code] ?? 0;
+              const total = totalMap[code];
+              const covPct = total ? Math.round((covered / total) * 100) : 0;
               return (
-                <div key={code} className="bg-surface rounded-xl border border-border p-4">
+                <div key={code} className="bg-surface rounded-xl border border-border px-4 py-3">
                   <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-medium">{unitNameMap[code] || code}</span>
+                    <div className="flex items-center gap-1.5 min-w-0">
                       {tierMap[code] && (
-                        <span title={tierMap[code].label}>{tierMap[code].emoji}</span>
+                        <span className="shrink-0" title={tierMap[code].label}>{tierMap[code].emoji}</span>
+                      )}
+                      <span className="font-medium truncate">{unitNameMap[code] || code}</span>
+                    </div>
+                    <div className="flex items-center gap-3 shrink-0 text-sm">
+                      <span className="text-text-secondary">{data.attempts}회</span>
+                      <span className={`font-bold ${
+                        score >= 80 ? 'text-success' : score >= 50 ? 'text-warning' : 'text-error'
+                      }`}>{score}%</span>
+                      {total !== undefined && (
+                        <span className="text-success font-medium">{covered}/{total}</span>
                       )}
                     </div>
-                    <span className="text-sm text-text-secondary">{data.attempts}회 풀이</span>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="flex-1 h-3 bg-gray-100 dark:bg-white/10 rounded-full overflow-hidden">
+                  {total !== undefined && (
+                    <div className="h-1.5 bg-gray-100 dark:bg-white/10 rounded-full overflow-hidden">
                       <div
-                        className={`h-full rounded-full transition-all ${
-                          score >= 80 ? 'bg-success' :
-                          score >= 50 ? 'bg-warning' : 'bg-error'
-                        }`}
-                        style={{ width: `${score}%` }}
+                        className="h-full bg-success rounded-full transition-all"
+                        style={{ width: `${covPct}%` }}
                       />
-                    </div>
-                    <span className={`text-sm font-bold min-w-[3rem] text-right ${
-                      score >= 80 ? 'text-success' :
-                      score >= 50 ? 'text-warning' : 'text-error'
-                    }`}>
-                      {score}%
-                    </span>
-                  </div>
-                  {totalMap[code] !== undefined && (
-                    <div className="mt-2 flex items-center gap-2">
-                      <span className="text-xs text-success font-medium whitespace-nowrap">
-                        진행 {coveredMap[code] ?? 0}/{totalMap[code]}
-                      </span>
-                      <div className="flex-1 h-1.5 bg-gray-100 dark:bg-white/10 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-success rounded-full transition-all"
-                          style={{ width: `${Math.round(((coveredMap[code] ?? 0) / totalMap[code]) * 100)}%` }}
-                        />
-                      </div>
                     </div>
                   )}
                 </div>
