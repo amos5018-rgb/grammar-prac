@@ -41,6 +41,7 @@ const UNIT_NAMES: Record<string, string> = {
 const TIER_CONFIG = [
   { level: 'master', label: '마스터', emoji: '👑', color: 'text-warning', bg: 'bg-warning-light' },
   { level: 'skilled', label: '숙련자', emoji: '💪', color: 'text-primary', bg: 'bg-primary-light' },
+  { level: 'trainee', label: '유망주', emoji: '🔥', color: 'text-error', bg: 'bg-error-light' },
   { level: 'challenger', label: '도전자', emoji: '⭐', color: 'text-text-secondary', bg: 'bg-background' },
 ] as const;
 

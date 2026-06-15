@@ -120,7 +120,7 @@ export default function UnitDetail({ unit, questionCount, questionIds = [] }: Un
           </p>
         ) : tier.hint && (
           <p className="text-sm text-text-secondary mb-4 bg-gray-50 dark:bg-white/5 rounded-lg px-4 py-2.5">
-            {tier.level === 'beginner' ? '⭐' : tier.level === 'challenger' ? '\u{1F4AA}' : '\u{1F451}'} 다음 칭호까지: {tier.hint}
+            {{ beginner: '⭐', challenger: '\u{1F525}', trainee: '\u{1F4AA}', skilled: '\u{1F451}', master: '\u{1F451}' }[tier.level]} 다음 칭호까지: {tier.hint}
           </p>
         )}
 

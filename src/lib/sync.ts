@@ -41,6 +41,7 @@ function fallbackAttemptId(unitCode: string, date: string, total: number): strin
 const TIER_LABELS: Record<string, { label: string }> = {
   beginner:   { label: '비기너' },
   challenger: { label: '도전자' },
+  trainee:    { label: '유망주' },
   skilled:    { label: '숙련자' },
   master:     { label: '마스터' },
 };
@@ -93,6 +94,9 @@ export function buildSnapshot(): SyncSnapshot | null {
     const qCount = unit ? getUnitQuestionIds(unit).length : 0;
     let level: string;
     let mastered = false;
+    const hasCov = qCount > 0 && d.totalAnswered > 0;
+    const coverage = hasCov ? d.correctIds.size / qCount : 0;
+    const accuracy = hasCov ? Math.round((d.totalCorrect / d.totalAnswered) * 100) : 0;
     if (!d.hasAny) {
       level = 'beginner';
     } else if (d.fullBest !== null && d.fullBest >= 100) {
@@ -100,14 +104,12 @@ export function buildSnapshot(): SyncSnapshot | null {
       mastered = true;
     } else if (d.fullBest !== null && d.fullBest >= 80) {
       level = 'skilled';
-    } else if (qCount > 0 && d.totalAnswered > 0) {
-      const coverage = d.correctIds.size / qCount;
-      const accuracy = Math.round((d.totalCorrect / d.totalAnswered) * 100);
-      if (coverage >= 0.8 && accuracy >= 80) {
-        level = 'skilled';
-      } else {
-        level = 'challenger';
-      }
+    } else if (hasCov && coverage >= 0.8 && accuracy >= 80) {
+      level = 'skilled';
+    } else if (d.fullBest !== null && d.fullBest >= 60) {
+      level = 'trainee';
+    } else if (hasCov && coverage >= 0.5 && accuracy >= 60) {
+      level = 'trainee';
     } else {
       level = 'challenger';
     }

@@ -225,7 +225,7 @@ export function getWrongCounts(): Record<string, number> {
 
 // ── 단원 칭호 ──
 
-export type TierLevel = 'beginner' | 'challenger' | 'skilled' | 'master';
+export type TierLevel = 'beginner' | 'challenger' | 'trainee' | 'skilled' | 'master';
 
 export interface UnitTier {
   level: TierLevel;
@@ -238,6 +238,7 @@ export interface UnitTier {
 const TIERS: Record<TierLevel, { label: string; emoji: string }> = {
   beginner:   { label: '비기너',  emoji: '\u{1F331}' },
   challenger: { label: '도전자',  emoji: '⭐' },
+  trainee:    { label: '유망주',  emoji: '\u{1F525}' },
   skilled:    { label: '숙련자',  emoji: '\u{1F4AA}' },
   master:     { label: '마스터',  emoji: '\u{1F451}' },
 };
@@ -270,39 +271,48 @@ function accumulate(agg: UnitAgg, r: QuizAttempt) {
   }
 }
 
+function gapHint(covPct: number, accPct: number, targetCov: number, targetAcc: number, targetName: string): string {
+  if (covPct < targetCov && accPct < targetAcc) {
+    return `정복도 ${covPct}%, 정답률 ${accPct}% → 둘 다 ${targetAcc}%면 ${targetName}!`;
+  }
+  if (covPct < targetCov) {
+    return `정복도 ${covPct}% → ${targetCov}%까지 올리면 ${targetName}!`;
+  }
+  return `정답률 ${accPct}% → ${targetAcc}%까지 올리면 ${targetName}!`;
+}
+
 function computeTier(agg: UnitAgg, unitQuestionCount?: number): UnitTier {
   if (!agg.hasAny) {
     return { ...TIERS.beginner, level: 'beginner', mastered: false, hint: '문제를 풀면 도전자!' };
   }
   const fb = agg.fullBest;
+  const hasCov = unitQuestionCount && unitQuestionCount > 0 && agg.totalAnswered > 0;
+  const covPct = hasCov ? Math.round((agg.correctIds.size / unitQuestionCount) * 100) : 0;
+  const accPct = hasCov ? Math.round((agg.totalCorrect / agg.totalAnswered) * 100) : 0;
+
+  // 👑 마스터: 전부 풀기 100%
   if (fb !== null && fb >= 100) {
     return { ...TIERS.master, level: 'master', mastered: true };
   }
+  // 💪 숙련자: 전부 풀기 ≥80% OR (정복도 ≥80% & 정답률 ≥80%)
   if (fb !== null && fb >= 80) {
-    const hint = `전부 풀기 최고 ${fb}% → 100%면 마스터!`;
-    return { ...TIERS.skilled, level: 'skilled', mastered: false, hint };
+    return { ...TIERS.skilled, level: 'skilled', mastered: false, hint: `전부 풀기 최고 ${fb}% → 100%면 마스터!` };
   }
-  if (unitQuestionCount && unitQuestionCount > 0 && agg.totalAnswered > 0) {
-    const coverage = agg.correctIds.size / unitQuestionCount;
-    const accuracy = Math.round((agg.totalCorrect / agg.totalAnswered) * 100);
-    if (coverage >= 0.8 && accuracy >= 80) {
-      return { ...TIERS.skilled, level: 'skilled', mastered: false, hint: '전부 풀기 100%를 달성하면 마스터!' };
-    }
+  if (hasCov && covPct >= 80 && accPct >= 80) {
+    return { ...TIERS.skilled, level: 'skilled', mastered: false, hint: '전부 풀기 100%를 달성하면 마스터!' };
   }
-  let hint: string;
-  if (unitQuestionCount && unitQuestionCount > 0 && agg.totalAnswered > 0) {
-    const covPct = Math.round((agg.correctIds.size / unitQuestionCount) * 100);
-    const accPct = Math.round((agg.totalCorrect / agg.totalAnswered) * 100);
-    if (covPct < 80 && accPct < 80) {
-      hint = `정복도 ${covPct}%, 정답률 ${accPct}% → 둘 다 80%면 숙련자!`;
-    } else if (covPct < 80) {
-      hint = `정복도 ${covPct}% → 80%까지 올리면 숙련자!`;
-    } else {
-      hint = `정답률 ${accPct}% → 80%까지 올리면 숙련자!`;
-    }
-  } else {
-    hint = '문제를 풀어 정복도와 정답률을 올리세요!';
+  // 🔥 유망주: 전부 풀기 ≥60% OR (정복도 ≥50% & 정답률 ≥60%)
+  if (fb !== null && fb >= 60) {
+    const hint = hasCov ? gapHint(covPct, accPct, 80, 80, '숙련자') : `전부 풀기 최고 ${fb}% → 80%면 숙련자!`;
+    return { ...TIERS.trainee, level: 'trainee', mastered: false, hint };
   }
+  if (hasCov && covPct >= 50 && accPct >= 60) {
+    return { ...TIERS.trainee, level: 'trainee', mastered: false, hint: gapHint(covPct, accPct, 80, 80, '숙련자') };
+  }
+  // ⭐ 도전자
+  const hint = hasCov
+    ? gapHint(covPct, accPct, 50, 60, '유망주')
+    : '문제를 풀어 정복도와 정답률을 올리세요!';
   return { ...TIERS.challenger, level: 'challenger', mastered: false, hint };
 }
 

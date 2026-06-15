@@ -13,7 +13,7 @@ import {
 import { getUnitQuestionIds } from '@/data/questions/coverage';
 import { units } from '@/data/units';
 
-const RANK: Record<string, number> = { beginner: 0, challenger: 1, skilled: 2, master: 3 };
+const RANK: Record<string, number> = { beginner: 0, challenger: 1, trainee: 2, skilled: 3, master: 4 };
 
 interface ResultExtra {
   tierAfter: UnitTier;
