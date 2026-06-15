@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Unit } from '@/lib/types';
+import { UnitTier } from '@/lib/storage';
 
 interface UnitCardProps {
   unit: Unit;
@@ -7,9 +8,10 @@ interface UnitCardProps {
   bestScore: number | null;
   attempts: number;
   covered?: number;
+  tier?: UnitTier;
 }
 
-export default function UnitCard({ unit, questionCount, bestScore, attempts, covered = 0 }: UnitCardProps) {
+export default function UnitCard({ unit, questionCount, bestScore, attempts, covered = 0, tier }: UnitCardProps) {
   return (
     <Link
       href={`/units/${unit.code}`}
@@ -21,6 +23,9 @@ export default function UnitCard({ unit, questionCount, bestScore, attempts, cov
     >
       <div className="flex items-center gap-2 mb-1">
         <h3 className="font-bold text-lg">{unit.name}</h3>
+        {tier && tier.level !== 'beginner' && (
+          <span className="text-sm" title={tier.label}>{tier.emoji} {tier.label}</span>
+        )}
       </div>
       <p className="text-text-secondary text-sm mb-4 line-clamp-2">{unit.description}</p>
       <div className="flex items-center gap-3 text-xs flex-wrap">

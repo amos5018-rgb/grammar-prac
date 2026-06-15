@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Category, Unit } from '@/lib/types';
-import { getUnitProgress, getCorrectQuestionIds } from '@/lib/storage';
+import { getUnitProgress, getCorrectQuestionIds, getUnitTierMap, UnitTier } from '@/lib/storage';
 import { getUnitQuestionIds } from '@/data/questions/coverage';
 import UnitCard from '@/components/UnitCard';
 
@@ -19,8 +19,10 @@ type Progress = Record<string, { attempts: number; bestScore: number | null }>;
 export default function CategoryContent({ category, units, questionCounts, totalQuestions }: CategoryContentProps) {
   const [progress, setProgress] = useState<Progress>({});
   const [coveredMap, setCoveredMap] = useState<Record<string, number>>({});
+  const [tierMap, setTierMap] = useState<Record<string, UnitTier>>({});
   useEffect(() => {
     setProgress(getUnitProgress());
+    setTierMap(getUnitTierMap());
     const correct = getCorrectQuestionIds();
     const cov: Record<string, number> = {};
     for (const u of units) {
@@ -68,6 +70,7 @@ export default function CategoryContent({ category, units, questionCounts, total
             bestScore={progress[unit.code]?.bestScore ?? null}
             attempts={progress[unit.code]?.attempts ?? 0}
             covered={coveredMap[unit.code] ?? 0}
+            tier={tierMap[unit.code]}
           />
         ))}
       </div>
