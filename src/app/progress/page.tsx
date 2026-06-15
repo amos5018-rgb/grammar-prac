@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { getQuizResults, getUnitProgress, getUnitTierMap, getCorrectQuestionIds, clearAllHistory, getStreak, getExamCalendar, getDday, UnitTier } from '@/lib/storage';
+import { getQuizResults, getUnitProgress, getUnitTierMap, getCorrectQuestionIds, clearAllHistory, getStreak, getExamCalendar, getDday, UnitTier, TierLevel } from '@/lib/storage';
 import { getUnitQuestionIds } from '@/data/questions/coverage';
 import { QuizAttempt } from '@/lib/types';
 import { units } from '@/data/units';
@@ -10,6 +10,7 @@ import { categories } from '@/data/categories';
 
 const unitNameMap: Record<string, string> = Object.fromEntries(units.map(u => [u.code, u.name]));
 for (const c of categories) unitNameMap[`mixed-${c.code}`] = `${c.name} 섞어풀기`;
+const TIER_RANK: Record<TierLevel, number> = { beginner: 0, challenger: 1, trainee: 2, skilled: 3, master: 4 };
 const DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'];
 
 export default function ProgressPage() {
@@ -64,7 +65,11 @@ export default function ProgressPage() {
     setCalendar(getExamCalendar());
   };
 
-  const unitCodes = Object.keys(progress);
+  const unitCodes = Object.keys(progress).sort((a, b) => {
+    const ra = TIER_RANK[tierMap[a]?.level ?? 'beginner'];
+    const rb = TIER_RANK[tierMap[b]?.level ?? 'beginner'];
+    return rb - ra;
+  });
   const totalAttempts = results.length;
 
   return (

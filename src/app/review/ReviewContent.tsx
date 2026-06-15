@@ -22,6 +22,7 @@ export default function ReviewContent({ allQuestions }: Props) {
   const [wrongCounts, setWrongCounts] = useState<Record<string, number>>({});
   const [sortByCount, setSortByCount] = useState(false);
   const [previewId, setPreviewId] = useState<string | null>(null);
+  const [unitDropdownOpen, setUnitDropdownOpen] = useState(false);
 
   useEffect(() => {
     setWrongAnswers(getDedupedWrongAnswers());
@@ -120,29 +121,48 @@ export default function ReviewContent({ allQuestions }: Props) {
           </Link>
 
           {/* Filter + Sort */}
-          <div className="flex items-center gap-2 mb-4 flex-wrap">
-            <button
-              onClick={() => setFilter('all')}
-              className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                filter === 'all' ? 'bg-primary text-white' : 'bg-gray-100 dark:bg-white/10 text-text-secondary hover:bg-gray-200 dark:hover:bg-white/15'
-              }`}
-            >
-              전체 ({wrongAnswers.length})
-            </button>
-            {unitCodes.map(code => {
-              const count = wrongAnswers.filter(w => w.unitCode === code).length;
-              return (
-                <button
-                  key={code}
-                  onClick={() => setFilter(code)}
-                  className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                    filter === code ? 'bg-primary text-white' : 'bg-gray-100 dark:bg-white/10 text-text-secondary hover:bg-gray-200 dark:hover:bg-white/15'
-                  }`}
-                >
-                  {unitNameMap[code] || code} ({count})
-                </button>
-              );
-            })}
+          <div className="flex items-center gap-2 mb-4">
+            <div className="relative flex-1">
+              <button
+                onClick={() => setUnitDropdownOpen(prev => !prev)}
+                className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl border border-border bg-surface text-sm font-medium hover:border-primary/40 transition-colors"
+              >
+                <span>
+                  {filter === 'all'
+                    ? `전체 단원 (${wrongAnswers.length}문제)`
+                    : `${unitNameMap[filter] || filter} (${filtered.length}문제)`}
+                </span>
+                <svg className={`w-4 h-4 text-text-secondary transition-transform ${unitDropdownOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {unitDropdownOpen && (
+                <div className="absolute z-10 mt-1 w-full bg-surface border border-border rounded-xl shadow-lg overflow-hidden">
+                  <button
+                    onClick={() => { setFilter('all'); setUnitDropdownOpen(false); }}
+                    className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
+                      filter === 'all' ? 'bg-primary-light text-primary font-semibold' : 'hover:bg-gray-50 dark:hover:bg-white/5'
+                    }`}
+                  >
+                    전체 단원 ({wrongAnswers.length}문제)
+                  </button>
+                  {unitCodes.map(code => {
+                    const count = wrongAnswers.filter(w => w.unitCode === code).length;
+                    return (
+                      <button
+                        key={code}
+                        onClick={() => { setFilter(code); setUnitDropdownOpen(false); }}
+                        className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
+                          filter === code ? 'bg-primary-light text-primary font-semibold' : 'hover:bg-gray-50 dark:hover:bg-white/5'
+                        }`}
+                      >
+                        {unitNameMap[code] || code} ({count}문제)
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="flex justify-end mb-3">
