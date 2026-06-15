@@ -123,7 +123,6 @@ export const units: Unit[] = [
     order: 50,
     active: true,
     summary: true,
-    shuffleOnly: true,
   },
   {
     code: 'phoneme-change-study',

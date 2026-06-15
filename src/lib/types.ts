@@ -24,7 +24,6 @@ export interface Unit {
   advanced?: boolean;    // true면 '고난도 도전' 섹션에 표시
   summary?: boolean;     // true면 '총정리' 섹션에 표시
   study?: boolean;       // true면 퀴즈 대신 인출 연습 UI
-  shuffleOnly?: boolean; // true면 셔플 고정, 토글 숨김
   parentCode?: string;   // 분할 소단원의 원본 unitCode (questions 필터용)
   partIndex?: number;    // 분할 소단원 번호 (0, 1, 2)
 }

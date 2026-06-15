@@ -18,6 +18,21 @@ export default function UnitDetail({ unit, questionCount }: UnitDetailProps) {
   const attempts = getUnitAttemptCount(unit.code);
   const tier = getUnitTier(unit.code);
 
+  // 풀이 모드 구성
+  //  - 고난도 소단원: 전부 풀기만
+  //  - 음운 변동 총정리 문제편: 랜덤 5 / 랜덤 10 / 전부 풀기
+  //  - 그 외 일반 소단원: 랜덤 5 / 전부 풀기
+  const base = `/units/${unit.code}/quiz`;
+  const modes: { label: string; href: string }[] = [];
+  if (unit.advanced) {
+    modes.push({ label: '문제 풀기 시작', href: base });
+  } else {
+    const isReview = unit.code === 'phoneme-change-review';
+    if (questionCount > 5) modes.push({ label: '랜덤 5문제 풀기', href: `${base}?n=5` });
+    if (isReview && questionCount > 10) modes.push({ label: '랜덤 10문제 풀기', href: `${base}?n=10` });
+    modes.push({ label: `전부 풀기 (${questionCount}문제)`, href: base });
+  }
+
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
       <Link
@@ -61,12 +76,21 @@ export default function UnitDetail({ unit, questionCount }: UnitDetailProps) {
           </p>
         )}
 
-        <Link
-          href={`/units/${unit.code}/quiz`}
-          className="block w-full py-4 bg-primary text-white text-center rounded-xl font-semibold text-base hover:bg-primary-dark transition-colors"
-        >
-          문제 풀기 시작
-        </Link>
+        <div className="space-y-3">
+          {modes.map((m, i) => (
+            <Link
+              key={m.label}
+              href={m.href}
+              className={`block w-full py-4 text-center rounded-xl font-semibold text-base transition-colors ${
+                i === 0
+                  ? 'bg-primary text-white hover:bg-primary-dark'
+                  : 'border-2 border-primary text-primary hover:bg-primary hover:text-white'
+              }`}
+            >
+              {m.label}
+            </Link>
+          ))}
+        </div>
       </div>
     </div>
   );

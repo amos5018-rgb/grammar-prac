@@ -21,14 +21,12 @@ interface QuizRunnerProps {
   questions: Question[];
   reviewMode?: boolean;
   exitHref?: string;
-  shuffleOnly?: boolean;
 }
 
-export default function QuizRunner({ unitCode, questions: initialQuestions, reviewMode = false, exitHref, shuffleOnly = false }: QuizRunnerProps) {
+export default function QuizRunner({ unitCode, questions: initialQuestions, reviewMode = false, exitHref }: QuizRunnerProps) {
   const router = useRouter();
-  const alwaysShuffle = shuffleOnly || reviewMode;
-  const [shuffled, setShuffled] = useState(alwaysShuffle);
-  const [questions, setQuestions] = useState(() => alwaysShuffle ? shuffle(initialQuestions) : initialQuestions);
+  // 모든 풀이는 셔플 모드로만 작동
+  const [questions] = useState(() => shuffle(initialQuestions));
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState('');
   const [blankAnswers, setBlankAnswers] = useState<string[]>([]);
@@ -40,22 +38,6 @@ export default function QuizRunner({ unitCode, questions: initialQuestions, revi
 
   const backHref = exitHref ?? `/units/${unitCode}`;
   const hasResultPage = !exitHref;
-
-  const canShuffle = answers.length === 0 && !showFeedback;
-
-  const toggleShuffle = () => {
-    if (!canShuffle) return;
-    if (shuffled) {
-      setQuestions(initialQuestions);
-      setShuffled(false);
-    } else {
-      setQuestions(shuffle(initialQuestions));
-      setShuffled(true);
-    }
-    setCurrentIndex(0);
-    setSelectedAnswer('');
-    setBlankAnswers([]);
-  };
 
   const question = questions[currentIndex];
   const progress = (currentIndex / questions.length) * 100;
@@ -276,33 +258,13 @@ export default function QuizRunner({ unitCode, questions: initialQuestions, revi
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center mb-4">
         <button
           onClick={exitQuiz}
           className="text-sm text-text-secondary hover:text-primary"
         >
           &larr; 나가기
         </button>
-        {!shuffleOnly && (
-          <button
-            onClick={toggleShuffle}
-            disabled={!canShuffle}
-            className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border transition-colors ${
-              shuffled
-                ? 'border-primary bg-primary-light text-primary'
-                : 'border-border text-text-secondary hover:border-gray-300 dark:hover:border-white/20'
-            } ${!canShuffle ? 'opacity-40 cursor-not-allowed' : ''}`}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="16 3 21 3 21 8" />
-              <line x1="4" y1="20" x2="21" y2="3" />
-              <polyline points="21 16 21 21 16 21" />
-              <line x1="15" y1="15" x2="21" y2="21" />
-              <line x1="4" y1="4" x2="9" y2="9" />
-            </svg>
-            셔플 {shuffled ? 'ON' : 'OFF'}
-          </button>
-        )}
       </div>
 
       {/* Progress bar */}
