@@ -23,7 +23,7 @@ export default function UnitDetail({ unit, questionCount, questionIds = [] }: Un
   //  - 고난도 소단원: 전부 풀기만
   //  - 음운 변동 총정리 문제편: 랜덤 5 / 랜덤 10 / 전부 풀기
   //  - 그 외 일반 소단원: 랜덤 5 / 전부 풀기
-  // 정복도: 한 번이라도 맞힌 문항 / 전체 문항
+  // 진행도: 한 번이라도 맞힌 문항 / 전체 문항
   const correctSet = getCorrectQuestionIds();
   const covered = questionIds.filter(id => correctSet.has(id)).length;
   const coveragePct = questionIds.length > 0 ? Math.round((covered / questionIds.length) * 100) : 0;
@@ -98,14 +98,14 @@ export default function UnitDetail({ unit, questionCount, questionIds = [] }: Un
           )}
         </div>
 
-        {/* 정복도: 어떤 모드로 풀든 새 문제를 맞히면 채워짐 */}
+        {/* 진행도: 어떤 모드로 풀든 새 문제를 맞히면 채워짐 */}
         {questionIds.length > 0 && (
           <div className="mb-4">
             <div className="flex items-center justify-between mb-1.5">
-              <span className="text-sm font-medium text-text">정복도</span>
+              <span className="text-sm font-medium text-text">진행도</span>
               <span className="text-sm font-semibold text-success">
                 {covered}/{questionIds.length}문제
-                {coveragePct === 100 && ' · 정복 완료 🎉'}
+                {coveragePct === 100 && ' · 완료 🎉'}
               </span>
             </div>
             <div className="h-2.5 bg-gray-100 dark:bg-white/10 rounded-full overflow-hidden">
@@ -134,7 +134,7 @@ export default function UnitDetail({ unit, questionCount, questionIds = [] }: Un
                 href={m.href}
                 className={`block w-full py-4 text-center rounded-xl font-semibold text-base transition-colors ${
                   m.wrong
-                    ? 'border-2 border-success text-success hover:bg-success hover:text-white'
+                    ? 'border-2 border-warning text-warning hover:bg-warning hover:text-white'
                     : isPrimary
                       ? `bg-primary text-white hover:bg-primary-dark${pulse}`
                       : 'border-2 border-primary text-primary hover:bg-primary hover:text-white'

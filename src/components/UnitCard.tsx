@@ -43,7 +43,7 @@ export default function UnitCard({ unit, questionCount, bestScore, attempts, cov
         )}
         {!unit.study && covered > 0 && (
           <span className="bg-success-light text-success px-2.5 py-1 rounded-full font-medium">
-            정복 {covered}/{questionCount}
+            진행 {covered}/{questionCount}
           </span>
         )}
         {!unit.study && attempts > 0 && (

@@ -103,11 +103,11 @@ export default function ResultContent({ code }: { code: string }) {
         {extra && extra.total > 0 && (
           <div className="mt-4">
             <div className="flex items-center justify-between mb-1.5">
-              <span className="text-sm font-medium text-text">정복도</span>
+              <span className="text-sm font-medium text-text">진행도</span>
               <span className="text-sm font-semibold text-success">
                 {extra.coveredAfter > extra.coveredBefore
-                  ? `정복 ${extra.coveredBefore} → ${extra.coveredAfter}/${extra.total}`
-                  : `정복 ${extra.coveredAfter}/${extra.total}`}
+                  ? `${extra.coveredBefore} → ${extra.coveredAfter}/${extra.total}`
+                  : `${extra.coveredAfter}/${extra.total}`}
               </span>
             </div>
             <div className="h-2.5 bg-gray-100 dark:bg-white/10 rounded-full overflow-hidden">

@@ -273,12 +273,12 @@ function accumulate(agg: UnitAgg, r: QuizAttempt) {
 
 function gapHint(covPct: number, accPct: number, targetCov: number, targetAcc: number, targetName: string): string {
   if (covPct < targetCov && accPct < targetAcc) {
-    return `정복도 ${covPct}%, 정답률 ${accPct}% → 둘 다 ${targetAcc}%면 ${targetName}!`;
+    return `진행도 ${covPct}%, 정답률 ${accPct}% → 둘 다 ${targetAcc}%면 ${targetName}!`;
   }
   if (covPct < targetCov) {
-    return `정복도 ${covPct}% → ${targetCov}%까지 올리면 ${targetName}!`;
+    return `진행도 ${covPct}% → ${targetCov}%까지 올리면 ${targetName}!`;
   }
-  return `정답률 ${accPct}% → ${targetAcc}%까지 올리면 ${targetName}!`;
+  return `정답률 ${accPct}% → ${targetAcc}%면 ${targetName}!`;
 }
 
 function computeTier(agg: UnitAgg, unitQuestionCount?: number): UnitTier {
@@ -312,7 +312,7 @@ function computeTier(agg: UnitAgg, unitQuestionCount?: number): UnitTier {
   // ⭐ 도전자
   const hint = hasCov
     ? gapHint(covPct, accPct, 50, 60, '유망주')
-    : '문제를 풀어 정복도와 정답률을 올리세요!';
+    : '문제를 풀어 진행도와 정답률을 올리세요!';
   return { ...TIERS.challenger, level: 'challenger', mastered: false, hint };
 }
 
@@ -346,7 +346,7 @@ export function getUnitTierMap(): Record<string, UnitTier> {
   return map;
 }
 
-// 한 번이라도 맞힌 서로 다른 문항 id 집합 (정복도 계산용)
+// 한 번이라도 맞힌 서로 다른 문항 id 집합 (진행도 계산용)
 export function getCorrectQuestionIds(results: QuizAttempt[] = getQuizResults()): Set<string> {
   const set = new Set<string>();
   for (const r of results) {

@@ -19,7 +19,6 @@ export default function ProgressPage() {
   const [tierMap, setTierMap] = useState<Record<string, UnitTier>>({});
   const [coveredMap, setCoveredMap] = useState<Record<string, number>>({});
   const [totalMap, setTotalMap] = useState<Record<string, number>>({});
-  const [totalCovered, setTotalCovered] = useState(0);
   const [streak, setStreak] = useState(0);
   const [calendar, setCalendar] = useState<{ date: string; active: boolean; isToday: boolean; isExam: boolean; isPast: boolean }[]>([]);
   const [dday, setDday] = useState(0);
@@ -37,23 +36,19 @@ export default function ProgressPage() {
     setTierMap(tiers);
     setMasteredCount(Object.values(tiers).filter(t => t.mastered).length);
 
-    // 정복도: 단원별 한 번이라도 맞힌 문항 수
+    // 진행도: 단원별 한 번이라도 맞힌 문항 수
     const correct = getCorrectQuestionIds(allResults);
     const cov: Record<string, number> = {};
     const tot: Record<string, number> = {};
-    let sum = 0;
     for (const u of units) {
       if (u.study) continue;
       const ids = getUnitQuestionIds(u);
       if (ids.length === 0) continue;
-      const c = ids.filter(id => correct.has(id)).length;
-      cov[u.code] = c;
+      cov[u.code] = ids.filter(id => correct.has(id)).length;
       tot[u.code] = ids.length;
-      sum += c;
     }
     setCoveredMap(cov);
     setTotalMap(tot);
-    setTotalCovered(sum);
   }, []);
 
   const handleReset = () => {
@@ -65,7 +60,6 @@ export default function ProgressPage() {
     setTierMap({});
     setCoveredMap({});
     setTotalMap({});
-    setTotalCovered(0);
     setStreak(0);
     setCalendar(getExamCalendar());
   };
@@ -153,18 +147,11 @@ export default function ProgressPage() {
           {/* Per-unit progress */}
           <div className="flex items-center justify-between mb-4 gap-2">
             <h2 className="font-bold text-lg">단원별 현황</h2>
-            <div className="flex items-center gap-2">
-              {totalCovered > 0 && (
-                <span className="bg-success-light text-success px-2.5 py-1 rounded-full text-sm font-medium whitespace-nowrap">
-                  정복 {totalCovered}문제
-                </span>
-              )}
-              {masteredCount > 0 && (
-                <span className="bg-warning-light text-warning px-2.5 py-1 rounded-full text-sm font-medium whitespace-nowrap">
-                  &#128081; {masteredCount}개 마스터
-                </span>
-              )}
-            </div>
+            {masteredCount > 0 && (
+              <span className="bg-warning-light text-warning px-2.5 py-1 rounded-full text-sm font-medium whitespace-nowrap">
+                &#128081; {masteredCount}개 마스터
+              </span>
+            )}
           </div>
           <div className="space-y-3">
             {unitCodes.map(code => {
@@ -201,7 +188,7 @@ export default function ProgressPage() {
                   {totalMap[code] !== undefined && (
                     <div className="mt-2 flex items-center gap-2">
                       <span className="text-xs text-success font-medium whitespace-nowrap">
-                        정복 {coveredMap[code] ?? 0}/{totalMap[code]}
+                        진행 {coveredMap[code] ?? 0}/{totalMap[code]}
                       </span>
                       <div className="flex-1 h-1.5 bg-gray-100 dark:bg-white/10 rounded-full overflow-hidden">
                         <div

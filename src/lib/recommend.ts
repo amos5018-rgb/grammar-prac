@@ -226,8 +226,8 @@ function getFullChallengeRecommendation(
     type: 'full-challenge',
     title: `'${best.name}' 전부 풀기로 마스터 도전`,
     subtitle: urgent
-      ? `D-${dday} · 정복도 ${Math.round(best.pct * 100)}% — 전부 풀기 100%면 마스터!`
-      : `정복도 ${Math.round(best.pct * 100)}%까지 왔어요 — 전부 풀기 100%면 마스터!`,
+      ? `D-${dday} · 진행도 ${Math.round(best.pct * 100)}% — 전부 풀기 100%면 마스터!`
+      : `진행도 ${Math.round(best.pct * 100)}%까지 왔어요 — 전부 풀기 100%면 마스터!`,
     href: `/units/${best.code}/quiz`,
     urgent,
   };
