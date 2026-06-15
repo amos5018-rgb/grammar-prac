@@ -21,9 +21,10 @@ interface QuizRunnerProps {
   questions: Question[];
   reviewMode?: boolean;
   exitHref?: string;
+  fullAttempt?: boolean; // 전부 풀기 여부 (랜덤 모드면 false) — 칭호 승급 판정에 사용
 }
 
-export default function QuizRunner({ unitCode, questions: initialQuestions, reviewMode = false, exitHref }: QuizRunnerProps) {
+export default function QuizRunner({ unitCode, questions: initialQuestions, reviewMode = false, exitHref, fullAttempt = false }: QuizRunnerProps) {
   const router = useRouter();
   // 모든 풀이는 셔플 모드로만 작동
   const [questions] = useState(() => shuffle(initialQuestions));
@@ -120,6 +121,7 @@ export default function QuizRunner({ unitCode, questions: initialQuestions, revi
         score: answers.filter(a => a.correct).length,
         total: questions.length,
         completed: true,
+        full: fullAttempt,
         answers,
       });
       if (hasResultPage) {

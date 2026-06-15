@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Unit } from '@/lib/types';
-import { getBestScore, getUnitAttemptCount, getUnitTier, getStudyCompletion, getDedupedWrongAnswers } from '@/lib/storage';
+import { getBestScore, getUnitAttemptCount, getUnitTier, getStudyCompletion, getDedupedWrongAnswers, getCorrectQuestionIds, CONVERT_COVERAGE } from '@/lib/storage';
 
 interface UnitDetailProps {
   unit: Unit;
@@ -23,16 +23,31 @@ export default function UnitDetail({ unit, questionCount, questionIds = [] }: Un
   //  - 고난도 소단원: 전부 풀기만
   //  - 음운 변동 총정리 문제편: 랜덤 5 / 랜덤 10 / 전부 풀기
   //  - 그 외 일반 소단원: 랜덤 5 / 전부 풀기
+  // 정복도: 한 번이라도 맞힌 문항 / 전체 문항
+  const correctSet = getCorrectQuestionIds();
+  const covered = questionIds.filter(id => correctSet.has(id)).length;
+  const coveragePct = questionIds.length > 0 ? Math.round((covered / questionIds.length) * 100) : 0;
+  // 전환 후보: 정복도 높지만(≥기준) 아직 도전자 → 전부 풀기로 끌어오기
+  const isCandidate =
+    tier.level === 'challenger' &&
+    questionIds.length > 0 &&
+    covered / questionIds.length >= CONVERT_COVERAGE;
+
   const base = `/units/${unit.code}/quiz`;
-  const modes: { label: string; href: string; wrong?: boolean }[] = [];
+  const modes: { label: string; href: string; wrong?: boolean; full?: boolean }[] = [];
   if (unit.advanced) {
-    modes.push({ label: '문제 풀기 시작', href: base });
+    modes.push({ label: '문제 풀기 시작', href: base, full: true });
   } else {
     const isReview = unit.code === 'phoneme-change-review';
     if (questionCount > 5) modes.push({ label: '랜덤 5문제 풀기', href: `${base}?n=5` });
     if (isReview && questionCount > 10) modes.push({ label: '랜덤 10문제 풀기', href: `${base}?n=10` });
-    modes.push({ label: `전부 풀기 (${questionCount}문제)`, href: base });
+    modes.push({ label: `전부 풀기 (${questionCount}문제)`, href: base, full: true });
   }
+
+  // 강조할 버튼: 전환 후보면 '전부 풀기', 아니면 첫 풀기 버튼
+  const primaryLabel = isCandidate
+    ? modes.find(m => m.full)?.label
+    : modes.find(m => !m.wrong)?.label;
 
   // 틀린 문제 모아풀기 (오답 노트 기반) — 일반·고난도 모두 적용
   // 문항 id로 집계해 고난도 분할 파트의 오답도 정확히 분리
@@ -87,28 +102,52 @@ export default function UnitDetail({ unit, questionCount, questionIds = [] }: Un
           )}
         </div>
 
-        {tier.hint && (
+        {/* 정복도: 어떤 모드로 풀든 새 문제를 맞히면 채워짐 */}
+        {questionIds.length > 0 && (
+          <div className="mb-4">
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-sm font-medium text-text">정복도</span>
+              <span className="text-sm font-semibold text-success">
+                {covered}/{questionIds.length}문제
+                {coveragePct === 100 && ' · 정복 완료 🎉'}
+              </span>
+            </div>
+            <div className="h-2.5 bg-gray-100 dark:bg-white/10 rounded-full overflow-hidden">
+              <div className="h-full bg-success rounded-full transition-all" style={{ width: `${coveragePct}%` }} />
+            </div>
+          </div>
+        )}
+
+        {isCandidate ? (
+          <p className="text-sm font-medium text-primary mb-4 bg-primary-light rounded-lg px-4 py-2.5">
+            &#128293; 숙련자까지 한 걸음! 정복도 {coveragePct}% — 전부 풀기로 칭호에 도전하세요.
+          </p>
+        ) : tier.hint && (
           <p className="text-sm text-text-secondary mb-4 bg-gray-50 dark:bg-white/5 rounded-lg px-4 py-2.5">
             {tier.level === 'beginner' ? '⭐' : tier.level === 'challenger' ? '\u{1F4AA}' : '\u{1F451}'} 다음 칭호까지: {tier.hint}
           </p>
         )}
 
         <div className="space-y-3">
-          {modes.map((m, i) => (
-            <Link
-              key={m.label}
-              href={m.href}
-              className={`block w-full py-4 text-center rounded-xl font-semibold text-base transition-colors ${
-                m.wrong
-                  ? 'border-2 border-success text-success hover:bg-success hover:text-white'
-                  : i === 0
-                    ? 'bg-primary text-white hover:bg-primary-dark'
-                    : 'border-2 border-primary text-primary hover:bg-primary hover:text-white'
-              }`}
-            >
-              {m.label}
-            </Link>
-          ))}
+          {modes.map(m => {
+            const isPrimary = !m.wrong && m.label === primaryLabel;
+            const pulse = isCandidate && m.full ? ' ring-2 ring-primary/40' : '';
+            return (
+              <Link
+                key={m.label}
+                href={m.href}
+                className={`block w-full py-4 text-center rounded-xl font-semibold text-base transition-colors ${
+                  m.wrong
+                    ? 'border-2 border-success text-success hover:bg-success hover:text-white'
+                    : isPrimary
+                      ? `bg-primary text-white hover:bg-primary-dark${pulse}`
+                      : 'border-2 border-primary text-primary hover:bg-primary hover:text-white'
+                }`}
+              >
+                {m.label}
+              </Link>
+            );
+          })}
         </div>
       </div>
     </div>

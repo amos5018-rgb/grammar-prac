@@ -51,18 +51,29 @@ export function buildSnapshot(): SyncSnapshot | null {
   const results = getQuizResults();
 
   // 한 번의 순회로 progress + tier 정보를 동시에 계산
-  const unitData: Record<string, { attempts: number; bestScore: number | null; dates: Set<string> }> = {};
+  // 칭호 승급(숙련자/마스터)은 '전부 풀기'(full !== false) 결과로만 인정
+  const unitData: Record<string, {
+    attempts: number;
+    bestScore: number | null;   // 임의 완료 최고점 (표시용)
+    hasAny: boolean;            // 도전자 진입 기준
+    fullBest: number | null;    // 전부 풀기 최고점 (승급 기준)
+    fullDays: Set<string>;
+  }> = {};
   for (const r of results) {
     let entry = unitData[r.unitCode];
     if (!entry) {
-      entry = { attempts: 0, bestScore: null, dates: new Set() };
+      entry = { attempts: 0, bestScore: null, hasAny: false, fullBest: null, fullDays: new Set() };
       unitData[r.unitCode] = entry;
     }
     entry.attempts++;
     if (r.completed !== false) {
+      entry.hasAny = true;
       const pct = Math.round((r.score / r.total) * 100);
       if (entry.bestScore === null || pct > entry.bestScore) entry.bestScore = pct;
-      entry.dates.add(r.date.split('T')[0]);
+      if (r.full !== false) { // 레거시(undefined)는 전부 풀기로 간주
+        if (entry.fullBest === null || pct > entry.fullBest) entry.fullBest = pct;
+        entry.fullDays.add(r.date.split('T')[0]);
+      }
     }
   }
 
@@ -72,12 +83,12 @@ export function buildSnapshot(): SyncSnapshot | null {
     unitProgress[code] = { attempts: d.attempts, bestScore: d.bestScore };
     let level: string;
     let mastered = false;
-    if (d.bestScore === null) {
+    if (!d.hasAny) {
       level = 'beginner';
-    } else if (d.bestScore >= 90 && d.dates.size >= 2) {
+    } else if (d.fullBest !== null && d.fullBest >= 90 && d.fullDays.size >= 2) {
       level = 'master';
       mastered = true;
-    } else if (d.bestScore >= 80) {
+    } else if (d.fullBest !== null && d.fullBest >= 80) {
       level = 'skilled';
     } else {
       level = 'challenger';

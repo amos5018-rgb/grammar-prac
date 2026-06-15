@@ -6,9 +6,10 @@ interface UnitCardProps {
   questionCount: number;
   bestScore: number | null;
   attempts: number;
+  covered?: number;
 }
 
-export default function UnitCard({ unit, questionCount, bestScore, attempts }: UnitCardProps) {
+export default function UnitCard({ unit, questionCount, bestScore, attempts, covered = 0 }: UnitCardProps) {
   return (
     <Link
       href={`/units/${unit.code}`}
@@ -38,6 +39,11 @@ export default function UnitCard({ unit, questionCount, bestScore, attempts }: U
             'bg-error-light text-error'
           }`}>
             최고 {bestScore}점
+          </span>
+        )}
+        {!unit.study && covered > 0 && (
+          <span className="bg-success-light text-success px-2.5 py-1 rounded-full font-medium">
+            정복 {covered}/{questionCount}
           </span>
         )}
         {!unit.study && attempts > 0 && (

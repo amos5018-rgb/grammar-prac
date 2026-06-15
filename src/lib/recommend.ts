@@ -1,10 +1,11 @@
-import { getUnitProgress, getDueCount, getWrongCounts, getUnitTierMap, getDday, getStudyCompletion, UnitTier } from './storage';
+import { getUnitProgress, getDueCount, getWrongCounts, getUnitTierMap, getCorrectQuestionIds, getDday, getStudyCompletion, CONVERT_COVERAGE, UnitTier } from './storage';
 import { units } from '@/data/units';
+import { getUnitQuestionIds } from '@/data/questions/coverage';
 
 type TierMap = Record<string, UnitTier>;
 type Progress = Record<string, { attempts: number; bestScore: number | null }>;
 
-export type RecommendationType = 'review' | 'wrong-top' | 'retry' | 'master-push' | 'new' | 'summary' | 'study' | 'advanced' | 'done';
+export type RecommendationType = 'review' | 'wrong-top' | 'retry' | 'full-challenge' | 'master-push' | 'new' | 'summary' | 'study' | 'advanced' | 'done';
 
 export interface Recommendation {
   type: RecommendationType;
@@ -73,6 +74,10 @@ export function getRecommendation(): Recommendation | null {
   // 5. master-push — 숙련자 단원 마스터 도전
   const masterPushRec = getMasterPushRecommendation(progress, tiers, dday, urgent);
   if (masterPushRec) pool.push(masterPushRec);
+
+  // 5+. full-challenge — 전환 훅: 정복도 높은 도전자를 '전부 풀기'로 끌어오기
+  const fullChallengeRec = getFullChallengeRecommendation(tiers, dday, urgent);
+  if (fullChallengeRec) pool.push(fullChallengeRec);
 
   if (pool.length > 0) {
     return pool[Math.floor(Math.random() * pool.length)];
@@ -186,17 +191,43 @@ function getMasterPushRecommendation(
 
   if (!skilledUnit) return null;
 
-  const best = progress[skilledUnit.code]?.bestScore ?? 0;
-  const needsScore = best < 90;
   const prefix = urgent ? `D-${dday} · ` : '';
 
   return {
     type: 'master-push',
     title: `'${skilledUnit.name}' 마스터 도전`,
-    subtitle: needsScore
-      ? `${prefix}최고 ${best}% — 90% 이상이면 마스터예요!`
-      : `${prefix}다른 날 한 번 더 90% 이상이면 마스터! \u{1F451}`,
+    subtitle: `${prefix}전부 풀기 90%를 다른 날에도 달성하면 마스터! \u{1F451}`,
     href: `/units/${skilledUnit.code}`,
+    urgent,
+  };
+}
+
+// 전환 훅: 정복도 ≥ 기준이지만 아직 도전자인 핵심 단원을 '전부 풀기'로 유도
+function getFullChallengeRecommendation(
+  tiers: TierMap,
+  dday: number,
+  urgent: boolean,
+): Recommendation | null {
+  const correct = getCorrectQuestionIds();
+  let best: { name: string; code: string; pct: number } | null = null;
+  for (const u of CORE) {
+    if (tiers[u.code]?.level !== 'challenger') continue;
+    const ids = getUnitQuestionIds(u);
+    if (ids.length === 0) continue;
+    const cov = ids.filter(id => correct.has(id)).length / ids.length;
+    if (cov >= CONVERT_COVERAGE && (!best || cov > best.pct)) {
+      best = { name: u.name, code: u.code, pct: cov };
+    }
+  }
+  if (!best) return null;
+
+  return {
+    type: 'full-challenge',
+    title: `'${best.name}' 전부 풀기로 칭호 올리기`,
+    subtitle: urgent
+      ? `D-${dday} · 정복도 ${Math.round(best.pct * 100)}% — 전부 풀기 80%면 숙련자!`
+      : `정복도 ${Math.round(best.pct * 100)}%까지 왔어요 — 전부 풀기 80%면 숙련자!`,
+    href: `/units/${best.code}/quiz`,
     urgent,
   };
 }

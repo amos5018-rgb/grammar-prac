@@ -27,5 +27,7 @@ export default function QuizLauncher({ unitCode, questions }: { unitCode: string
     return questions;
   });
 
-  return <QuizRunner unitCode={unitCode} questions={selected} />;
+  const fullAttempt = selected.length === questions.length;
+
+  return <QuizRunner unitCode={unitCode} questions={selected} fullAttempt={fullAttempt} />;
 }

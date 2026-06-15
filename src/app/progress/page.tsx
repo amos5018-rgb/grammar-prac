@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { getQuizResults, clearAllHistory, TierLevel, getStreak, getExamCalendar, getDday } from '@/lib/storage';
+import { getQuizResults, getUnitProgress, getUnitTierMap, getCorrectQuestionIds, clearAllHistory, getStreak, getExamCalendar, getDday, UnitTier } from '@/lib/storage';
+import { getUnitQuestionIds } from '@/data/questions/coverage';
 import { QuizAttempt } from '@/lib/types';
 import { units } from '@/data/units';
 import { categories } from '@/data/categories';
@@ -15,7 +16,10 @@ export default function ProgressPage() {
   const [progress, setProgress] = useState<Record<string, { attempts: number; bestScore: number | null }>>({});
   const [results, setResults] = useState<QuizAttempt[]>([]);
   const [masteredCount, setMasteredCount] = useState(0);
-  const [tierMap, setTierMap] = useState<Record<string, { level: TierLevel; label: string; emoji: string }>>({});
+  const [tierMap, setTierMap] = useState<Record<string, UnitTier>>({});
+  const [coveredMap, setCoveredMap] = useState<Record<string, number>>({});
+  const [totalMap, setTotalMap] = useState<Record<string, number>>({});
+  const [totalCovered, setTotalCovered] = useState(0);
   const [streak, setStreak] = useState(0);
   const [calendar, setCalendar] = useState<{ date: string; active: boolean; isToday: boolean; isExam: boolean; isPast: boolean }[]>([]);
   const [dday, setDday] = useState(0);
@@ -27,50 +31,29 @@ export default function ProgressPage() {
     setCalendar(getExamCalendar());
     setDday(getDday());
 
-    // 단일 순회로 progress + tier 동시 계산 (getUnitTier 반복 호출 회피)
-    const prog: Record<string, { attempts: number; bestScore: number | null }> = {};
-    const unitData: Record<string, { bestScore: number | null; dates: Set<string> }> = {};
-    for (const r of allResults) {
-      if (!prog[r.unitCode]) prog[r.unitCode] = { attempts: 0, bestScore: null };
-      const p = prog[r.unitCode];
-      p.attempts++;
-      if (r.completed !== false) {
-        const pct = Math.round((r.score / r.total) * 100);
-        if (p.bestScore === null || pct > p.bestScore) p.bestScore = pct;
-        if (!unitData[r.unitCode]) unitData[r.unitCode] = { bestScore: null, dates: new Set() };
-        const d = unitData[r.unitCode];
-        if (d.bestScore === null || pct > d.bestScore) d.bestScore = pct;
-        d.dates.add(r.date.split('T')[0]);
-      }
-    }
-    setProgress(prog);
+    setProgress(getUnitProgress());
 
-    const TIERS: Record<TierLevel, { label: string; emoji: string }> = {
-      beginner:   { label: '비기너',  emoji: '\u{1F331}' },
-      challenger: { label: '도전자',  emoji: '\u{2B50}' },
-      skilled:    { label: '숙련자',  emoji: '\u{1F4AA}' },
-      master:     { label: '마스터',  emoji: '\u{1F451}' },
-    };
-    let mc = 0;
-    const t: Record<string, { level: TierLevel; label: string; emoji: string }> = {};
+    const tiers = getUnitTierMap();
+    setTierMap(tiers);
+    setMasteredCount(Object.values(tiers).filter(t => t.mastered).length);
+
+    // 정복도: 단원별 한 번이라도 맞힌 문항 수
+    const correct = getCorrectQuestionIds(allResults);
+    const cov: Record<string, number> = {};
+    const tot: Record<string, number> = {};
+    let sum = 0;
     for (const u of units) {
-      const d = unitData[u.code];
-      let level: TierLevel = 'beginner';
-      let mastered = false;
-      if (d) {
-        if (d.bestScore !== null && d.bestScore >= 90 && d.dates.size >= 2) {
-          level = 'master'; mastered = true;
-        } else if (d.bestScore !== null && d.bestScore >= 80) {
-          level = 'skilled';
-        } else if (d.bestScore !== null) {
-          level = 'challenger';
-        }
-      }
-      t[u.code] = { level, ...TIERS[level] };
-      if (mastered) mc++;
+      if (u.study) continue;
+      const ids = getUnitQuestionIds(u);
+      if (ids.length === 0) continue;
+      const c = ids.filter(id => correct.has(id)).length;
+      cov[u.code] = c;
+      tot[u.code] = ids.length;
+      sum += c;
     }
-    setMasteredCount(mc);
-    setTierMap(t);
+    setCoveredMap(cov);
+    setTotalMap(tot);
+    setTotalCovered(sum);
   }, []);
 
   const handleReset = () => {
@@ -80,6 +63,9 @@ export default function ProgressPage() {
     setResults([]);
     setMasteredCount(0);
     setTierMap({});
+    setCoveredMap({});
+    setTotalMap({});
+    setTotalCovered(0);
     setStreak(0);
     setCalendar(getExamCalendar());
   };
@@ -165,13 +151,20 @@ export default function ProgressPage() {
           </div>
 
           {/* Per-unit progress */}
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-4 gap-2">
             <h2 className="font-bold text-lg">단원별 현황</h2>
-            {masteredCount > 0 && (
-              <span className="bg-warning-light text-warning px-2.5 py-1 rounded-full text-sm font-medium whitespace-nowrap">
-                &#128081; {masteredCount}개 마스터
-              </span>
-            )}
+            <div className="flex items-center gap-2">
+              {totalCovered > 0 && (
+                <span className="bg-success-light text-success px-2.5 py-1 rounded-full text-sm font-medium whitespace-nowrap">
+                  정복 {totalCovered}문제
+                </span>
+              )}
+              {masteredCount > 0 && (
+                <span className="bg-warning-light text-warning px-2.5 py-1 rounded-full text-sm font-medium whitespace-nowrap">
+                  &#128081; {masteredCount}개 마스터
+                </span>
+              )}
+            </div>
           </div>
           <div className="space-y-3">
             {unitCodes.map(code => {
@@ -205,6 +198,19 @@ export default function ProgressPage() {
                       {score}%
                     </span>
                   </div>
+                  {totalMap[code] !== undefined && (
+                    <div className="mt-2 flex items-center gap-2">
+                      <span className="text-xs text-success font-medium whitespace-nowrap">
+                        정복 {coveredMap[code] ?? 0}/{totalMap[code]}
+                      </span>
+                      <div className="flex-1 h-1.5 bg-gray-100 dark:bg-white/10 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-success rounded-full transition-all"
+                          style={{ width: `${Math.round(((coveredMap[code] ?? 0) / totalMap[code]) * 100)}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })}

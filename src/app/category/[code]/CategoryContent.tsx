@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Category, Unit } from '@/lib/types';
-import { getUnitProgress } from '@/lib/storage';
+import { getUnitProgress, getCorrectQuestionIds } from '@/lib/storage';
+import { getUnitQuestionIds } from '@/data/questions/coverage';
 import UnitCard from '@/components/UnitCard';
 
 interface CategoryContentProps {
@@ -17,8 +18,16 @@ type Progress = Record<string, { attempts: number; bestScore: number | null }>;
 
 export default function CategoryContent({ category, units, questionCounts, totalQuestions }: CategoryContentProps) {
   const [progress, setProgress] = useState<Progress>({});
+  const [coveredMap, setCoveredMap] = useState<Record<string, number>>({});
   useEffect(() => {
     setProgress(getUnitProgress());
+    const correct = getCorrectQuestionIds();
+    const cov: Record<string, number> = {};
+    for (const u of units) {
+      if (u.study) continue;
+      cov[u.code] = getUnitQuestionIds(u).filter(id => correct.has(id)).length;
+    }
+    setCoveredMap(cov);
   }, [units]);
 
   const regularUnits = units.filter(u => !u.advanced && !u.summary);
@@ -58,6 +67,7 @@ export default function CategoryContent({ category, units, questionCounts, total
             questionCount={questionCounts[unit.code] || 0}
             bestScore={progress[unit.code]?.bestScore ?? null}
             attempts={progress[unit.code]?.attempts ?? 0}
+            covered={coveredMap[unit.code] ?? 0}
           />
         ))}
       </div>
@@ -76,7 +86,8 @@ export default function CategoryContent({ category, units, questionCounts, total
                 questionCount={questionCounts[unit.code] || 0}
                 bestScore={progress[unit.code]?.bestScore ?? null}
                 attempts={progress[unit.code]?.attempts ?? 0}
-                  />
+                covered={coveredMap[unit.code] ?? 0}
+              />
             ))}
           </div>
         </>
@@ -96,7 +107,8 @@ export default function CategoryContent({ category, units, questionCounts, total
                 questionCount={questionCounts[unit.code] || 0}
                 bestScore={progress[unit.code]?.bestScore ?? null}
                 attempts={progress[unit.code]?.attempts ?? 0}
-                  />
+                covered={coveredMap[unit.code] ?? 0}
+              />
             ))}
           </div>
         </>

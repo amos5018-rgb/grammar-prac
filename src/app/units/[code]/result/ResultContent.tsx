@@ -3,14 +3,58 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { QuizAttempt } from '@/lib/types';
-import { getLastQuizResult } from '@/lib/storage';
+import {
+  getLastQuizResult,
+  getQuizResults,
+  getCorrectQuestionIds,
+  tierFromResults,
+  CONVERT_COVERAGE,
+  UnitTier,
+} from '@/lib/storage';
+import { getUnitQuestionIds } from '@/data/questions/coverage';
+import { units } from '@/data/units';
+
+const RANK: Record<string, number> = { beginner: 0, challenger: 1, skilled: 2, master: 3 };
+
+interface ResultExtra {
+  tierAfter: UnitTier;
+  promoted: boolean;
+  coveredBefore: number;
+  coveredAfter: number;
+  total: number;
+  showConversion: boolean;
+}
 
 export default function ResultContent({ code }: { code: string }) {
   const [result, setResult] = useState<QuizAttempt | null>(null);
+  const [extra, setExtra] = useState<ResultExtra | null>(null);
 
   useEffect(() => {
     const last = getLastQuizResult();
-    if (last && last.unitCode === code) setResult(last);
+    if (!last || last.unitCode !== code) return;
+    setResult(last);
+
+    const all = getQuizResults();
+    const before = all.filter(r => r.attemptId !== last.attemptId);
+    const unit = units.find(u => u.code === code);
+    const ids = unit ? getUnitQuestionIds(unit) : [];
+
+    const tierAfter = tierFromResults(all, code);
+    const tierBefore = tierFromResults(before, code);
+    const promoted = RANK[tierAfter.level] > RANK[tierBefore.level];
+
+    const correctAfter = getCorrectQuestionIds(all);
+    const correctBefore = getCorrectQuestionIds(before);
+    const coveredAfter = ids.filter(id => correctAfter.has(id)).length;
+    const coveredBefore = ids.filter(id => correctBefore.has(id)).length;
+
+    const showConversion =
+      last.full === false &&
+      tierAfter.level === 'challenger' &&
+      ids.length > 0 &&
+      coveredAfter / ids.length >= CONVERT_COVERAGE;
+
+    setExtra({ tierAfter, promoted, coveredBefore, coveredAfter, total: ids.length, showConversion });
   }, [code]);
 
   if (!result) {
@@ -51,7 +95,41 @@ export default function ResultContent({ code }: { code: string }) {
             <span className="text-error">{result.total - result.score}문제 오답</span>
           )}
         </p>
+
+        {extra?.promoted && (
+          <p className="mt-4 inline-block bg-primary-light text-primary font-bold px-4 py-2 rounded-xl">
+            &#127881; {extra.tierAfter.emoji} {extra.tierAfter.label} 달성!
+          </p>
+        )}
+
+        {extra && extra.total > 0 && (
+          <div className="mt-4">
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-sm font-medium text-text">정복도</span>
+              <span className="text-sm font-semibold text-success">
+                {extra.coveredAfter > extra.coveredBefore
+                  ? `정복 ${extra.coveredBefore} → ${extra.coveredAfter}/${extra.total}`
+                  : `정복 ${extra.coveredAfter}/${extra.total}`}
+              </span>
+            </div>
+            <div className="h-2.5 bg-gray-100 dark:bg-white/10 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-success rounded-full transition-all"
+                style={{ width: `${Math.round((extra.coveredAfter / extra.total) * 100)}%` }}
+              />
+            </div>
+          </div>
+        )}
       </div>
+
+      {extra?.showConversion && (
+        <Link
+          href={`/units/${code}/quiz`}
+          className="block w-full mb-6 py-4 text-center bg-primary text-white rounded-xl font-semibold hover:bg-primary-dark transition-colors"
+        >
+          &#128293; 전부 풀기로 숙련자 도전 &rarr;
+        </Link>
+      )}
 
       {/* Answer breakdown */}
       <div className="space-y-3 mb-8">
