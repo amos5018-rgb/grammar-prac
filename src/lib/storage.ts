@@ -1,4 +1,6 @@
 import { StudentProfile, QuizAttempt, AnswerRecord, ReviewScheduleEntry } from './types';
+import { units as _units } from '@/data/units';
+import { getUnitQuestionIds as _getUnitQuestionIds } from '@/data/questions/coverage';
 
 const PROFILE_KEY = 'grammar_student_profile';
 const RESULTS_KEY = 'grammar_quiz_results';
@@ -240,63 +242,84 @@ const TIERS: Record<TierLevel, { label: string; emoji: string }> = {
   master:     { label: '마스터',  emoji: '\u{1F451}' },
 };
 
-// 단원 집계: 승급(숙련자/마스터)은 '전부 풀기' 결과로만, 도전자는 임의 완료로 진입
 interface UnitAgg {
-  hasAny: boolean;            // 임의 완료 결과 존재 (도전자 진입 기준)
-  fullBest: number | null;    // 전부 풀기 결과의 최고 %
-  fullDays: Set<string>;      // 전부 풀기 결과의 서로 다른 날
+  hasAny: boolean;
+  fullBest: number | null;
+  correctIds: Set<string>;
+  totalCorrect: number;
+  totalAnswered: number;
 }
 
 function emptyAgg(): UnitAgg {
-  return { hasAny: false, fullBest: null, fullDays: new Set() };
+  return { hasAny: false, fullBest: null, correctIds: new Set(), totalCorrect: 0, totalAnswered: 0 };
 }
 
 function accumulate(agg: UnitAgg, r: QuizAttempt) {
   if (r.completed === false) return;
   agg.hasAny = true;
-  // 레거시(full undefined)는 기능 도입 전이라 전부 풀기로 간주
+  for (const a of r.answers) {
+    agg.totalAnswered++;
+    if (a.correct) {
+      agg.totalCorrect++;
+      agg.correctIds.add(a.questionId);
+    }
+  }
   if (r.full !== false) {
     const pct = Math.round((r.score / r.total) * 100);
     if (agg.fullBest === null || pct > agg.fullBest) agg.fullBest = pct;
-    agg.fullDays.add(r.date.split('T')[0]);
   }
 }
 
-// 순수 함수: 단원 집계로 칭호 결정
-function computeTier(agg: UnitAgg): UnitTier {
+function computeTier(agg: UnitAgg, unitQuestionCount?: number): UnitTier {
   if (!agg.hasAny) {
     return { ...TIERS.beginner, level: 'beginner', mastered: false, hint: '문제를 풀면 도전자!' };
   }
   const fb = agg.fullBest;
-  if (fb !== null && fb >= 90 && agg.fullDays.size >= 2) {
+  if (fb !== null && fb >= 100) {
     return { ...TIERS.master, level: 'master', mastered: true };
   }
   if (fb !== null && fb >= 80) {
-    const hint = fb < 90
-      ? `전부 풀기 최고 ${fb}% → 90% 이상이면 마스터 한 걸음!`
-      : '다른 날 전부 풀기 한 번 더 90%면 마스터!';
+    const hint = `전부 풀기 최고 ${fb}% → 100%면 마스터!`;
     return { ...TIERS.skilled, level: 'skilled', mastered: false, hint };
   }
-  const hint = fb === null
-    ? '전부 풀기에 도전해 숙련자가 되어 보세요!'
-    : `전부 풀기 최고 ${fb}% → 80% 이상이면 숙련자!`;
+  if (unitQuestionCount && unitQuestionCount > 0 && agg.totalAnswered > 0) {
+    const coverage = agg.correctIds.size / unitQuestionCount;
+    const accuracy = Math.round((agg.totalCorrect / agg.totalAnswered) * 100);
+    if (coverage >= 0.8 && accuracy >= 80) {
+      return { ...TIERS.skilled, level: 'skilled', mastered: false, hint: '전부 풀기 100%를 달성하면 마스터!' };
+    }
+  }
+  let hint: string;
+  if (unitQuestionCount && unitQuestionCount > 0 && agg.totalAnswered > 0) {
+    const covPct = Math.round((agg.correctIds.size / unitQuestionCount) * 100);
+    const accPct = Math.round((agg.totalCorrect / agg.totalAnswered) * 100);
+    if (covPct < 80 && accPct < 80) {
+      hint = `정복도 ${covPct}%, 정답률 ${accPct}% → 둘 다 80%면 숙련자!`;
+    } else if (covPct < 80) {
+      hint = `정복도 ${covPct}% → 80%까지 올리면 숙련자!`;
+    } else {
+      hint = `정답률 ${accPct}% → 80%까지 올리면 숙련자!`;
+    }
+  } else {
+    hint = '문제를 풀어 정복도와 정답률을 올리세요!';
+  }
   return { ...TIERS.challenger, level: 'challenger', mastered: false, hint };
 }
 
-// 순수 함수: 결과 배열에서 단원 칭호 계산 (결과화면 승급 판정 등 재사용)
-export function tierFromResults(results: QuizAttempt[], unitCode: string): UnitTier {
+export function tierFromResults(results: QuizAttempt[], unitCode: string, unitQuestionCount?: number): UnitTier {
   const agg = emptyAgg();
   for (const r of results) {
     if (r.unitCode === unitCode) accumulate(agg, r);
   }
-  return computeTier(agg);
+  return computeTier(agg, unitQuestionCount);
 }
 
 export function getUnitTier(unitCode: string): UnitTier {
-  return tierFromResults(getQuizResults(), unitCode);
+  const unit = _units.find(u => u.code === unitCode);
+  const qCount = unit ? _getUnitQuestionIds(unit).length : 0;
+  return tierFromResults(getQuizResults(), unitCode, qCount);
 }
 
-// 전체 결과를 단 한 번 순회해 단원별 칭호 맵을 만든다 (반복 getUnitTier 호출 회피)
 export function getUnitTierMap(): Record<string, UnitTier> {
   const acc: Record<string, UnitAgg> = {};
   for (const r of getQuizResults()) {
@@ -306,7 +329,9 @@ export function getUnitTierMap(): Record<string, UnitTier> {
   }
   const map: Record<string, UnitTier> = {};
   for (const [code, d] of Object.entries(acc)) {
-    map[code] = computeTier(d);
+    const unit = _units.find(u => u.code === code);
+    const qCount = unit ? _getUnitQuestionIds(unit).length : 0;
+    map[code] = computeTier(d, qCount);
   }
   return map;
 }
@@ -322,12 +347,12 @@ export function getCorrectQuestionIds(results: QuizAttempt[] = getQuizResults())
   return set;
 }
 
-// 정복도 60% 이상 도전자 = '전부 풀기'로 승급시킬 전환 후보
-export const CONVERT_COVERAGE = 0.6;
+export const CONVERT_COVERAGE = 0.8;
 
-export function isConversionCandidate(unitCode: string, questionIds: string[]): boolean {
+export function isMasterCandidate(unitCode: string, questionIds: string[]): boolean {
   if (questionIds.length === 0) return false;
-  if (getUnitTier(unitCode).level !== 'challenger') return false;
+  const tier = getUnitTier(unitCode);
+  if (tier.level !== 'skilled' || tier.mastered) return false;
   const correct = getCorrectQuestionIds();
   const covered = questionIds.filter(id => correct.has(id)).length;
   return covered / questionIds.length >= CONVERT_COVERAGE;

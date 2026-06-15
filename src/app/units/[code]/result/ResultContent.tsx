@@ -8,7 +8,6 @@ import {
   getQuizResults,
   getCorrectQuestionIds,
   tierFromResults,
-  CONVERT_COVERAGE,
   UnitTier,
 } from '@/lib/storage';
 import { getUnitQuestionIds } from '@/data/questions/coverage';
@@ -39,8 +38,8 @@ export default function ResultContent({ code }: { code: string }) {
     const unit = units.find(u => u.code === code);
     const ids = unit ? getUnitQuestionIds(unit) : [];
 
-    const tierAfter = tierFromResults(all, code);
-    const tierBefore = tierFromResults(before, code);
+    const tierAfter = tierFromResults(all, code, ids.length);
+    const tierBefore = tierFromResults(before, code, ids.length);
     const promoted = RANK[tierAfter.level] > RANK[tierBefore.level];
 
     const correctAfter = getCorrectQuestionIds(all);
@@ -50,9 +49,8 @@ export default function ResultContent({ code }: { code: string }) {
 
     const showConversion =
       last.full === false &&
-      tierAfter.level === 'challenger' &&
-      ids.length > 0 &&
-      coveredAfter / ids.length >= CONVERT_COVERAGE;
+      tierAfter.level === 'skilled' &&
+      !tierAfter.mastered;
 
     setExtra({ tierAfter, promoted, coveredBefore, coveredAfter, total: ids.length, showConversion });
   }, [code]);
@@ -127,7 +125,7 @@ export default function ResultContent({ code }: { code: string }) {
           href={`/units/${code}/quiz`}
           className="block w-full mb-6 py-4 text-center bg-primary text-white rounded-xl font-semibold hover:bg-primary-dark transition-colors"
         >
-          &#128293; 전부 풀기로 숙련자 도전 &rarr;
+          &#128293; 전부 풀기로 마스터 도전 &rarr;
         </Link>
       )}
 

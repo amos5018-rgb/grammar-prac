@@ -5,6 +5,8 @@ import {
   getStreak,
   getActivityDates,
 } from './storage';
+import { units } from '@/data/units';
+import { getUnitQuestionIds } from '@/data/questions/coverage';
 
 const PENDING_KEY = 'grammar_sync_pending';
 const LAST_SYNC_KEY = 'grammar_sync_last';
@@ -50,19 +52,19 @@ export function buildSnapshot(): SyncSnapshot | null {
 
   const results = getQuizResults();
 
-  // 한 번의 순회로 progress + tier 정보를 동시에 계산
-  // 칭호 승급(숙련자/마스터)은 '전부 풀기'(full !== false) 결과로만 인정
   const unitData: Record<string, {
     attempts: number;
-    bestScore: number | null;   // 임의 완료 최고점 (표시용)
-    hasAny: boolean;            // 도전자 진입 기준
-    fullBest: number | null;    // 전부 풀기 최고점 (승급 기준)
-    fullDays: Set<string>;
+    bestScore: number | null;
+    hasAny: boolean;
+    fullBest: number | null;
+    correctIds: Set<string>;
+    totalCorrect: number;
+    totalAnswered: number;
   }> = {};
   for (const r of results) {
     let entry = unitData[r.unitCode];
     if (!entry) {
-      entry = { attempts: 0, bestScore: null, hasAny: false, fullBest: null, fullDays: new Set() };
+      entry = { attempts: 0, bestScore: null, hasAny: false, fullBest: null, correctIds: new Set(), totalCorrect: 0, totalAnswered: 0 };
       unitData[r.unitCode] = entry;
     }
     entry.attempts++;
@@ -70,9 +72,15 @@ export function buildSnapshot(): SyncSnapshot | null {
       entry.hasAny = true;
       const pct = Math.round((r.score / r.total) * 100);
       if (entry.bestScore === null || pct > entry.bestScore) entry.bestScore = pct;
-      if (r.full !== false) { // 레거시(undefined)는 전부 풀기로 간주
+      for (const a of r.answers) {
+        entry.totalAnswered++;
+        if (a.correct) {
+          entry.totalCorrect++;
+          entry.correctIds.add(a.questionId);
+        }
+      }
+      if (r.full !== false) {
         if (entry.fullBest === null || pct > entry.fullBest) entry.fullBest = pct;
-        entry.fullDays.add(r.date.split('T')[0]);
       }
     }
   }
@@ -81,15 +89,25 @@ export function buildSnapshot(): SyncSnapshot | null {
   const unitProgress: SyncSnapshot['unitProgress'] = {};
   for (const [code, d] of Object.entries(unitData)) {
     unitProgress[code] = { attempts: d.attempts, bestScore: d.bestScore };
+    const unit = units.find(u => u.code === code);
+    const qCount = unit ? getUnitQuestionIds(unit).length : 0;
     let level: string;
     let mastered = false;
     if (!d.hasAny) {
       level = 'beginner';
-    } else if (d.fullBest !== null && d.fullBest >= 90 && d.fullDays.size >= 2) {
+    } else if (d.fullBest !== null && d.fullBest >= 100) {
       level = 'master';
       mastered = true;
     } else if (d.fullBest !== null && d.fullBest >= 80) {
       level = 'skilled';
+    } else if (qCount > 0 && d.totalAnswered > 0) {
+      const coverage = d.correctIds.size / qCount;
+      const accuracy = Math.round((d.totalCorrect / d.totalAnswered) * 100);
+      if (coverage >= 0.8 && accuracy >= 80) {
+        level = 'skilled';
+      } else {
+        level = 'challenger';
+      }
     } else {
       level = 'challenger';
     }

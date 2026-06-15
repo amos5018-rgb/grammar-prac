@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Unit } from '@/lib/types';
-import { getBestScore, getUnitAttemptCount, getUnitTier, getStudyCompletion, getDedupedWrongAnswers, getCorrectQuestionIds, CONVERT_COVERAGE } from '@/lib/storage';
+import { getBestScore, getUnitAttemptCount, getUnitTier, getStudyCompletion, getDedupedWrongAnswers, getCorrectQuestionIds, isMasterCandidate } from '@/lib/storage';
 
 interface UnitDetailProps {
   unit: Unit;
@@ -27,11 +27,7 @@ export default function UnitDetail({ unit, questionCount, questionIds = [] }: Un
   const correctSet = getCorrectQuestionIds();
   const covered = questionIds.filter(id => correctSet.has(id)).length;
   const coveragePct = questionIds.length > 0 ? Math.round((covered / questionIds.length) * 100) : 0;
-  // 전환 후보: 정복도 높지만(≥기준) 아직 도전자 → 전부 풀기로 끌어오기
-  const isCandidate =
-    tier.level === 'challenger' &&
-    questionIds.length > 0 &&
-    covered / questionIds.length >= CONVERT_COVERAGE;
+  const isCandidate = isMasterCandidate(unit.code, questionIds);
 
   const base = `/units/${unit.code}/quiz`;
   const modes: { label: string; href: string; wrong?: boolean; full?: boolean }[] = [];
@@ -120,7 +116,7 @@ export default function UnitDetail({ unit, questionCount, questionIds = [] }: Un
 
         {isCandidate ? (
           <p className="text-sm font-medium text-primary mb-4 bg-primary-light rounded-lg px-4 py-2.5">
-            &#128293; 숙련자까지 한 걸음! 정복도 {coveragePct}% — 전부 풀기로 칭호에 도전하세요.
+            &#128293; 전부 풀기로 마스터에 도전하세요! 100%면 마스터 달성!
           </p>
         ) : tier.hint && (
           <p className="text-sm text-text-secondary mb-4 bg-gray-50 dark:bg-white/5 rounded-lg px-4 py-2.5">

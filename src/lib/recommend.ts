@@ -75,7 +75,7 @@ export function getRecommendation(): Recommendation | null {
   const masterPushRec = getMasterPushRecommendation(progress, tiers, dday, urgent);
   if (masterPushRec) pool.push(masterPushRec);
 
-  // 5+. full-challenge — 전환 훅: 정복도 높은 도전자를 '전부 풀기'로 끌어오기
+  // 5+. full-challenge — 전환 훅: 숙련자를 '전부 풀기'로 마스터 도전 유도
   const fullChallengeRec = getFullChallengeRecommendation(tiers, dday, urgent);
   if (fullChallengeRec) pool.push(fullChallengeRec);
 
@@ -196,13 +196,13 @@ function getMasterPushRecommendation(
   return {
     type: 'master-push',
     title: `'${skilledUnit.name}' 마스터 도전`,
-    subtitle: `${prefix}전부 풀기 90%를 다른 날에도 달성하면 마스터! \u{1F451}`,
+    subtitle: `${prefix}전부 풀기 100%를 달성하면 마스터! \u{1F451}`,
     href: `/units/${skilledUnit.code}`,
     urgent,
   };
 }
 
-// 전환 훅: 정복도 ≥ 기준이지만 아직 도전자인 핵심 단원을 '전부 풀기'로 유도
+// 전환 훅: 숙련자이지만 마스터 미달성인 핵심 단원을 '전부 풀기'로 유도
 function getFullChallengeRecommendation(
   tiers: TierMap,
   dday: number,
@@ -211,7 +211,8 @@ function getFullChallengeRecommendation(
   const correct = getCorrectQuestionIds();
   let best: { name: string; code: string; pct: number } | null = null;
   for (const u of CORE) {
-    if (tiers[u.code]?.level !== 'challenger') continue;
+    const t = tiers[u.code];
+    if (!t || t.level !== 'skilled' || t.mastered) continue;
     const ids = getUnitQuestionIds(u);
     if (ids.length === 0) continue;
     const cov = ids.filter(id => correct.has(id)).length / ids.length;
@@ -223,10 +224,10 @@ function getFullChallengeRecommendation(
 
   return {
     type: 'full-challenge',
-    title: `'${best.name}' 전부 풀기로 칭호 올리기`,
+    title: `'${best.name}' 전부 풀기로 마스터 도전`,
     subtitle: urgent
-      ? `D-${dday} · 정복도 ${Math.round(best.pct * 100)}% — 전부 풀기 80%면 숙련자!`
-      : `정복도 ${Math.round(best.pct * 100)}%까지 왔어요 — 전부 풀기 80%면 숙련자!`,
+      ? `D-${dday} · 정복도 ${Math.round(best.pct * 100)}% — 전부 풀기 100%면 마스터!`
+      : `정복도 ${Math.round(best.pct * 100)}%까지 왔어요 — 전부 풀기 100%면 마스터!`,
     href: `/units/${best.code}/quiz`,
     urgent,
   };
