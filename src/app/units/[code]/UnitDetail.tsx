@@ -24,7 +24,7 @@ export default function UnitDetail({ unit, questionCount, questionIds = [] }: Un
   //  - 음운 변동 총정리 문제편: 랜덤 5 / 랜덤 10 / 전부 풀기
   //  - 그 외 일반 소단원: 랜덤 5 / 전부 풀기
   const base = `/units/${unit.code}/quiz`;
-  const modes: { label: string; href: string }[] = [];
+  const modes: { label: string; href: string; wrong?: boolean }[] = [];
   if (unit.advanced) {
     modes.push({ label: '문제 풀기 시작', href: base });
   } else {
@@ -44,9 +44,9 @@ export default function UnitDetail({ unit, questionCount, questionIds = [] }: Un
       ? `/review/quiz?unit=${unit.parentCode}&part=${unit.partIndex}`
       : `/review/quiz?unit=${unit.code}`;
     const sep = wrongHref.includes('?') ? '&' : '?';
-    modes.push({ label: `틀린 문제 모아풀기 (${wrongCount}문제)`, href: wrongHref });
+    modes.push({ label: `틀린 문제 모아풀기 (${wrongCount}문제)`, href: wrongHref, wrong: true });
     if (wrongCount >= 6) {
-      modes.push({ label: '틀린 문제 랜덤 5문제 풀기', href: `${wrongHref}${sep}n=5` });
+      modes.push({ label: '틀린 문제 랜덤 5문제 풀기', href: `${wrongHref}${sep}n=5`, wrong: true });
     }
   }
 
@@ -99,9 +99,11 @@ export default function UnitDetail({ unit, questionCount, questionIds = [] }: Un
               key={m.label}
               href={m.href}
               className={`block w-full py-4 text-center rounded-xl font-semibold text-base transition-colors ${
-                i === 0
-                  ? 'bg-primary text-white hover:bg-primary-dark'
-                  : 'border-2 border-primary text-primary hover:bg-primary hover:text-white'
+                m.wrong
+                  ? 'border-2 border-success text-success hover:bg-success hover:text-white'
+                  : i === 0
+                    ? 'bg-primary text-white hover:bg-primary-dark'
+                    : 'border-2 border-primary text-primary hover:bg-primary hover:text-white'
               }`}
             >
               {m.label}
