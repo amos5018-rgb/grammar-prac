@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { getDedupedWrongAnswers, clearAllHistory, WrongAnswerRecord, getDueCount, getWrongCounts } from '@/lib/storage';
 import { Question } from '@/lib/types';
@@ -23,6 +23,18 @@ export default function ReviewContent({ allQuestions }: Props) {
   const [sortByCount, setSortByCount] = useState(false);
   const [previewId, setPreviewId] = useState<string | null>(null);
   const [unitDropdownOpen, setUnitDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!unitDropdownOpen) return;
+    const handleClick = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setUnitDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [unitDropdownOpen]);
 
   useEffect(() => {
     setWrongAnswers(getDedupedWrongAnswers());
@@ -122,7 +134,7 @@ export default function ReviewContent({ allQuestions }: Props) {
 
           {/* Filter + Sort */}
           <div className="flex items-center gap-2 mb-4">
-            <div className="relative flex-1 min-w-0">
+            <div ref={dropdownRef} className="relative flex-1 min-w-0">
               <button
                 onClick={() => setUnitDropdownOpen(prev => !prev)}
                 className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl border border-border bg-surface text-sm font-medium hover:border-primary/40 transition-colors"

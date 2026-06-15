@@ -273,7 +273,9 @@ function accumulate(agg: UnitAgg, r: QuizAttempt) {
 
 function gapHint(covPct: number, accPct: number, targetCov: number, targetAcc: number, targetName: string): string {
   if (covPct < targetCov && accPct < targetAcc) {
-    return `진행도 ${covPct}%, 정답률 ${accPct}% → 둘 다 ${targetAcc}%면 ${targetName}!`;
+    return targetCov === targetAcc
+      ? `진행도 ${covPct}%, 정답률 ${accPct}% → 둘 다 ${targetAcc}%면 ${targetName}!`
+      : `진행도 ${covPct}%→${targetCov}%, 정답률 ${accPct}%→${targetAcc}%면 ${targetName}!`;
   }
   if (covPct < targetCov) {
     return `진행도 ${covPct}% → ${targetCov}%까지 올리면 ${targetName}!`;

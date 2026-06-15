@@ -164,6 +164,7 @@ export default function QuizRunner({ unitCode, questions: initialQuestions, revi
         score: answers.filter(a => a.correct).length,
         total: answers.length,
         completed: false,
+        full: false,
         answers,
       });
       if (hasResultPage) {

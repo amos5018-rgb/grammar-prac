@@ -23,8 +23,8 @@ export default function UnitCard({ unit, questionCount, bestScore, attempts, cov
     >
       <div className="flex items-center gap-2 mb-1">
         <h3 className="font-bold text-lg">{unit.name}</h3>
-        {tier && tier.level !== 'beginner' && (
-          <span className="text-sm" title={tier.label}>{tier.emoji} {tier.label}</span>
+        {tier?.mastered && (
+          <span className="text-sm" title={tier.label}>{tier.emoji}</span>
         )}
       </div>
       <p className="text-text-secondary text-sm mb-4 line-clamp-2">{unit.description}</p>

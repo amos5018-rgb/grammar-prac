@@ -90,6 +90,7 @@ export default function CategoryContent({ category, units, questionCounts, total
                 bestScore={progress[unit.code]?.bestScore ?? null}
                 attempts={progress[unit.code]?.attempts ?? 0}
                 covered={coveredMap[unit.code] ?? 0}
+                tier={tierMap[unit.code]}
               />
             ))}
           </div>
@@ -111,6 +112,7 @@ export default function CategoryContent({ category, units, questionCounts, total
                 bestScore={progress[unit.code]?.bestScore ?? null}
                 attempts={progress[unit.code]?.attempts ?? 0}
                 covered={coveredMap[unit.code] ?? 0}
+                tier={tierMap[unit.code]}
               />
             ))}
           </div>
