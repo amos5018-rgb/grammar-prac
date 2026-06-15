@@ -30,7 +30,7 @@ export default function UnitDetail({ unit, questionCount, questionIds = [] }: Un
   const isCandidate = isMasterCandidate(unit.code, questionIds);
 
   const base = `/units/${unit.code}/quiz`;
-  const modes: { label: string; href: string; wrong?: boolean; full?: boolean }[] = [];
+  const modes: { label: string; href: string; wrong?: boolean; wrongFull?: boolean; full?: boolean }[] = [];
   if (unit.advanced) {
     modes.push({ label: '문제 풀기 시작', href: base, full: true });
   } else {
@@ -55,10 +55,10 @@ export default function UnitDetail({ unit, questionCount, questionIds = [] }: Un
       ? `/review/quiz?unit=${unit.parentCode}&part=${unit.partIndex}`
       : `/review/quiz?unit=${unit.code}`;
     const sep = wrongHref.includes('?') ? '&' : '?';
-    modes.push({ label: `틀린 문제 모아풀기 (${wrongCount}문제)`, href: wrongHref, wrong: true });
     if (wrongCount >= 6) {
       modes.push({ label: '틀린 문제 랜덤 5문제 풀기', href: `${wrongHref}${sep}n=5`, wrong: true });
     }
+    modes.push({ label: `틀린 문제 모아풀기 (${wrongCount}문제)`, href: wrongHref, wrong: true, wrongFull: true });
   }
 
   return (
@@ -133,11 +133,13 @@ export default function UnitDetail({ unit, questionCount, questionIds = [] }: Un
                 key={m.label}
                 href={m.href}
                 className={`block w-full py-4 text-center rounded-xl font-semibold text-base transition-colors ${
-                  m.wrong
-                    ? 'border-2 border-warning text-warning hover:bg-warning hover:text-white'
-                    : isPrimary
-                      ? `bg-primary text-white hover:bg-primary-dark${pulse}`
-                      : 'border-2 border-primary text-primary hover:bg-primary hover:text-white'
+                  m.wrongFull
+                    ? 'bg-warning text-white hover:bg-warning/90'
+                    : m.wrong
+                      ? 'border-2 border-warning text-warning hover:bg-warning hover:text-white'
+                      : isPrimary
+                        ? `bg-primary text-white hover:bg-primary-dark${pulse}`
+                        : 'border-2 border-primary text-primary hover:bg-primary hover:text-white'
                 }`}
               >
                 {m.label}
