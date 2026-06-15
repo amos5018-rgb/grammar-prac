@@ -20,6 +20,7 @@ export default async function UnitPage({ params }: { params: Promise<{ code: str
   if (!unit) notFound();
 
   const count = unit.study ? fetchStudyCards(code).length : questions.length;
+  const questionIds = unit.study ? [] : questions.map(q => q.id);
 
-  return <UnitDetail unit={unit} questionCount={count} />;
+  return <UnitDetail unit={unit} questionCount={count} questionIds={questionIds} />;
 }

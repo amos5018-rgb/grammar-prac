@@ -2,14 +2,15 @@
 
 import Link from 'next/link';
 import { Unit } from '@/lib/types';
-import { getBestScore, getUnitAttemptCount, getUnitTier, getStudyCompletion, getUnitWrongQuestionIds } from '@/lib/storage';
+import { getBestScore, getUnitAttemptCount, getUnitTier, getStudyCompletion, getDedupedWrongAnswers } from '@/lib/storage';
 
 interface UnitDetailProps {
   unit: Unit;
   questionCount: number;
+  questionIds?: string[];
 }
 
-export default function UnitDetail({ unit, questionCount }: UnitDetailProps) {
+export default function UnitDetail({ unit, questionCount, questionIds = [] }: UnitDetailProps) {
   if (unit.study) {
     return <StudyUnitDetail unit={unit} cardCount={questionCount} />;
   }
@@ -31,14 +32,21 @@ export default function UnitDetail({ unit, questionCount }: UnitDetailProps) {
     if (questionCount > 5) modes.push({ label: '랜덤 5문제 풀기', href: `${base}?n=5` });
     if (isReview && questionCount > 10) modes.push({ label: '랜덤 10문제 풀기', href: `${base}?n=10` });
     modes.push({ label: `전부 풀기 (${questionCount}문제)`, href: base });
+  }
 
-    // 틀린 문제 모아풀기 (오답 노트 기반)
-    const wrongCount = getUnitWrongQuestionIds(unit.code).length;
-    if (wrongCount >= 1) {
-      modes.push({ label: `틀린 문제 모아풀기 (${wrongCount}문제)`, href: `/review/quiz?unit=${unit.code}` });
-    }
+  // 틀린 문제 모아풀기 (오답 노트 기반) — 일반·고난도 모두 적용
+  // 문항 id로 집계해 고난도 분할 파트의 오답도 정확히 분리
+  const wrongSet = new Set(getDedupedWrongAnswers().map(w => w.questionId));
+  const wrongCount = questionIds.filter(id => wrongSet.has(id)).length;
+  if (wrongCount >= 1) {
+    // 고난도 분할 단원은 부모 코드 + 파트로 복습 퀴즈에 전달
+    const wrongHref = unit.advanced && unit.parentCode != null && unit.partIndex != null
+      ? `/review/quiz?unit=${unit.parentCode}&part=${unit.partIndex}`
+      : `/review/quiz?unit=${unit.code}`;
+    const sep = wrongHref.includes('?') ? '&' : '?';
+    modes.push({ label: `틀린 문제 모아풀기 (${wrongCount}문제)`, href: wrongHref });
     if (wrongCount >= 6) {
-      modes.push({ label: '틀린 문제 랜덤 5문제 풀기', href: `/review/quiz?unit=${unit.code}&n=5` });
+      modes.push({ label: '틀린 문제 랜덤 5문제 풀기', href: `${wrongHref}${sep}n=5` });
     }
   }
 

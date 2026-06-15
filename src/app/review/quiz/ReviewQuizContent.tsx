@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { getDedupedWrongAnswers, getDueQuestionIds, getTopWrongQuestionIds } from '@/lib/storage';
+import { splitQuestions } from '@/data/questions/split';
 import { Question } from '@/lib/types';
 import QuizRunner from '@/components/QuizRunner';
 
@@ -21,6 +22,7 @@ export default function ReviewQuizContent({ allQuestions }: { allQuestions: Ques
   const router = useRouter();
   const searchParams = useSearchParams();
   const unitFilter = searchParams.get('unit');
+  const partParam = searchParams.get('part');
   const dueOnly = searchParams.get('due') === '1';
   const wrongTop = searchParams.get('wrong') === '1';
   const nParam = searchParams.get('n');
@@ -36,6 +38,13 @@ export default function ReviewQuizContent({ allQuestions }: { allQuestions: Ques
       let wrong = getDedupedWrongAnswers();
       if (unitFilter) {
         wrong = wrong.filter(w => w.unitCode === unitFilter);
+        // 고난도 분할 파트: 부모 문항을 동일 규칙으로 분할해 해당 파트만 남김
+        if (partParam != null) {
+          const part = parseInt(partParam, 10);
+          const parentQs = allQuestions.filter(q => q.unitCode === unitFilter);
+          const partIds = new Set(splitQuestions(parentQs, part).map(q => q.id));
+          wrong = wrong.filter(w => partIds.has(w.questionId));
+        }
       }
       if (dueOnly) {
         // 복습 예정 문제 중 무작위 5개
@@ -69,7 +78,7 @@ export default function ReviewQuizContent({ allQuestions }: { allQuestions: Ques
     }
 
     setQuestions(matched);
-  }, [router, allQuestions, unitFilter, dueOnly, wrongTop, nParam]);
+  }, [router, allQuestions, unitFilter, partParam, dueOnly, wrongTop, nParam]);
 
   if (!questions) {
     return (
