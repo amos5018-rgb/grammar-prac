@@ -95,7 +95,7 @@ export default function ProgressPage() {
       ) : (
         <>
           {/* 기말고사 D-day 캘린더 */}
-          <div className="bg-surface rounded-xl border border-border p-4 mb-6">
+          <div className="bg-surface rounded-2xl border border-border/70 shadow-[var(--shadow-sm)] p-4 mb-6">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <span className="text-lg">&#128293;</span>
@@ -166,7 +166,7 @@ export default function ProgressPage() {
               const total = totalMap[code];
               const covPct = total ? Math.round((covered / total) * 100) : 0;
               return (
-                <div key={code} className="bg-surface rounded-xl border border-border px-4 py-3">
+                <div key={code} className="bg-surface rounded-xl border border-border/70 shadow-[var(--shadow-sm)] px-4 py-3">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-1.5 min-w-0">
                       {tierMap[code] && (
@@ -174,7 +174,7 @@ export default function ProgressPage() {
                       )}
                       <span className="font-medium truncate">{unitNameMap[code] || code}</span>
                     </div>
-                    <div className="flex items-center gap-3 shrink-0 text-sm">
+                    <div className="flex items-center gap-3 shrink-0 text-sm tabular-nums">
                       <span className="text-text-secondary">{data.attempts}회</span>
                       <span className={`font-bold ${
                         score >= 80 ? 'text-success' : score >= 50 ? 'text-warning' : 'text-error'
@@ -201,14 +201,14 @@ export default function ProgressPage() {
           <h2 className="font-bold text-lg mt-8 mb-4">최근 풀이 기록</h2>
           <div className="space-y-2">
             {[...results].reverse().slice(0, 10).map((result, idx) => (
-              <div key={idx} className="flex items-center justify-between bg-surface rounded-xl border border-border px-4 py-3">
+              <div key={idx} className="flex items-center justify-between bg-surface rounded-xl border border-border/70 shadow-[var(--shadow-sm)] px-4 py-3">
                 <div>
                   <span className="font-medium text-sm">{unitNameMap[result.unitCode] || result.unitCode}</span>
                   <span className="text-xs text-text-secondary ml-2">
                     {new Date(result.date).toLocaleDateString('ko-KR')}
                   </span>
                 </div>
-                <span className={`font-bold text-sm ${
+                <span className={`font-bold text-sm tabular-nums ${
                   (result.score / result.total) >= 0.8 ? 'text-success' :
                   (result.score / result.total) >= 0.5 ? 'text-warning' : 'text-error'
                 }`}>

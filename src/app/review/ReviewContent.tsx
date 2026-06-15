@@ -106,7 +106,7 @@ export default function ReviewContent({ allQuestions }: Props) {
       {dueCount > 0 && (
         <Link
           href="/review/quiz?due=1"
-          className="block w-full mb-4 py-4 text-center bg-primary text-white rounded-xl font-semibold hover:bg-primary-dark transition-colors"
+          className="block w-full mb-4 py-4 text-center bg-primary text-white rounded-xl font-semibold shadow-[var(--shadow-sm)] hover:bg-primary-dark hover:shadow-[var(--shadow-md)] active:scale-[0.99] transition-all"
         >
           오늘의 복습 {dueCount}문제
           <span className="block text-xs font-normal mt-0.5 opacity-80">
@@ -125,7 +125,7 @@ export default function ReviewContent({ allQuestions }: Props) {
           {/* 전체 틀린 문제 모아 풀기 */}
           <Link
             href={filter === 'all' ? '/review/quiz' : `/review/quiz?unit=${filter}`}
-            className="block w-full mb-6 py-3 text-center bg-error text-white rounded-xl font-semibold hover:bg-red-600 transition-colors"
+            className="block w-full mb-6 py-3 text-center bg-error text-white rounded-xl font-semibold shadow-[var(--shadow-sm)] hover:bg-red-600 hover:shadow-[var(--shadow-md)] active:scale-[0.99] transition-all"
           >
             {filter === 'all'
               ? `전체 틀린 문제 모아 풀기 (${wrongAnswers.length}문제)`
@@ -234,7 +234,7 @@ export default function ReviewContent({ allQuestions }: Props) {
           {filtered.length > 0 && filter !== 'all' && (
             <Link
               href={`/units/${filter}/quiz`}
-              className="block w-full mt-6 py-3 text-center bg-primary text-white rounded-xl font-semibold hover:bg-primary-dark transition-colors"
+              className="block w-full mt-6 py-3 text-center bg-primary text-white rounded-xl font-semibold shadow-[var(--shadow-sm)] hover:bg-primary-dark hover:shadow-[var(--shadow-md)] active:scale-[0.99] transition-all"
             >
               이 단원 다시 풀기
             </Link>
@@ -435,7 +435,7 @@ function QuestionPreview({
       {/* 닫기 버튼 */}
       <button
         onClick={onClose}
-        className="w-full py-4 bg-primary text-white rounded-xl font-semibold text-base hover:bg-primary-dark transition-colors"
+        className="w-full py-4 bg-primary text-white rounded-xl font-semibold text-base shadow-[var(--shadow-sm)] hover:bg-primary-dark hover:shadow-[var(--shadow-md)] active:scale-[0.99] transition-all"
       >
         오답 노트로 돌아가기
       </button>

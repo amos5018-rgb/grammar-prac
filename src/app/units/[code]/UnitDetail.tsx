@@ -70,9 +70,9 @@ export default function UnitDetail({ unit, questionCount, questionIds = [] }: Un
         &larr; 단원 목록
       </Link>
 
-      <div className="bg-surface rounded-2xl border border-border p-6 mb-6">
+      <div className="animate-fade-up bg-surface rounded-2xl border border-border/70 shadow-[var(--shadow-sm)] p-6 mb-6">
         <div className="flex items-center gap-2 mb-2">
-          <h1 className="text-2xl font-bold">{unit.name}</h1>
+          <h1 className="text-2xl font-bold tracking-tight">{unit.name}</h1>
           <span className="text-2xl" title={tier.label}>{tier.emoji}</span>
           <span className="text-sm font-medium text-text-secondary">{tier.label}</span>
         </div>
@@ -132,13 +132,13 @@ export default function UnitDetail({ unit, questionCount, questionIds = [] }: Un
               <Link
                 key={m.label}
                 href={m.href}
-                className={`block w-full py-4 text-center rounded-xl font-semibold text-base transition-colors ${
+                className={`block w-full py-4 text-center rounded-xl font-semibold text-base transition-all active:scale-[0.99] ${
                   m.wrongFull
-                    ? 'bg-warning text-white hover:bg-warning/90'
+                    ? 'bg-warning text-white shadow-[var(--shadow-sm)] hover:bg-warning/90 hover:shadow-[var(--shadow-md)]'
                     : m.wrong
                       ? 'border-2 border-warning text-warning hover:bg-warning hover:text-white'
                       : isPrimary
-                        ? `bg-primary text-white hover:bg-primary-dark${pulse}`
+                        ? `bg-primary text-white shadow-[var(--shadow-sm)] hover:bg-primary-dark hover:shadow-[var(--shadow-md)]${pulse}`
                         : 'border-2 border-primary text-primary hover:bg-primary hover:text-white'
                 }`}
               >
@@ -164,7 +164,7 @@ function StudyUnitDetail({ unit, cardCount }: { unit: Unit; cardCount: number })
         &larr; 단원 목록
       </Link>
 
-      <div className="bg-surface rounded-2xl border border-border p-6 mb-6">
+      <div className="animate-fade-up bg-surface rounded-2xl border border-border/70 shadow-[var(--shadow-sm)] p-6 mb-6">
         <h1 className="text-2xl font-bold mb-2">{unit.name}</h1>
         <p className="text-text-secondary mb-6">{unit.description}</p>
 

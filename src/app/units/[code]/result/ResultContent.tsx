@@ -68,7 +68,7 @@ export default function ResultContent({ code }: { code: string }) {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
-      <div className="bg-surface rounded-2xl border border-border p-6 text-center mb-6">
+      <div className="animate-fade-up bg-surface rounded-2xl border border-border/70 shadow-[var(--shadow-md)] p-6 text-center mb-6">
         <h1 className="text-2xl font-bold mb-2">결과</h1>
         {result.completed === false && (
           <p className="inline-block text-xs bg-warning-light text-warning px-2.5 py-1 rounded-full font-medium mb-3">
@@ -76,7 +76,7 @@ export default function ResultContent({ code }: { code: string }) {
           </p>
         )}
 
-        <div className={`inline-flex items-center justify-center w-28 h-28 rounded-full text-3xl font-bold mb-4 ${
+        <div className={`inline-flex items-center justify-center w-28 h-28 rounded-full text-3xl font-bold mb-4 tabular-nums ${
           pct >= 80 ? 'bg-success-light text-success' :
           pct >= 50 ? 'bg-warning-light text-warning' :
           'bg-error-light text-error'
@@ -95,7 +95,7 @@ export default function ResultContent({ code }: { code: string }) {
         </p>
 
         {extra?.promoted && (
-          <p className="mt-4 inline-block bg-primary-light text-primary font-bold px-4 py-2 rounded-xl">
+          <p className="animate-fade-up mt-4 inline-block bg-primary-light text-primary font-bold px-4 py-2 rounded-xl shadow-[var(--shadow-sm)]">
             &#127881; {extra.tierAfter.emoji} {extra.tierAfter.label} 달성!
           </p>
         )}
@@ -123,7 +123,7 @@ export default function ResultContent({ code }: { code: string }) {
       {extra?.showConversion && (
         <Link
           href={`/units/${code}/quiz`}
-          className="block w-full mb-6 py-4 text-center bg-primary text-white rounded-xl font-semibold hover:bg-primary-dark transition-colors"
+          className="block w-full mb-6 py-4 text-center bg-primary text-white rounded-xl font-semibold shadow-[var(--shadow-sm)] hover:bg-primary-dark hover:shadow-[var(--shadow-md)] active:scale-[0.99] transition-all"
         >
           &#128293; 전부 풀기로 마스터 도전 &rarr;
         </Link>
@@ -166,13 +166,13 @@ export default function ResultContent({ code }: { code: string }) {
       <div className="flex gap-3">
         <Link
           href={`/units/${code}/quiz`}
-          className="flex-1 py-3 text-center bg-primary text-white rounded-xl font-semibold hover:bg-primary-dark transition-colors"
+          className="flex-1 py-3 text-center bg-primary text-white rounded-xl font-semibold shadow-[var(--shadow-sm)] hover:bg-primary-dark hover:shadow-[var(--shadow-md)] active:scale-[0.99] transition-all"
         >
           다시 풀기
         </Link>
         <Link
           href="/"
-          className="flex-1 py-3 text-center border border-border rounded-xl font-semibold hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
+          className="flex-1 py-3 text-center border border-border rounded-xl font-semibold hover:bg-gray-50 dark:hover:bg-white/5 active:scale-[0.99] transition-all"
         >
           단원 목록
         </Link>

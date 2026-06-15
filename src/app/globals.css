@@ -4,44 +4,60 @@
 
 /* ── 라이트 모드 색상 ── */
 :root {
-  --background: #f8fafc;
+  --background: #f6f7f9;
   --surface: #ffffff;
   --text: #1e293b;
   --text-secondary: #64748b;
-  --border: #e2e8f0;
-  --primary: #2563eb;
-  --primary-dark: #1d4ed8;
-  --primary-light: #dbeafe;
-  --success: #16a34a;
+  --border: #e7e9ee;
+  --primary: #4f46e5;
+  --primary-dark: #4338ca;
+  --primary-light: #eef2ff;
+  --success: #15a34a;
   --success-light: #dcfce7;
   --error: #dc2626;
   --error-light: #fee2e2;
-  --warning: #f59e0b;
+  --warning: #ea9a07;
   --warning-light: #fef3c7;
+
+  /* 깊이감(elevation) — 부드러운 레이어드 섀도 */
+  --shadow-sm: 0 1px 2px 0 rgb(15 23 42 / 0.04), 0 1px 3px 0 rgb(15 23 42 / 0.06);
+  --shadow-md: 0 2px 4px -1px rgb(15 23 42 / 0.05), 0 6px 16px -4px rgb(15 23 42 / 0.10);
+  --shadow-lg: 0 10px 28px -6px rgb(15 23 42 / 0.14), 0 4px 10px -4px rgb(15 23 42 / 0.08);
+
+  /* 반투명 크롬(frosted glass)용 surface */
+  --surface-blur: rgb(255 255 255 / 0.72);
 }
 
 /* ── 다크 모드 색상 ── */
 .dark {
-  --background: #0f172a;
-  --surface: #1e293b;
+  --background: #0c1322;
+  --surface: #18202f;
   --text: #f1f5f9;
   --text-secondary: #94a3b8;
-  --border: #334155;
-  --primary: #3b82f6;
-  --primary-dark: #60a5fa;
-  --primary-light: #1e3a5f;
-  --success: #22c55e;
-  --success-light: #14532d;
-  --error: #ef4444;
-  --error-light: #451a1a;
+  --border: #2c3650;
+  --primary: #818cf8;
+  --primary-dark: #a5b4fc;
+  --primary-light: #2a2f55;
+  --success: #34d399;
+  --success-light: #123524;
+  --error: #f87171;
+  --error-light: #401b1b;
   --warning: #fbbf24;
-  --warning-light: #422006;
+  --warning-light: #3a2806;
+
+  /* 다크에서는 섀도를 거의 안 보이게(표면 밝기로 깊이 표현) */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.30);
+  --shadow-md: 0 4px 14px -3px rgb(0 0 0 / 0.45);
+  --shadow-lg: 0 12px 30px -6px rgb(0 0 0 / 0.55);
+
+  --surface-blur: rgb(24 32 47 / 0.72);
 }
 
 /* Tailwind 유틸리티가 위 변수를 참조하도록 연결 (다크 모드 전환의 핵심) */
 @theme inline {
   --color-background: var(--background);
   --color-surface: var(--surface);
+  --color-surface-blur: var(--surface-blur);
   --color-text: var(--text);
   --color-text-secondary: var(--text-secondary);
   --color-border: var(--border);
@@ -62,9 +78,49 @@ body {
   color: var(--text);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 input, textarea, select {
   background-color: transparent;
   color: inherit;
+}
+
+/* 일관된 포커스 링 (접근성 + 디테일) — outline은 요소의 border-radius를 따름 */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* 텍스트 선택 색 */
+::selection {
+  background: color-mix(in srgb, var(--primary) 22%, transparent);
+}
+
+/* ── 모션: 진입 애니메이션 ── */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out both;
+}
+
+/* 모션 최소화 선호 시 애니메이션 비활성화 */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up,
+  .animate-fade-in {
+    animation: none;
+  }
+  * {
+    scroll-behavior: auto !important;
+  }
 }

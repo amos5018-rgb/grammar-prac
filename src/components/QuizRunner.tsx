@@ -180,7 +180,7 @@ export default function QuizRunner({ unitCode, questions: initialQuestions, revi
     const correctCount = answers.filter(a => a.correct).length;
     return (
       <div className="max-w-2xl mx-auto px-4 py-12 text-center">
-        <div className="bg-surface rounded-2xl border border-border p-8">
+        <div className="animate-fade-up bg-surface rounded-2xl border border-border/70 shadow-[var(--shadow-md)] p-8">
           <h1 className="text-2xl font-bold mb-3">복습 완료!</h1>
           <p className="text-lg mb-2">
             <span className="font-bold">{answers.length}</span>문제 중{' '}
@@ -215,7 +215,7 @@ export default function QuizRunner({ unitCode, questions: initialQuestions, revi
     const pct = Math.round((correctCount / answers.length) * 100);
     return (
       <div className="max-w-2xl mx-auto px-4 py-12 text-center">
-        <div className="bg-surface rounded-2xl border border-border p-8">
+        <div className="animate-fade-up bg-surface rounded-2xl border border-border/70 shadow-[var(--shadow-md)] p-8">
           <h1 className="text-2xl font-bold mb-4">결과</h1>
           <div className={`inline-flex items-center justify-center w-28 h-28 rounded-full text-3xl font-bold mb-4 ${
             pct >= 80 ? 'bg-success-light text-success' :
@@ -282,9 +282,9 @@ export default function QuizRunner({ unitCode, questions: initialQuestions, revi
             {question.difficulty}
           </span>
         </div>
-        <div className="h-2 bg-gray-200 dark:bg-white/15 rounded-full overflow-hidden">
+        <div className="h-2.5 bg-gray-200 dark:bg-white/10 rounded-full overflow-hidden">
           <div
-            className="h-full bg-primary rounded-full transition-all duration-300"
+            className="h-full bg-gradient-to-r from-primary to-primary-dark rounded-full transition-all duration-500 ease-out"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -316,13 +316,17 @@ export default function QuizRunner({ unitCode, questions: initialQuestions, revi
               <button
                 key={idx}
                 onClick={() => setSelectedAnswer(String(idx + 1))}
-                className={`w-full text-left px-5 py-4 rounded-xl border-2 transition-all text-base ${
+                className={`w-full text-left px-5 py-4 rounded-xl border-2 transition-all text-base active:scale-[0.99] ${
                   selectedAnswer === String(idx + 1)
-                    ? 'border-primary bg-primary-light'
-                    : 'border-border hover:border-gray-300 dark:hover:border-white/20'
+                    ? 'border-primary bg-primary-light shadow-[var(--shadow-sm)]'
+                    : 'border-border hover:border-primary/40 hover:bg-primary-light/40'
                 }`}
               >
-                <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-gray-100 dark:bg-white/10 text-sm font-semibold mr-3">
+                <span className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-sm font-semibold mr-3 transition-colors ${
+                  selectedAnswer === String(idx + 1)
+                    ? 'bg-primary text-white'
+                    : 'bg-gray-100 dark:bg-white/10'
+                }`}>
                   {idx + 1}
                 </span>
                 {choice}
@@ -394,8 +398,13 @@ export default function QuizRunner({ unitCode, questions: initialQuestions, revi
 
         {/* Feedback */}
         {showFeedback && (
-          <div className={`rounded-xl p-5 ${isCorrect ? 'bg-success-light' : 'bg-error-light'}`}>
-            <p className={`font-bold text-lg mb-2 ${isCorrect ? 'text-success' : 'text-error'}`}>
+          <div className={`animate-fade-in rounded-xl p-5 ${isCorrect ? 'bg-success-light' : 'bg-error-light'}`}>
+            <p className={`flex items-center gap-2 font-bold text-lg mb-2 ${isCorrect ? 'text-success' : 'text-error'}`}>
+              <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                {isCorrect
+                  ? <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  : <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />}
+              </svg>
               {isCorrect ? '정답입니다!' : '틀렸습니다'}
             </p>
             {!isCorrect && (
@@ -418,14 +427,14 @@ export default function QuizRunner({ unitCode, questions: initialQuestions, revi
         <button
           onClick={checkAnswer}
           disabled={!canSubmit}
-          className="w-full py-4 bg-primary text-white rounded-xl font-semibold text-base hover:bg-primary-dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          className="w-full py-4 bg-primary text-white rounded-xl font-semibold text-base shadow-[var(--shadow-sm)] hover:bg-primary-dark hover:shadow-[var(--shadow-md)] active:scale-[0.99] transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none disabled:active:scale-100"
         >
           정답 확인
         </button>
       ) : (
         <button
           onClick={goNext}
-          className="w-full py-4 bg-primary text-white rounded-xl font-semibold text-base hover:bg-primary-dark transition-colors"
+          className="w-full py-4 bg-primary text-white rounded-xl font-semibold text-base shadow-[var(--shadow-sm)] hover:bg-primary-dark hover:shadow-[var(--shadow-md)] active:scale-[0.99] transition-all"
         >
           {currentIndex + 1 >= questions.length
             ? (reviewMode ? '복습 완료' : '결과 보기')

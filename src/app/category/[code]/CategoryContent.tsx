@@ -48,7 +48,7 @@ export default function CategoryContent({ category, units, questionCounts, total
       {totalQuestions > 0 && (
         <Link
           href={`/category/${category.code}/mixed`}
-          className="flex items-center justify-center gap-2 w-full mb-6 py-3 text-center bg-surface border-2 border-primary text-primary rounded-xl font-semibold hover:bg-primary hover:text-white transition-colors"
+          className="flex items-center justify-center gap-2 w-full mb-6 py-3 text-center bg-surface border-2 border-primary text-primary rounded-xl font-semibold shadow-[var(--shadow-sm)] hover:bg-primary hover:text-white hover:shadow-[var(--shadow-md)] transition-all active:scale-[0.99]"
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="16 3 21 3 21 8" />
@@ -62,7 +62,7 @@ export default function CategoryContent({ category, units, questionCounts, total
       )}
 
       <div className="grid gap-4 sm:grid-cols-2">
-        {regularUnits.map(unit => (
+        {regularUnits.map((unit, i) => (
           <UnitCard
             key={unit.code}
             unit={unit}
@@ -71,6 +71,7 @@ export default function CategoryContent({ category, units, questionCounts, total
             attempts={progress[unit.code]?.attempts ?? 0}
             covered={coveredMap[unit.code] ?? 0}
             tier={tierMap[unit.code]}
+            index={i}
           />
         ))}
       </div>
@@ -82,7 +83,7 @@ export default function CategoryContent({ category, units, questionCounts, total
             배운 내용을 종합하여 복습하고 실력을 점검하세요
           </p>
           <div className="grid gap-4 sm:grid-cols-2">
-            {summaryUnits.map(unit => (
+            {summaryUnits.map((unit, i) => (
               <UnitCard
                 key={unit.code}
                 unit={unit}
@@ -91,6 +92,7 @@ export default function CategoryContent({ category, units, questionCounts, total
                 attempts={progress[unit.code]?.attempts ?? 0}
                 covered={coveredMap[unit.code] ?? 0}
                 tier={tierMap[unit.code]}
+                index={i}
               />
             ))}
           </div>
@@ -104,7 +106,7 @@ export default function CategoryContent({ category, units, questionCounts, total
             수능·모의평가 형식의 자료 제시형 문제로 실력을 시험해 보세요
           </p>
           <div className="grid gap-4 sm:grid-cols-2">
-            {advancedUnits.map(unit => (
+            {advancedUnits.map((unit, i) => (
               <UnitCard
                 key={unit.code}
                 unit={unit}
@@ -113,6 +115,7 @@ export default function CategoryContent({ category, units, questionCounts, total
                 attempts={progress[unit.code]?.attempts ?? 0}
                 covered={coveredMap[unit.code] ?? 0}
                 tier={tierMap[unit.code]}
+                index={i}
               />
             ))}
           </div>

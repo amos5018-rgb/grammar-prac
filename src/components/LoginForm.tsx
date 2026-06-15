@@ -16,8 +16,8 @@ export default function LoginForm({ onLogin }: { onLogin: () => void }) {
 
   return (
     <div className="min-h-[60vh] flex items-center justify-center px-4">
-      <form onSubmit={handleSubmit} className="w-full max-w-sm bg-surface rounded-2xl shadow-sm border border-border p-8">
-        <h2 className="text-2xl font-bold text-center mb-2">국어 문법 연습</h2>
+      <form onSubmit={handleSubmit} className="animate-fade-up w-full max-w-sm bg-surface rounded-2xl shadow-[var(--shadow-lg)] border border-border/70 p-8">
+        <h2 className="text-2xl font-bold text-center mb-2 tracking-tight">국어 문법 연습</h2>
         <p className="text-text-secondary text-center text-sm mb-8">이름과 학번을 입력하고 시작하세요</p>
         <label className="block mb-4">
           <span className="text-sm font-medium text-text mb-1 block">이름</span>
@@ -43,7 +43,7 @@ export default function LoginForm({ onLogin }: { onLogin: () => void }) {
         </label>
         <button
           type="submit"
-          className="w-full py-3 bg-primary text-white rounded-xl font-semibold text-base hover:bg-primary-dark transition-colors"
+          className="w-full py-3 bg-primary text-white rounded-xl font-semibold text-base shadow-[var(--shadow-sm)] hover:bg-primary-dark hover:shadow-[var(--shadow-md)] active:scale-[0.99] transition-all"
         >
           시작하기
         </button>

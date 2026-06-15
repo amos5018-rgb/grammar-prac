@@ -20,10 +20,10 @@ export default function Header() {
   if (pathname.startsWith('/teacher')) return null;
 
   return (
-    <header className="bg-surface border-b border-border sticky top-0 z-50">
+    <header className="bg-surface/80 supports-[backdrop-filter]:bg-surface/70 backdrop-blur-md border-b border-border/70 sticky top-0 z-50">
       <div className="max-w-3xl mx-auto px-4">
         <div className="h-12 flex items-center justify-between">
-          <Link href="/" className="font-bold text-primary text-lg">
+          <Link href="/" className="font-bold text-primary text-lg tracking-tight">
             오남고 1학년 국어: 문법 연습&#128218;
           </Link>
           <div className="flex items-center gap-2">
