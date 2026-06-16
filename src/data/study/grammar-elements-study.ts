@@ -49,7 +49,9 @@ export const grammarElementsStudyCards: StudyCard[] = [
     exampleLabel: '예문',
     examples: [
       '나는 어제 영화를 보았다. (과거)',
+      '어제는 날씨가 추웠다. (과거)',
       '동생이 지금 밥을 먹는다. (현재)',
+      '오늘은 하늘이 맑다. (현재)',
       '내일은 비가 오겠다. (미래)',
     ],
     reveals: [

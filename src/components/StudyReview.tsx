@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { StudyCard, StudyCardReveal, StudyCardTable } from '@/lib/types';
 import { saveStudyCompletion } from '@/lib/storage';
@@ -52,6 +52,22 @@ export default function StudyReview({ unitCode, cards }: StudyReviewProps) {
       } else {
         current.add(key);
       }
+      return { ...prev, [currentIndex]: current };
+    });
+  }
+
+  // 표의 모든 답 셀을 한 번에 공개/접기 (스크롤로 못 본 셀 누락 방지)
+  function setTableAll(keyPrefix: string, table: StudyCardTable, reveal: boolean) {
+    setRevealed(prev => {
+      const current = new Set(prev[currentIndex] || []);
+      table.rows.forEach((row, ri) =>
+        row.forEach((_, ci) => {
+          if (ci === 0) return;
+          const k = `${keyPrefix}-${ri}-${ci}`;
+          if (reveal) current.add(k);
+          else current.delete(k);
+        }),
+      );
       return { ...prev, [currentIndex]: current };
     });
   }
@@ -187,7 +203,7 @@ export default function StudyReview({ unitCode, cards }: StudyReviewProps) {
 
         {/* 셀 인출 안내 */}
         {hasTable && (
-          <p className="text-xs text-text-secondary mb-2">표의 칸을 탭하면 내용이 나타납니다.</p>
+          <p className="text-xs text-text-secondary mb-2">표의 각 칸을 탭하면 내용이 나타납니다. 표가 화면보다 넓으면 좌우로 넘겨 보세요.</p>
         )}
 
         {/* 인출칸 (가변 개수) */}
@@ -201,6 +217,7 @@ export default function StudyReview({ unitCode, cards }: StudyReviewProps) {
                 keyPrefix={`c${i}`}
                 revealedKeys={cardRevealed}
                 onToggleCell={(row, col) => toggle(`c${i}-${row}-${col}`)}
+                onSetAll={(reveal) => setTableAll(`c${i}`, r.table!, reveal)}
               />
             ) : (
               <RevealBox
@@ -278,17 +295,56 @@ function TableReveal({
   keyPrefix,
   revealedKeys,
   onToggleCell,
+  onSetAll,
 }: {
   label: string;
   table: StudyCardTable;
   keyPrefix: string;
   revealedKeys: Set<string>;
   onToggleCell: (row: number, col: number) => void;
+  onSetAll: (reveal: boolean) => void;
 }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [fade, setFade] = useState({ left: false, right: false });
+
+  const updateFade = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const max = el.scrollWidth - el.clientWidth;
+    setFade({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
+  };
+
+  useEffect(() => {
+    updateFade();
+    window.addEventListener('resize', updateFade);
+    return () => window.removeEventListener('resize', updateFade);
+  }, []);
+
+  // 답 셀(첫 열 제외) 공개 현황
+  let total = 0;
+  let revealedCount = 0;
+  table.rows.forEach((row, ri) =>
+    row.forEach((_, ci) => {
+      if (ci === 0) return;
+      total++;
+      if (revealedKeys.has(`${keyPrefix}-${ri}-${ci}`)) revealedCount++;
+    }),
+  );
+  const allRevealed = total > 0 && revealedCount === total;
+
   return (
     <div>
-      <div className="text-sm font-semibold text-text mb-2">{label}</div>
-      <div className="overflow-x-auto">
+      <div className="flex items-center justify-between gap-2 mb-2">
+        <div className="text-sm font-semibold text-text">{label}</div>
+        <button
+          onClick={() => onSetAll(!allRevealed)}
+          className="shrink-0 text-xs font-medium text-primary hover:underline"
+        >
+          {allRevealed ? '모두 접기' : '모두 펼치기'}
+        </button>
+      </div>
+      <div className="relative">
+        <div ref={scrollRef} onScroll={updateFade} className="overflow-x-auto">
         <table className="w-full text-[15px] border-collapse">
           <thead>
             <tr>
@@ -337,6 +393,23 @@ function TableReveal({
             ))}
           </tbody>
         </table>
+        </div>
+        {/* 좌우 스크롤 가능 표시 (가려진 셀 누락 방지) */}
+        {fade.left && (
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-6 bg-gradient-to-r from-surface to-transparent" />
+        )}
+        {fade.right && (
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-surface to-transparent flex items-center justify-end">
+            <span className="text-primary text-lg pr-0.5">&rsaquo;</span>
+          </div>
+        )}
+      </div>
+      <div className="mt-1.5 text-xs text-text-secondary">
+        {revealedCount === 0
+          ? '아직 확인한 칸이 없습니다.'
+          : allRevealed
+            ? `모든 칸 확인 완료 (${total}/${total})`
+            : `${revealedCount} / ${total}칸 확인`}
       </div>
     </div>
   );
