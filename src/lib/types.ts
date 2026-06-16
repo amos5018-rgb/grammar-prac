@@ -28,9 +28,15 @@ export interface Unit {
   partIndex?: number;    // 분할 소단원 번호 (0, 1, 2)
 }
 
+export interface StudyCardTable {
+  headers: string[];
+  rows: string[][];
+}
+
 export interface StudyCardReveal {
   label: string;
-  content: string;
+  content?: string;          // 텍스트 답
+  table?: StudyCardTable;    // 표 답
 }
 
 export interface StudyCard {

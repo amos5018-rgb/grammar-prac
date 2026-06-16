@@ -138,7 +138,7 @@ export const units: Unit[] = [
     code: 'grammar-elements-study',
     category: 'grammar-elements',
     name: '문법 요소 실현 방법 총정리: 복습편',
-    description: '높임·시간·피동·인용 표현의 예문을 단서로 기능과 실현 방법을 스스로 떠올리는 인출 연습입니다.',
+    description: '높임·시간·피동·인용 표현의 예문을 단서로 실현 방법을 표로 스스로 떠올리는 인출 연습입니다.',
     order: 52,
     active: true,
     summary: true,

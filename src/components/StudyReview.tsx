@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { StudyCard, StudyCardReveal } from '@/lib/types';
+import { StudyCard, StudyCardReveal, StudyCardTable } from '@/lib/types';
 import { saveStudyCompletion } from '@/lib/storage';
 
 interface StudyReviewProps {
@@ -191,6 +191,7 @@ export default function StudyReview({ unitCode, cards }: StudyReviewProps) {
               key={i}
               label={`${i + 1}. ${r.label}`}
               content={r.content}
+              table={r.table}
               isRevealed={cardRevealed.has(i)}
               onToggle={() => toggle(i)}
             />
@@ -221,23 +222,62 @@ export default function StudyReview({ unitCode, cards }: StudyReviewProps) {
 function RevealBox({
   label,
   content,
+  table,
   isRevealed,
   onToggle,
 }: {
   label: string;
-  content: string;
+  content?: string;
+  table?: StudyCardTable;
   isRevealed: boolean;
   onToggle: () => void;
 }) {
   if (isRevealed) {
     return (
-      <button
+      <div
+        role="button"
+        tabIndex={0}
         onClick={onToggle}
-        className="w-full rounded-xl border border-border bg-gray-50 dark:bg-white/5 p-4 text-left hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggle(); } }}
+        className="w-full rounded-xl border border-border bg-gray-50 dark:bg-white/5 p-4 text-left hover:bg-gray-100 dark:hover:bg-white/10 transition-colors cursor-pointer"
       >
         <div className="text-xs font-medium text-text-secondary mb-1">{label}</div>
-        <p className="text-sm leading-relaxed">{content}</p>
-      </button>
+        {content && <p className="text-sm leading-relaxed whitespace-pre-line">{content}</p>}
+        {table && (
+          <div className="overflow-x-auto mt-2">
+            <table className="w-full text-xs border-collapse">
+              <thead>
+                <tr>
+                  {table.headers.map((h, i) => (
+                    <th
+                      key={i}
+                      className="border border-border bg-background px-2 py-1.5 font-semibold text-left text-text whitespace-nowrap"
+                    >
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {table.rows.map((row, ri) => (
+                  <tr key={ri}>
+                    {row.map((cell, ci) => (
+                      <td
+                        key={ci}
+                        className={`border border-border px-2 py-1.5 align-top leading-relaxed ${
+                          ci === 0 ? 'font-medium text-text whitespace-nowrap' : 'text-text-secondary'
+                        }`}
+                      >
+                        {cell}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     );
   }
 
