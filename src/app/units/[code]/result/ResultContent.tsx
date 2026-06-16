@@ -10,8 +10,7 @@ import {
   tierFromResults,
   UnitTier,
 } from '@/lib/storage';
-import { getUnitQuestionIds } from '@/data/questions/coverage';
-import { units } from '@/data/units';
+import { questionIdMap } from '@/data/questions/question-id-map';
 
 const RANK: Record<string, number> = { beginner: 0, challenger: 1, trainee: 2, skilled: 3, master: 4 };
 
@@ -35,8 +34,7 @@ export default function ResultContent({ code }: { code: string }) {
 
     const all = getQuizResults();
     const before = all.filter(r => r.attemptId !== last.attemptId);
-    const unit = units.find(u => u.code === code);
-    const ids = unit ? getUnitQuestionIds(unit) : [];
+    const ids = questionIdMap[code] ?? [];
 
     const tierAfter = tierFromResults(all, code, ids.length);
     const tierBefore = tierFromResults(before, code, ids.length);

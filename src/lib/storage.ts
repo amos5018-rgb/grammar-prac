@@ -1,6 +1,5 @@
 import { StudentProfile, QuizAttempt, AnswerRecord, ReviewScheduleEntry } from './types';
-import { units as _units } from '@/data/units';
-import { getUnitQuestionIds as _getUnitQuestionIds } from '@/data/questions/coverage';
+import { questionCountMap as _qCountMap } from '@/data/questions/question-id-map';
 
 const PROFILE_KEY = 'grammar_student_profile';
 const RESULTS_KEY = 'grammar_quiz_results';
@@ -327,8 +326,7 @@ export function tierFromResults(results: QuizAttempt[], unitCode: string, unitQu
 }
 
 export function getUnitTier(unitCode: string): UnitTier {
-  const unit = _units.find(u => u.code === unitCode);
-  const qCount = unit ? _getUnitQuestionIds(unit).length : 0;
+  const qCount = _qCountMap[unitCode] ?? 0;
   return tierFromResults(getQuizResults(), unitCode, qCount);
 }
 
@@ -341,8 +339,7 @@ export function getUnitTierMap(): Record<string, UnitTier> {
   }
   const map: Record<string, UnitTier> = {};
   for (const [code, d] of Object.entries(acc)) {
-    const unit = _units.find(u => u.code === code);
-    const qCount = unit ? _getUnitQuestionIds(unit).length : 0;
+    const qCount = _qCountMap[code] ?? 0;
     map[code] = computeTier(d, qCount);
   }
   return map;

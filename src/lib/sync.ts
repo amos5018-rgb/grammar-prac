@@ -5,8 +5,7 @@ import {
   getStreak,
   getActivityDates,
 } from './storage';
-import { units } from '@/data/units';
-import { getUnitQuestionIds } from '@/data/questions/coverage';
+import { questionCountMap } from '@/data/questions/question-id-map';
 
 const PENDING_KEY = 'grammar_sync_pending';
 const LAST_SYNC_KEY = 'grammar_sync_last';
@@ -90,8 +89,7 @@ export function buildSnapshot(): SyncSnapshot | null {
   const unitProgress: SyncSnapshot['unitProgress'] = {};
   for (const [code, d] of Object.entries(unitData)) {
     unitProgress[code] = { attempts: d.attempts, bestScore: d.bestScore };
-    const unit = units.find(u => u.code === code);
-    const qCount = unit ? getUnitQuestionIds(unit).length : 0;
+    const qCount = questionCountMap[code] ?? 0;
     let level: string;
     let mastered = false;
     const hasCov = qCount > 0 && d.totalAnswered > 0;

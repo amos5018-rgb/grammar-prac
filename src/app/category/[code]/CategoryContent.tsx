@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Category, Unit } from '@/lib/types';
 import { getUnitProgress, getCorrectQuestionIds, getUnitTierMap, UnitTier } from '@/lib/storage';
-import { getUnitQuestionIds } from '@/data/questions/coverage';
+import { questionIdMap } from '@/data/questions/question-id-map';
 import UnitCard from '@/components/UnitCard';
 
 interface CategoryContentProps {
@@ -27,7 +27,7 @@ export default function CategoryContent({ category, units, questionCounts, total
     const cov: Record<string, number> = {};
     for (const u of units) {
       if (u.study) continue;
-      cov[u.code] = getUnitQuestionIds(u).filter(id => correct.has(id)).length;
+      cov[u.code] = (questionIdMap[u.code] ?? []).filter(id => correct.has(id)).length;
     }
     setCoveredMap(cov);
   }, [units]);

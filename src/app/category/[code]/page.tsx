@@ -3,7 +3,7 @@ import { categories } from '@/data/categories';
 import { notFound } from 'next/navigation';
 import CategoryContent from './CategoryContent';
 
-export const revalidate = 300;
+export const revalidate = 3600;
 
 export async function generateStaticParams() {
   return categories.map(c => ({ code: c.code }));

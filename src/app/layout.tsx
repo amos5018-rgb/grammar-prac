@@ -31,9 +31,15 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
         <link
-          rel="stylesheet"
+          rel="preload"
+          as="style"
           crossOrigin="anonymous"
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var l=document.createElement('link');l.rel='stylesheet';l.href='https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css';document.head.appendChild(l)})();`,
+          }}
         />
         <script
           dangerouslySetInnerHTML={{

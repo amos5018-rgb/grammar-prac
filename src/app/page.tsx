@@ -1,17 +1,14 @@
-import { fetchUnits, fetchQuestions } from '@/lib/sheets';
+import { fetchUnits } from '@/lib/sheets';
 import { categories } from '@/data/categories';
+import { questionCountMap } from '@/data/questions/question-id-map';
 import HomeContent, { CategoryCardData } from './HomeContent';
 
-// 정적으로 미리 생성하고 5분마다 갱신 (빠른 로딩)
-export const revalidate = 300;
+export const revalidate = 3600;
 
 export default async function Home() {
-  const [units, questions] = await Promise.all([fetchUnits(), fetchQuestions()]);
+  const units = await fetchUnits();
 
-  const questionCounts: Record<string, number> = {};
-  for (const q of questions) {
-    questionCounts[q.unitCode] = (questionCounts[q.unitCode] || 0) + 1;
-  }
+  const questionCounts = questionCountMap;
 
   const known = new Set(categories.map(c => c.code));
   const cards: CategoryCardData[] = [...categories]

@@ -1,6 +1,6 @@
 import { getUnitProgress, getDueCount, getWrongCounts, getUnitTierMap, getCorrectQuestionIds, getDday, getStudyCompletion, CONVERT_COVERAGE, UnitTier } from './storage';
 import { units } from '@/data/units';
-import { getUnitQuestionIds } from '@/data/questions/coverage';
+import { questionIdMap } from '@/data/questions/question-id-map';
 
 type TierMap = Record<string, UnitTier>;
 type Progress = Record<string, { attempts: number; bestScore: number | null }>;
@@ -213,7 +213,7 @@ function getFullChallengeRecommendation(
   for (const u of CORE) {
     const t = tiers[u.code];
     if (!t || t.level !== 'skilled' || t.mastered) continue;
-    const ids = getUnitQuestionIds(u);
+    const ids = questionIdMap[u.code] ?? [];
     if (ids.length === 0) continue;
     const cov = ids.filter(id => correct.has(id)).length / ids.length;
     if (cov >= CONVERT_COVERAGE && (!best || cov > best.pct)) {

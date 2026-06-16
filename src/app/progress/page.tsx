@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { getQuizResults, getUnitProgress, getUnitTierMap, getCorrectQuestionIds, clearAllHistory, getStreak, getExamCalendar, getDday, UnitTier, TierLevel } from '@/lib/storage';
-import { getUnitQuestionIds } from '@/data/questions/coverage';
+import { questionIdMap } from '@/data/questions/question-id-map';
 import { QuizAttempt } from '@/lib/types';
 import { units } from '@/data/units';
 import { categories } from '@/data/categories';
@@ -43,8 +43,8 @@ export default function ProgressPage() {
     const tot: Record<string, number> = {};
     for (const u of units) {
       if (u.study) continue;
-      const ids = getUnitQuestionIds(u);
-      if (ids.length === 0) continue;
+      const ids = questionIdMap[u.code];
+      if (!ids || ids.length === 0) continue;
       cov[u.code] = ids.filter(id => correct.has(id)).length;
       tot[u.code] = ids.length;
     }
