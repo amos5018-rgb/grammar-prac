@@ -36,20 +36,21 @@ function legacyReveals(card: StudyCard): StudyCardReveal[] {
 
 export default function StudyReview({ unitCode, cards }: StudyReviewProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [revealed, setRevealed] = useState<Record<number, Set<number>>>({});
+  const [revealed, setRevealed] = useState<Record<number, Set<string>>>({});
   const [completed, setCompleted] = useState(false);
 
   const card = cards[currentIndex];
-  const cardRevealed = revealed[currentIndex] || new Set<number>();
+  const cardRevealed = revealed[currentIndex] || new Set<string>();
   const reveals = card.reveals && card.reveals.length > 0 ? card.reveals : legacyReveals(card);
+  const hasTable = reveals.some(r => r.table);
 
-  function toggle(index: number) {
+  function toggle(key: string) {
     setRevealed(prev => {
       const current = new Set(prev[currentIndex] || []);
-      if (current.has(index)) {
-        current.delete(index);
+      if (current.has(key)) {
+        current.delete(key);
       } else {
-        current.add(index);
+        current.add(key);
       }
       return { ...prev, [currentIndex]: current };
     });
@@ -184,18 +185,33 @@ export default function StudyReview({ unitCode, cards }: StudyReviewProps) {
           </div>
         )}
 
+        {/* 셀 인출 안내 */}
+        {hasTable && (
+          <p className="text-xs text-text-secondary mb-2">표의 칸을 탭하면 내용이 나타납니다.</p>
+        )}
+
         {/* 인출칸 (가변 개수) */}
-        <div className="space-y-3">
-          {reveals.map((r, i) => (
-            <RevealBox
-              key={i}
-              label={`${i + 1}. ${r.label}`}
-              content={r.content}
-              table={r.table}
-              isRevealed={cardRevealed.has(i)}
-              onToggle={() => toggle(i)}
-            />
-          ))}
+        <div className="space-y-4">
+          {reveals.map((r, i) =>
+            r.table ? (
+              <TableReveal
+                key={i}
+                label={r.label}
+                table={r.table}
+                keyPrefix={`c${i}`}
+                revealedKeys={cardRevealed}
+                onToggleCell={(row, col) => toggle(`c${i}-${row}-${col}`)}
+              />
+            ) : (
+              <RevealBox
+                key={i}
+                label={r.label}
+                content={r.content}
+                isRevealed={cardRevealed.has(`t${i}`)}
+                onToggle={() => toggle(`t${i}`)}
+              />
+            )
+          )}
         </div>
       </div>
 
@@ -222,62 +238,23 @@ export default function StudyReview({ unitCode, cards }: StudyReviewProps) {
 function RevealBox({
   label,
   content,
-  table,
   isRevealed,
   onToggle,
 }: {
   label: string;
   content?: string;
-  table?: StudyCardTable;
   isRevealed: boolean;
   onToggle: () => void;
 }) {
   if (isRevealed) {
     return (
-      <div
-        role="button"
-        tabIndex={0}
+      <button
         onClick={onToggle}
-        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggle(); } }}
-        className="w-full rounded-xl border border-border bg-gray-50 dark:bg-white/5 p-4 text-left hover:bg-gray-100 dark:hover:bg-white/10 transition-colors cursor-pointer"
+        className="w-full rounded-xl border border-border bg-gray-50 dark:bg-white/5 p-4 text-left hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
       >
         <div className="text-xs font-medium text-text-secondary mb-1">{label}</div>
-        {content && <p className="text-sm leading-relaxed whitespace-pre-line">{content}</p>}
-        {table && (
-          <div className="overflow-x-auto mt-2">
-            <table className="w-full text-xs border-collapse">
-              <thead>
-                <tr>
-                  {table.headers.map((h, i) => (
-                    <th
-                      key={i}
-                      className="border border-border bg-background px-2 py-1.5 font-semibold text-left text-text whitespace-nowrap"
-                    >
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {table.rows.map((row, ri) => (
-                  <tr key={ri}>
-                    {row.map((cell, ci) => (
-                      <td
-                        key={ci}
-                        className={`border border-border px-2 py-1.5 align-top leading-relaxed ${
-                          ci === 0 ? 'font-medium text-text whitespace-nowrap' : 'text-text-secondary'
-                        }`}
-                      >
-                        {cell}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+        <p className="text-sm leading-relaxed whitespace-pre-line">{content}</p>
+      </button>
     );
   }
 
@@ -291,5 +268,76 @@ function RevealBox({
         탭하여 확인 &rarr;
       </p>
     </button>
+  );
+}
+
+// 표를 항상 노출하되, 첫 열(질문/행 머리)은 보이고 나머지 답 셀은 탭하여 인출
+function TableReveal({
+  label,
+  table,
+  keyPrefix,
+  revealedKeys,
+  onToggleCell,
+}: {
+  label: string;
+  table: StudyCardTable;
+  keyPrefix: string;
+  revealedKeys: Set<string>;
+  onToggleCell: (row: number, col: number) => void;
+}) {
+  return (
+    <div>
+      <div className="text-sm font-semibold text-text mb-2">{label}</div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-xs border-collapse">
+          <thead>
+            <tr>
+              {table.headers.map((h, i) => (
+                <th
+                  key={i}
+                  className="border border-border bg-background px-2 py-1.5 font-semibold text-left text-text whitespace-nowrap"
+                >
+                  {h}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {table.rows.map((row, ri) => (
+              <tr key={ri}>
+                {row.map((cell, ci) => {
+                  if (ci === 0) {
+                    return (
+                      <td
+                        key={ci}
+                        className="border border-border px-2 py-1.5 align-top font-medium text-text whitespace-nowrap bg-background/50"
+                      >
+                        {cell}
+                      </td>
+                    );
+                  }
+                  const revealed = revealedKeys.has(`${keyPrefix}-${ri}-${ci}`);
+                  return (
+                    <td key={ci} className="border border-border p-0 align-top min-w-[88px]">
+                      <button
+                        onClick={() => onToggleCell(ri, ci)}
+                        className={`block w-full text-left px-2 py-1.5 transition-colors ${
+                          revealed
+                            ? 'text-text-secondary leading-relaxed hover:bg-gray-100 dark:hover:bg-white/10'
+                            : 'text-center font-semibold text-primary bg-primary-light hover:bg-primary/10'
+                        }`}
+                        aria-label={revealed ? undefined : '탭하여 확인'}
+                      >
+                        {revealed ? cell : '탭'}
+                      </button>
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 }
