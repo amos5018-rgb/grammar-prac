@@ -1,34 +1,46 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import SummaryStrip from './SummaryStrip';
+import AtRiskList from './AtRiskList';
+import DailyTrendChart from './DailyTrendChart';
 import UnitRatesTable from './UnitRatesTable';
 import HardestQuestions from './HardestQuestions';
-import MasteryGrid from './MasteryGrid';
-import StreakOverview from './StreakOverview';
+import StudentRoster from './StudentRoster';
+import StudentDetailDrawer from './StudentDetailDrawer';
 
-type Tab = 'units' | 'questions' | 'mastery' | 'streaks';
-
-const TABS: { key: Tab; label: string }[] = [
-  { key: 'units', label: '단원 정답률' },
-  { key: 'questions', label: '어려운 문항' },
-  { key: 'mastery', label: '마스터 현황' },
-  { key: 'streaks', label: '스트릭' },
-];
+interface RosterStudent {
+  clientId: string;
+  name: string;
+  studentId: string;
+  streak: number;
+  masteredCount: number;
+  lastSyncedAt: string;
+  correctRate: number | null;
+  totalAnswers: number;
+  riskTags: string[];
+  inactiveDays: number | null;
+  unitTiers: Record<string, { level: string; label: string; mastered: boolean; bestScore: number | null }>;
+  unitProgress: Record<string, { attempts: number; bestScore: number | null }>;
+}
 
 interface Stats {
   totalStudents: number;
   activeToday: number;
-  unitRates: Array<{ unit_code: string; total_answers: number; correct_answers: number; correct_rate: number }>;
+  overallCorrectRate: number;
+  avgMasteredCount: number;
+  dailyTrend: Array<{ date: string; activeStudents: number; totalAnswers: number; correctAnswers: number; correctRate: number }>;
+  unitRates: Array<{ unit_code: string; total_answers: number; correct_answers: number; correct_rate: number; student_count: number }>;
   questionRates: Array<{ question_id: string; unit_code: string; question_text: string; attempts: number; correct_count: number; correct_rate: number }>;
   masteryByUnit: Record<string, number>;
-  roster: Array<{ clientId: string; name: string; studentId: string; streak: number; masteredCount: number; lastSyncedAt: string }>;
+  roster: RosterStudent[];
 }
 
 export default function TeacherDashboard({ onLogout }: { onLogout: () => void }) {
   const [stats, setStats] = useState<Stats | null>(null);
   const [error, setError] = useState('');
-  const [tab, setTab] = useState<Tab>('units');
   const [refreshing, setRefreshing] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState<string | null>(null);
 
   const fetchStats = async () => {
     setRefreshing(true);
@@ -61,10 +73,10 @@ export default function TeacherDashboard({ onLogout }: { onLogout: () => void })
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="bg-surface border-b border-border sticky top-0 z-50">
-        <div className="max-w-3xl mx-auto px-4">
+      <header className="bg-surface/80 supports-[backdrop-filter]:bg-surface/70 backdrop-blur-md border-b border-border/70 sticky top-0 z-30">
+        <div className="max-w-4xl mx-auto px-4">
           <div className="h-12 flex items-center justify-between">
-            <h1 className="font-bold text-primary text-lg">교사 대시보드</h1>
+            <h1 className="font-bold text-primary text-lg tracking-tight">교사 대시보드</h1>
             <div className="flex items-center gap-2">
               <button
                 onClick={fetchStats}
@@ -84,55 +96,50 @@ export default function TeacherDashboard({ onLogout }: { onLogout: () => void })
         </div>
       </header>
 
-      <div className="max-w-3xl mx-auto px-4 py-4 space-y-4">
+      <div className="max-w-4xl mx-auto px-4 py-4 space-y-5">
         {error && (
           <div className="bg-error-light text-error text-sm rounded-xl p-3 text-center">{error}</div>
         )}
 
         {stats && (
           <>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-surface rounded-2xl border border-border p-4 text-center">
-                <p className="text-3xl font-bold text-text">{stats.totalStudents}</p>
-                <p className="text-xs text-text-secondary mt-1">등록 학생 수</p>
-              </div>
-              <div className="bg-surface rounded-2xl border border-border p-4 text-center">
-                <p className="text-3xl font-bold text-primary">{stats.activeToday}</p>
-                <p className="text-xs text-text-secondary mt-1">오늘 활동</p>
-              </div>
-            </div>
+            {/* ① Summary Strip */}
+            <SummaryStrip
+              totalStudents={stats.totalStudents}
+              activeToday={stats.activeToday}
+              overallCorrectRate={stats.overallCorrectRate}
+              avgMasteredCount={stats.avgMasteredCount}
+            />
 
-            <div className="flex gap-1 bg-surface rounded-xl border border-border p-1">
-              {TABS.map(t => (
-                <button
-                  key={t.key}
-                  onClick={() => setTab(t.key)}
-                  className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
-                    tab === t.key
-                      ? 'bg-primary text-white'
-                      : 'text-text-secondary hover:text-text'
-                  }`}
-                >
-                  {t.label}
-                </button>
-              ))}
-            </div>
+            {/* ② At-Risk Students */}
+            <AtRiskList
+              roster={stats.roster}
+              onStudentClick={setSelectedStudent}
+            />
 
-            {tab === 'units' && <UnitRatesTable data={stats.unitRates} />}
-            {tab === 'questions' && <HardestQuestions data={stats.questionRates} />}
-            {tab === 'mastery' && (
-              <MasteryGrid
-                masteryByUnit={stats.masteryByUnit}
-                totalStudents={stats.totalStudents}
-                roster={stats.roster}
-              />
-            )}
-            {tab === 'streaks' && (
-              <StreakOverview roster={stats.roster} activeToday={stats.activeToday} />
-            )}
+            {/* ③ Daily Trend */}
+            <DailyTrendChart data={stats.dailyTrend} />
+
+            {/* ④ Unit Rates */}
+            <UnitRatesTable data={stats.unitRates} totalStudents={stats.totalStudents} />
+
+            {/* ⑤ Hardest Questions */}
+            <HardestQuestions data={stats.questionRates} />
+
+            {/* ⑥ Student Roster */}
+            <StudentRoster
+              roster={stats.roster}
+              onStudentClick={setSelectedStudent}
+            />
           </>
         )}
       </div>
+
+      {/* Student Detail Drawer */}
+      <StudentDetailDrawer
+        clientId={selectedStudent}
+        onClose={() => setSelectedStudent(null)}
+      />
     </div>
   );
 }

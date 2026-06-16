@@ -39,15 +39,19 @@ create index if not exists answers_client_id_idx   on public.answers (client_id)
 alter table public.students enable row level security;
 alter table public.answers  enable row level security;
 
--- 단원별 정답률 (낮은 순)
+-- 단원별 정답률 (낮은 순) + 참여 학생 수
 create or replace view public.v_unit_rates as
 select unit_code,
        count(*) as total_answers,
        sum(case when correct then 1 else 0 end) as correct_answers,
-       round(100.0 * sum(case when correct then 1 else 0 end) / count(*), 1) as correct_rate
+       round(100.0 * sum(case when correct then 1 else 0 end) / count(*), 1) as correct_rate,
+       count(distinct client_id) as student_count
 from public.answers
 group by unit_code
 order by correct_rate asc;
+
+-- 일별 추이 쿼리 성능용 인덱스
+create index if not exists answers_answered_at_idx on public.answers (answered_at);
 
 -- 문항별 정답률 (어려운 순)
 create or replace view public.v_question_rates as
