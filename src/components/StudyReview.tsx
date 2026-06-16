@@ -289,13 +289,13 @@ function TableReveal({
     <div>
       <div className="text-sm font-semibold text-text mb-2">{label}</div>
       <div className="overflow-x-auto">
-        <table className="w-full text-xs border-collapse">
+        <table className="w-full text-[15px] border-collapse">
           <thead>
             <tr>
               {table.headers.map((h, i) => (
                 <th
                   key={i}
-                  className="border border-border bg-background px-2 py-1.5 font-semibold text-left text-text whitespace-nowrap"
+                  className="border border-border bg-background px-3.5 py-3 font-semibold text-left text-text whitespace-nowrap"
                 >
                   {h}
                 </th>
@@ -310,7 +310,7 @@ function TableReveal({
                     return (
                       <td
                         key={ci}
-                        className="border border-border px-2 py-1.5 align-top font-medium text-text whitespace-nowrap bg-background/50"
+                        className="border border-border px-3.5 py-3 align-top font-semibold text-text whitespace-nowrap bg-background/50"
                       >
                         {cell}
                       </td>
@@ -318,12 +318,12 @@ function TableReveal({
                   }
                   const revealed = revealedKeys.has(`${keyPrefix}-${ri}-${ci}`);
                   return (
-                    <td key={ci} className="border border-border p-0 align-top min-w-[88px]">
+                    <td key={ci} className="border border-border p-0 align-top min-w-[130px]">
                       <button
                         onClick={() => onToggleCell(ri, ci)}
-                        className={`block w-full text-left px-2 py-1.5 transition-colors ${
+                        className={`block w-full text-left px-3.5 py-4 min-h-[56px] transition-colors ${
                           revealed
-                            ? 'text-text-secondary leading-relaxed hover:bg-gray-100 dark:hover:bg-white/10'
+                            ? 'text-text leading-relaxed hover:bg-gray-100 dark:hover:bg-white/10'
                             : 'text-center font-semibold text-primary bg-primary-light hover:bg-primary/10'
                         }`}
                         aria-label={revealed ? undefined : '탭하여 확인'}
