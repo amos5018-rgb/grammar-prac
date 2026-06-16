@@ -134,6 +134,16 @@ export const units: Unit[] = [
     summary: true,
     study: true,
   },
+  {
+    code: 'grammar-elements-study',
+    category: 'grammar-elements',
+    name: '문법 요소 실현 방법 총정리: 복습편',
+    description: '높임·시간·피동·인용 표현의 예문을 단서로 기능과 실현 방법을 스스로 떠올리는 인출 연습입니다.',
+    order: 52,
+    active: true,
+    summary: true,
+    study: true,
+  },
 
   // ── 고난도 문제 (각 중분류의 '고난도 도전' 섹션에 표시됨, 25문제를 8/8/9로 분할) ──
   {

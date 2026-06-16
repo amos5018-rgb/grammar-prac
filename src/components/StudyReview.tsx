@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { StudyCard } from '@/lib/types';
+import { StudyCard, StudyCardReveal } from '@/lib/types';
 import { saveStudyCompletion } from '@/lib/storage';
 
 interface StudyReviewProps {
@@ -10,29 +10,46 @@ interface StudyReviewProps {
   cards: StudyCard[];
 }
 
-type RevealField = 'definition' | 'formula' | 'reason';
-
 function hasJongseong(str: string): boolean {
   const last = str.charCodeAt(str.length - 1);
   if (last < 0xAC00 || last > 0xD7A3) return false;
   return (last - 0xAC00) % 28 !== 0;
 }
 
+// 레거시(음운) 카드의 3칸을 범용 reveals 형태로 변환
+function legacyReveals(card: StudyCard): StudyCardReveal[] {
+  const list: StudyCardReveal[] = [];
+  if (card.definition != null) {
+    list.push({ label: `${card.name}의 개념을 정의하면?`, content: card.definition });
+  }
+  if (card.formula != null) {
+    list.push({ label: '무엇이 → 무엇으로 / 어디에서', content: card.formula });
+  }
+  if (card.nonExampleReason != null) {
+    list.push({
+      label: `${card.name}${hasJongseong(card.name) ? '이' : '가'} 비예시에 적용되지 않는 이유는?`,
+      content: card.nonExampleReason,
+    });
+  }
+  return list;
+}
+
 export default function StudyReview({ unitCode, cards }: StudyReviewProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [revealed, setRevealed] = useState<Record<number, Set<RevealField>>>({});
+  const [revealed, setRevealed] = useState<Record<number, Set<number>>>({});
   const [completed, setCompleted] = useState(false);
 
   const card = cards[currentIndex];
-  const cardRevealed = revealed[currentIndex] || new Set<RevealField>();
+  const cardRevealed = revealed[currentIndex] || new Set<number>();
+  const reveals = card.reveals && card.reveals.length > 0 ? card.reveals : legacyReveals(card);
 
-  function toggle(field: RevealField) {
+  function toggle(index: number) {
     setRevealed(prev => {
       const current = new Set(prev[currentIndex] || []);
-      if (current.has(field)) {
-        current.delete(field);
+      if (current.has(index)) {
+        current.delete(index);
       } else {
-        current.add(field);
+        current.add(index);
       }
       return { ...prev, [currentIndex]: current };
     });
@@ -60,7 +77,7 @@ export default function StudyReview({ unitCode, cards }: StudyReviewProps) {
           <div className="text-5xl mb-4">&#9989;</div>
           <h2 className="text-2xl font-bold mb-2">복습 완료!</h2>
           <p className="text-text-secondary mb-6">
-            {cards.length}개 음운 변동을 모두 복습했습니다.
+            {cards.length}개 카드를 모두 복습했습니다.
           </p>
           <div className="flex flex-col gap-3">
             <button
@@ -110,53 +127,74 @@ export default function StudyReview({ unitCode, cards }: StudyReviewProps) {
 
       {/* 카드 */}
       <div className="bg-surface rounded-2xl border border-border p-6 mb-6">
+        {/* 상위 분류 배지 */}
+        {card.group && (
+          <span className="inline-block bg-primary-light text-primary text-xs font-semibold px-2.5 py-1 rounded-full mb-2">
+            {card.group}
+          </span>
+        )}
+
         {/* 이름 */}
         <h2 className="text-xl font-bold mb-4">{card.name}</h2>
 
-        {/* 예시 / 비예시 */}
-        <div className="flex flex-wrap gap-3 mb-6">
-          <div className="flex-1 min-w-[140px]">
-            <div className="text-xs font-medium text-success mb-1.5">&#9898; 예시</div>
-            <div className="flex flex-wrap gap-1.5">
-              {card.examples.map((ex, i) => (
-                <span key={i} className="bg-success-light text-success px-2.5 py-1 rounded-lg text-sm font-medium">
-                  {ex}
-                </span>
-              ))}
+        {card.reveals && card.reveals.length > 0 ? (
+          // 문법 카드: 예문(인출 단서)을 세로 목록으로 노출
+          card.examples && card.examples.length > 0 && (
+            <div className="mb-6">
+              <div className="text-xs font-medium text-text-secondary mb-1.5">
+                &#9998; {card.exampleLabel ?? '예시'} (인출 단서)
+              </div>
+              <ul className="space-y-1.5">
+                {card.examples.map((ex, i) => (
+                  <li
+                    key={i}
+                    className="bg-primary-light/60 text-text rounded-lg px-3 py-2 text-sm leading-relaxed border-l-2 border-primary/50"
+                  >
+                    {ex}
+                  </li>
+                ))}
+              </ul>
             </div>
-          </div>
-          <div className="flex-1 min-w-[140px]">
-            <div className="text-xs font-medium text-error mb-1.5">&#10060; 비예시</div>
-            <div className="flex flex-wrap gap-1.5">
-              {card.nonExamples.map((ex, i) => (
-                <span key={i} className="bg-error-light text-error px-2.5 py-1 rounded-lg text-sm font-medium">
-                  {ex}
-                </span>
-              ))}
+          )
+        ) : (
+          // 레거시(음운) 카드: 예시 / 비예시 배지 2열
+          <div className="flex flex-wrap gap-3 mb-6">
+            <div className="flex-1 min-w-[140px]">
+              <div className="text-xs font-medium text-success mb-1.5">&#9898; {card.exampleLabel ?? '예시'}</div>
+              <div className="flex flex-wrap gap-1.5">
+                {(card.examples ?? []).map((ex, i) => (
+                  <span key={i} className="bg-success-light text-success px-2.5 py-1 rounded-lg text-sm font-medium">
+                    {ex}
+                  </span>
+                ))}
+              </div>
             </div>
+            {card.nonExamples && card.nonExamples.length > 0 && (
+              <div className="flex-1 min-w-[140px]">
+                <div className="text-xs font-medium text-error mb-1.5">&#10060; 비예시</div>
+                <div className="flex flex-wrap gap-1.5">
+                  {card.nonExamples.map((ex, i) => (
+                    <span key={i} className="bg-error-light text-error px-2.5 py-1 rounded-lg text-sm font-medium">
+                      {ex}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
-        </div>
+        )}
 
-        {/* 인출 3칸 */}
+        {/* 인출칸 (가변 개수) */}
         <div className="space-y-3">
-          <RevealBox
-            label={`1. ${card.name}의 개념을 정의하면?`}
-            content={card.definition}
-            isRevealed={cardRevealed.has('definition')}
-            onToggle={() => toggle('definition')}
-          />
-          <RevealBox
-            label="2. 무엇이 → 무엇으로 / 어디에서"
-            content={card.formula}
-            isRevealed={cardRevealed.has('formula')}
-            onToggle={() => toggle('formula')}
-          />
-          <RevealBox
-            label={`3. ${card.name}${hasJongseong(card.name) ? '이' : '가'} 비예시에 적용되지 않는 이유는?`}
-            content={card.nonExampleReason}
-            isRevealed={cardRevealed.has('reason')}
-            onToggle={() => toggle('reason')}
-          />
+          {reveals.map((r, i) => (
+            <RevealBox
+              key={i}
+              label={`${i + 1}. ${r.label}`}
+              content={r.content}
+              isRevealed={cardRevealed.has(i)}
+              onToggle={() => toggle(i)}
+            />
+          ))}
         </div>
       </div>
 

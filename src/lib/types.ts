@@ -28,14 +28,22 @@ export interface Unit {
   partIndex?: number;    // 분할 소단원 번호 (0, 1, 2)
 }
 
+export interface StudyCardReveal {
+  label: string;
+  content: string;
+}
+
 export interface StudyCard {
   id: string;
   name: string;
-  examples: string[];
-  nonExamples: string[];
-  definition: string;
-  formula: string;
-  nonExampleReason: string;
+  group?: string;              // 상위 분류 배지 (예: "높임 표현")
+  examples?: string[];         // 음운: 예시(초록) / 문법: 예문(인출 단서)
+  nonExamples?: string[];      // 음운만 (있을 때만 비예시 배지)
+  exampleLabel?: string;       // 단서 섹션 라벨 (문법은 "예문", 기본 "예시")
+  definition?: string;         // 레거시 음운 카드용
+  formula?: string;            // 레거시
+  nonExampleReason?: string;   // 레거시
+  reveals?: StudyCardReveal[]; // 있으면 이 항목들을 인출칸으로 렌더(가변 개수)
 }
 
 export interface Question {
