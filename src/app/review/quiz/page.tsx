@@ -2,7 +2,7 @@ import { Suspense } from 'react';
 import { fetchQuestions } from '@/lib/sheets';
 import ReviewQuizContent from './ReviewQuizContent';
 
-export const revalidate = 300;
+export const revalidate = 3600;
 
 export default async function ReviewQuizPage() {
   const allQuestions = await fetchQuestions();

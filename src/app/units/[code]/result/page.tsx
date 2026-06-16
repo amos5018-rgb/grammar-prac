@@ -1,7 +1,7 @@
 import { fetchUnits } from '@/lib/sheets';
 import ResultContent from './ResultContent';
 
-export const revalidate = 300;
+export const revalidate = 3600;
 
 export async function generateStaticParams() {
   const units = await fetchUnits();

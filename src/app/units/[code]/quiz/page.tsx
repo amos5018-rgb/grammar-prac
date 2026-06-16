@@ -3,8 +3,8 @@ import { fetchUnits, fetchQuestions } from '@/lib/sheets';
 import { notFound } from 'next/navigation';
 import QuizLauncher from './QuizLauncher';
 
-// 빌드 시 퀴즈 페이지를 미리 생성하고, 5분마다 갱신 (빠른 로딩)
-export const revalidate = 300;
+// 빌드 시 퀴즈 페이지를 미리 생성하고, 1시간마다 갱신 (빠른 로딩)
+export const revalidate = 3600;
 
 export async function generateStaticParams() {
   const units = await fetchUnits();

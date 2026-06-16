@@ -2,7 +2,9 @@ import fs from 'fs';
 import path from 'path';
 import DownloadButton from '@/components/DownloadButton';
 
-export const revalidate = 300;
+// 학습 자료는 public/materials 파일시스템만 읽음(외부 데이터 없음) → 재배포 시에만 변경.
+// 완전 정적으로 처리해 ISR 재생성을 제거한다.
+export const revalidate = false;
 
 interface WorksheetGroup {
   title: string;

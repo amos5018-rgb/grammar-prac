@@ -125,7 +125,7 @@ src/data/
 2. 시트를 **"링크가 있는 모든 사용자 - 뷰어"**로 공유
 3. Vercel 프로젝트 설정 → Environment Variables에 `GOOGLE_SHEET_ID` 추가
    (시트 주소 `https://docs.google.com/spreadsheets/d/여기부분/edit`)
-4. 시트를 수정하면 **5분 안에** 웹앱에 자동 반영됩니다.
+4. 시트를 수정하면 **1시간 안에** 웹앱에 자동 반영됩니다.
 
 > Google Sheets를 설정하면 `src/data/` 파일 대신 시트 내용이 사용됩니다.
 > 시트 설정을 지우면 다시 파일 데이터로 돌아옵니다.

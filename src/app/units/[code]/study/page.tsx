@@ -2,7 +2,9 @@ import { fetchUnits, fetchStudyCards } from '@/lib/sheets';
 import { notFound } from 'next/navigation';
 import StudyReview from '@/components/StudyReview';
 
-export const revalidate = 300;
+// 복습 카드는 fetchStudyCards()(로컬 전용, Google Sheets 미연동)만 사용 → 재배포 시에만 변경.
+// 완전 정적으로 처리해 ISR 재생성을 제거한다.
+export const revalidate = false;
 
 export async function generateStaticParams() {
   const units = await fetchUnits();

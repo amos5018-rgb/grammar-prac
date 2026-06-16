@@ -2,7 +2,7 @@
 // 데이터 불러오기
 // - 기본: src/data/ 폴더의 로컬 문제 데이터 사용 (빠름, 관리 쉬움)
 // - 선택: 환경변수 GOOGLE_SHEET_ID를 설정하면 Google Sheets 데이터가
-//         로컬 데이터 대신 사용됨 (5분마다 자동 갱신)
+//         로컬 데이터 대신 사용됨 (1시간마다 자동 갱신)
 // ============================================================
 import { Unit, Question, QuestionType, Difficulty, StudyCard } from './types';
 import { units as localUnits } from '@/data/units';
@@ -62,7 +62,7 @@ async function fetchSheet(sheetName: string): Promise<string[][]> {
   const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
 
   try {
-    const res = await fetch(url, { next: { revalidate: 300 } });
+    const res = await fetch(url, { next: { revalidate: 3600 } });
     if (!res.ok) return [];
     const text = await res.text();
     return parseCSV(text);

@@ -2,7 +2,7 @@ import { fetchUnits, fetchQuestions, fetchStudyCards } from '@/lib/sheets';
 import { notFound } from 'next/navigation';
 import UnitDetail from './UnitDetail';
 
-export const revalidate = 300;
+export const revalidate = 3600;
 
 export async function generateStaticParams() {
   const units = await fetchUnits();
