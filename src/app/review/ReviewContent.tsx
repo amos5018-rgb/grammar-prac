@@ -108,11 +108,11 @@ export default function ReviewContent({ allQuestions }: Props) {
           {dueCount > 0 && (
             <Link
               href="/review/quiz?due=1"
-              className="flex-1 py-3.5 text-center bg-primary text-white rounded-xl font-semibold shadow-[var(--shadow-sm)] hover:bg-primary-dark hover:shadow-[var(--shadow-md)] active:scale-[0.99] transition-all"
+              className="flex-1 py-3.5 text-center border-2 border-primary text-primary rounded-xl font-semibold hover:bg-primary hover:text-white active:scale-[0.99] transition-all"
             >
               간격 복습 {Math.min(dueCount, 5)}문제
               <span className="block text-xs font-normal mt-0.5 opacity-80">
-                간격 반복 학습
+                까먹을 때쯤 다시 풀기
               </span>
             </Link>
           )}
