@@ -125,11 +125,11 @@ export default function StudyReview({ unitCode, cards }: StudyReviewProps) {
       <div className="flex items-center justify-between mb-4">
         <Link
           href={`/units/${unitCode}`}
-          className="text-sm text-text-secondary hover:text-primary"
+          className="text-base text-text-secondary hover:text-primary"
         >
           &larr; 돌아가기
         </Link>
-        <span className="text-sm font-medium text-text-secondary">
+        <span className="text-base font-medium text-text-secondary">
           {currentIndex + 1} / {cards.length}
         </span>
       </div>
@@ -146,26 +146,26 @@ export default function StudyReview({ unitCode, cards }: StudyReviewProps) {
       <div className="bg-surface rounded-2xl border border-border p-6 mb-6">
         {/* 상위 분류 배지 */}
         {card.group && (
-          <span className="inline-block bg-primary-light text-primary text-xs font-semibold px-2.5 py-1 rounded-full mb-2">
+          <span className="inline-block bg-primary-light text-primary text-sm font-semibold px-2.5 py-1 rounded-full mb-2">
             {card.group}
           </span>
         )}
 
         {/* 이름 */}
-        <h2 className="text-xl font-bold mb-4">{card.name}</h2>
+        <h2 className="text-2xl font-bold mb-4">{card.name}</h2>
 
         {card.reveals && card.reveals.length > 0 ? (
           // 문법 카드: 예문(인출 단서)을 세로 목록으로 노출
           card.examples && card.examples.length > 0 && (
             <div className="mb-6">
-              <div className="text-xs font-medium text-text-secondary mb-1.5">
+              <div className="text-sm font-medium text-text-secondary mb-1.5">
                 &#9998; {card.exampleLabel ?? '예시'} (인출 단서)
               </div>
               <ul className="space-y-1.5">
                 {card.examples.map((ex, i) => (
                   <li
                     key={i}
-                    className="bg-primary-light/60 text-text rounded-lg px-3 py-2 text-sm leading-relaxed border-l-2 border-primary/50"
+                    className="bg-primary-light/60 text-text rounded-lg px-3 py-2.5 text-base leading-relaxed border-l-2 border-primary/50"
                   >
                     {ex}
                   </li>
@@ -177,10 +177,10 @@ export default function StudyReview({ unitCode, cards }: StudyReviewProps) {
           // 레거시(음운) 카드: 예시 / 비예시 배지 2열
           <div className="flex flex-wrap gap-3 mb-6">
             <div className="flex-1 min-w-[140px]">
-              <div className="text-xs font-medium text-success mb-1.5">&#9898; {card.exampleLabel ?? '예시'}</div>
+              <div className="text-sm font-medium text-success mb-1.5">&#9898; {card.exampleLabel ?? '예시'}</div>
               <div className="flex flex-wrap gap-1.5">
                 {(card.examples ?? []).map((ex, i) => (
-                  <span key={i} className="bg-success-light text-success px-2.5 py-1 rounded-lg text-sm font-medium">
+                  <span key={i} className="bg-success-light text-success px-2.5 py-1 rounded-lg text-base font-medium">
                     {ex}
                   </span>
                 ))}
@@ -188,10 +188,10 @@ export default function StudyReview({ unitCode, cards }: StudyReviewProps) {
             </div>
             {card.nonExamples && card.nonExamples.length > 0 && (
               <div className="flex-1 min-w-[140px]">
-                <div className="text-xs font-medium text-error mb-1.5">&#10060; 비예시</div>
+                <div className="text-sm font-medium text-error mb-1.5">&#10060; 비예시</div>
                 <div className="flex flex-wrap gap-1.5">
                   {card.nonExamples.map((ex, i) => (
-                    <span key={i} className="bg-error-light text-error px-2.5 py-1 rounded-lg text-sm font-medium">
+                    <span key={i} className="bg-error-light text-error px-2.5 py-1 rounded-lg text-base font-medium">
                       {ex}
                     </span>
                   ))}
@@ -203,7 +203,7 @@ export default function StudyReview({ unitCode, cards }: StudyReviewProps) {
 
         {/* 셀 인출 안내 */}
         {hasTable && (
-          <p className="text-xs text-text-secondary mb-2">표의 각 칸을 탭하면 내용이 나타납니다. 표가 화면보다 넓으면 좌우로 넘겨 보세요.</p>
+          <p className="text-sm text-text-secondary mb-2">표의 각 칸을 탭하면 내용이 나타납니다. 표가 화면보다 넓으면 좌우로 넘겨 보세요.</p>
         )}
 
         {/* 인출칸 (가변 개수) */}
@@ -269,8 +269,8 @@ function RevealBox({
         onClick={onToggle}
         className="w-full rounded-xl border border-border bg-gray-50 dark:bg-white/5 p-4 text-left hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
       >
-        <div className="text-xs font-medium text-text-secondary mb-1">{label}</div>
-        <p className="text-sm leading-relaxed whitespace-pre-line">{content}</p>
+        <div className="text-sm font-medium text-text-secondary mb-1">{label}</div>
+        <p className="text-base leading-relaxed whitespace-pre-line">{content}</p>
       </button>
     );
   }
@@ -280,8 +280,8 @@ function RevealBox({
       onClick={onToggle}
       className="w-full rounded-xl border-2 border-primary/40 bg-primary-light p-4 text-left hover:border-primary hover:bg-primary/10 transition-colors group"
     >
-      <div className="text-sm font-semibold text-text mb-1">{label}</div>
-      <p className="text-sm font-medium text-primary group-hover:text-primary-dark transition-colors">
+      <div className="text-base font-semibold text-text mb-1">{label}</div>
+      <p className="text-base font-medium text-primary group-hover:text-primary-dark transition-colors">
         탭하여 확인 &rarr;
       </p>
     </button>
@@ -335,17 +335,17 @@ function TableReveal({
   return (
     <div>
       <div className="flex items-center justify-between gap-2 mb-2">
-        <div className="text-sm font-semibold text-text">{label}</div>
+        <div className="text-base font-semibold text-text">{label}</div>
         <button
           onClick={() => onSetAll(!allRevealed)}
-          className="shrink-0 text-xs font-medium text-primary hover:underline"
+          className="shrink-0 text-sm font-medium text-primary hover:underline"
         >
           {allRevealed ? '모두 접기' : '모두 펼치기'}
         </button>
       </div>
       <div className="relative">
         <div ref={scrollRef} onScroll={updateFade} className="overflow-x-auto">
-        <table className="w-full text-[15px] border-collapse">
+        <table className="w-full text-[17px] border-collapse">
           <thead>
             <tr>
               {table.headers.map((h, i) => (
@@ -404,7 +404,7 @@ function TableReveal({
           </div>
         )}
       </div>
-      <div className="mt-1.5 text-xs text-text-secondary">
+      <div className="mt-1.5 text-sm text-text-secondary">
         {revealedCount === 0
           ? '아직 확인한 칸이 없습니다.'
           : allRevealed
