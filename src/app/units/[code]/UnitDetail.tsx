@@ -139,8 +139,8 @@ function BlockUnitDetail({ unit, questionCount, questionIds, blockQuestionIds }:
 
       {/* 블록 선택 */}
       <div className="animate-fade-up bg-surface rounded-2xl border border-border/70 shadow-[var(--shadow-sm)] p-5">
-        <h2 className="text-base font-bold mb-3">블록 선택</h2>
-        <div className="grid grid-cols-2 gap-2 mb-4">
+        <h2 className="text-lg font-bold mb-3">블록 선택</h2>
+        <div className="grid grid-cols-2 gap-2.5 mb-4">
           {blocks.map(b => {
             const bIds = blockQuestionIds[b.code] || [];
             const bCovered = bIds.filter(id => correctSet.has(id)).length;
@@ -150,23 +150,23 @@ function BlockUnitDetail({ unit, questionCount, questionIds, blockQuestionIds }:
               <button
                 key={b.code}
                 onClick={() => setSelectedBlock(isSelected ? null : b.code)}
-                className={`relative text-left px-4 py-3 rounded-xl border-2 transition-all ${
+                className={`relative text-left px-4 py-3.5 rounded-xl border-2 transition-all ${
                   isSelected
                     ? 'border-primary bg-primary-light shadow-[var(--shadow-sm)]'
                     : 'border-border hover:border-primary/40'
                 }`}
               >
-                <div className="flex items-center gap-1.5 mb-1">
-                  <span className={`text-xs font-bold px-1.5 py-0.5 rounded ${
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className={`text-sm font-bold px-2 py-0.5 rounded ${
                     isSelected ? 'bg-primary text-white' : 'bg-gray-100 dark:bg-white/10 text-text-secondary'
                   }`}>{b.code}</span>
-                  <span className="text-sm font-semibold truncate">{b.name}</span>
+                  <span className="text-base font-semibold truncate">{b.name}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="flex-1 h-1.5 bg-gray-100 dark:bg-white/10 rounded-full overflow-hidden">
+                  <div className="flex-1 h-2 bg-gray-100 dark:bg-white/10 rounded-full overflow-hidden">
                     <div className="h-full bg-success rounded-full transition-all" style={{ width: `${bPct}%` }} />
                   </div>
-                  <span className="text-xs text-text-secondary whitespace-nowrap">{bCovered}/{bIds.length}</span>
+                  <span className="text-sm text-text-secondary whitespace-nowrap">{bCovered}/{bIds.length}</span>
                 </div>
               </button>
             );
@@ -209,16 +209,16 @@ function SelectedBlockPanel({ block, unitCode, blockIds, correctSet, wrongSet }:
   return (
     <div className="animate-fade-in bg-gray-50 dark:bg-white/5 rounded-xl p-4 border border-border/50">
       <div className="flex items-center gap-2 mb-1.5">
-        <span className="text-xs font-bold px-1.5 py-0.5 rounded bg-primary text-white">{block.code}</span>
-        <span className="font-semibold text-sm">{block.name}</span>
+        <span className="text-sm font-bold px-2 py-0.5 rounded bg-primary text-white">{block.code}</span>
+        <span className="font-semibold text-base">{block.name}</span>
       </div>
-      <p className="text-xs text-text-secondary mb-3">{block.description}</p>
-      <div className="space-y-2">
+      <p className="text-sm text-text-secondary mb-3">{block.description}</p>
+      <div className="space-y-2.5">
         {modes.map(m => (
           <Link
             key={m.label}
             href={m.href}
-            className={`block w-full py-3 text-center rounded-xl font-semibold text-sm transition-all active:scale-[0.99] ${
+            className={`block w-full py-3.5 text-center rounded-xl font-semibold text-base transition-all active:scale-[0.99] ${
               m.wrongFull
                 ? 'bg-warning text-white hover:bg-warning/90'
                 : m.full
