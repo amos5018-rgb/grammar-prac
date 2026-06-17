@@ -17,14 +17,18 @@ function sample<T>(arr: T[], n: number): T[] {
 export default function QuizLauncher({ unitCode, questions }: { unitCode: string; questions: Question[] }) {
   const searchParams = useSearchParams();
   const nParam = searchParams.get('n');
+  const blockParam = searchParams.get('block');
 
-  // '랜덤 N문제' 모드면 무작위로 N개 선별, 아니면 전체
   const [selected] = useState(() => {
-    const n = nParam ? parseInt(nParam, 10) : 0;
-    if (Number.isFinite(n) && n > 0 && n < questions.length) {
-      return sample(questions, n);
+    let pool = questions;
+    if (blockParam) {
+      pool = questions.filter(q => q.block === blockParam);
     }
-    return questions;
+    const n = nParam ? parseInt(nParam, 10) : 0;
+    if (Number.isFinite(n) && n > 0 && n < pool.length) {
+      return sample(pool, n);
+    }
+    return pool;
   });
 
   const fullAttempt = selected.length === questions.length;

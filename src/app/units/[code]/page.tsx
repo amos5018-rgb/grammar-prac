@@ -22,5 +22,14 @@ export default async function UnitPage({ params }: { params: Promise<{ code: str
   const count = unit.study ? fetchStudyCards(code).length : questions.length;
   const questionIds = unit.study ? [] : questions.map(q => q.id);
 
-  return <UnitDetail unit={unit} questionCount={count} questionIds={questionIds} />;
+  // 블록이 있는 단원: 블록별 문제 ID 매핑 생성
+  let blockQuestionIds: Record<string, string[]> | undefined;
+  if (unit.blocks && unit.blocks.length > 0) {
+    blockQuestionIds = {};
+    for (const b of unit.blocks) {
+      blockQuestionIds[b.code] = questions.filter(q => q.block === b.code).map(q => q.id);
+    }
+  }
+
+  return <UnitDetail unit={unit} questionCount={count} questionIds={questionIds} blockQuestionIds={blockQuestionIds} />;
 }

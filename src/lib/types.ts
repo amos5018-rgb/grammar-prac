@@ -14,6 +14,12 @@ export interface Category {
   order: number;
 }
 
+export interface UnitBlock {
+  code: string;
+  name: string;
+  description: string;
+}
+
 export interface Unit {
   code: string;
   category: string; // 중분류 코드 (categories.ts의 code)
@@ -26,6 +32,7 @@ export interface Unit {
   study?: boolean;       // true면 퀴즈 대신 인출 연습 UI
   parentCode?: string;   // 분할 소단원의 원본 unitCode (questions 필터용)
   partIndex?: number;    // 분할 소단원 번호 (0, 1, 2)
+  blocks?: UnitBlock[];  // 블록 목록 (있으면 블록별 선택 UI)
 }
 
 export interface StudyCardTable {
@@ -63,6 +70,7 @@ export interface Question {
   answer: string;
   explanation: string;
   steps?: PhonemeChangeStep[];
+  block?: string;          // 블록 코드 (Unit.blocks의 code와 대응)
 }
 
 export interface StudentProfile {

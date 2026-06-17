@@ -23,6 +23,7 @@ export default function ReviewQuizContent({ allQuestions }: { allQuestions: Ques
   const searchParams = useSearchParams();
   const unitFilter = searchParams.get('unit');
   const partParam = searchParams.get('part');
+  const blockParam = searchParams.get('block');
   const dueOnly = searchParams.get('due') === '1';
   const wrongTop = searchParams.get('wrong') === '1';
   const nParam = searchParams.get('n');
@@ -44,6 +45,13 @@ export default function ReviewQuizContent({ allQuestions }: { allQuestions: Ques
           const parentQs = allQuestions.filter(q => q.unitCode === unitFilter);
           const partIds = new Set(splitQuestions(parentQs, part).map(q => q.id));
           wrong = wrong.filter(w => partIds.has(w.questionId));
+        }
+        // 블록 필터: 해당 블록의 문항만 남김
+        if (blockParam) {
+          const blockIds = new Set(
+            allQuestions.filter(q => q.unitCode === unitFilter && q.block === blockParam).map(q => q.id)
+          );
+          wrong = wrong.filter(w => blockIds.has(w.questionId));
         }
       }
       if (dueOnly) {
@@ -78,7 +86,7 @@ export default function ReviewQuizContent({ allQuestions }: { allQuestions: Ques
     }
 
     setQuestions(matched);
-  }, [router, allQuestions, unitFilter, partParam, dueOnly, wrongTop, nParam]);
+  }, [router, allQuestions, unitFilter, partParam, blockParam, dueOnly, wrongTop, nParam]);
 
   if (!questions) {
     return (

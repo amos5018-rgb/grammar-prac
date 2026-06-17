@@ -142,6 +142,12 @@ export const units: Unit[] = [
     order: 51.5,
     active: true,
     summary: true,
+    blocks: [
+      { code: 'A', name: '높임 찾기', description: '주체·객체·상대 높임을 찾고 실현 요소를 파악합니다.' },
+      { code: 'B', name: '시제 찾기', description: '과거·현재·미래 시제와 실현 요소를 파악합니다.' },
+      { code: 'C', name: '능동↔피동 변환', description: '능동문을 피동문으로, 피동문을 능동문으로 바꿉니다.' },
+      { code: 'D', name: '직접→간접 인용', description: '직접 인용문을 간접 인용문으로 바꿉니다.' },
+    ],
   },
   {
     code: 'grammar-elements-study',
