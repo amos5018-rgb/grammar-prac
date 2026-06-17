@@ -34,7 +34,7 @@ export default function UnitDetail({ unit, questionCount, questionIds = [] }: Un
   if (unit.advanced) {
     modes.push({ label: '문제 풀기 시작', href: base, full: true });
   } else {
-    const isReview = unit.code === 'phoneme-change-review';
+    const isReview = !!unit.summary; // 총정리 문제편 공통 (복습편은 study라 위에서 이미 반환됨)
     if (questionCount > 5) modes.push({ label: '랜덤 5문제 풀기', href: `${base}?n=5` });
     if (isReview && questionCount > 10) modes.push({ label: '랜덤 10문제 풀기', href: `${base}?n=10` });
     modes.push({ label: `전부 풀기 (${questionCount}문제)`, href: base, full: true });

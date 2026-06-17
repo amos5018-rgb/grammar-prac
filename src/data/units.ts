@@ -135,6 +135,15 @@ export const units: Unit[] = [
     study: true,
   },
   {
+    code: 'grammar-elements-review',
+    category: 'grammar-elements',
+    name: '문법 요소 총정리: 문제편',
+    description: '높임·시제 찾기와 피동·인용 변환을 다양한 예문으로 반복 연습합니다. 한 기능씩 떼어 집중 훈련하는 문제 모음입니다.',
+    order: 51.5,
+    active: true,
+    summary: true,
+  },
+  {
     code: 'grammar-elements-study',
     category: 'grammar-elements',
     name: '문법 요소 실현 방법 총정리: 복습편',

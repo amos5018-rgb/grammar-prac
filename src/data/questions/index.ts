@@ -18,6 +18,7 @@ import { honorificsQuestions } from './honorifics';
 import { timeExpressionQuestions } from './time-expression';
 import { passiveQuotationQuestions } from './passive-quotation';
 import { phonemeChangeReviewQuestions } from './phoneme-change-review';
+import { grammarElementsReviewQuestions } from './grammar-elements-review';
 import { advancedBasicsQuestions } from './advanced-basics';
 import { advancedPhonemeChangeQuestions } from './advanced-phoneme-change';
 import { advancedGrammarQuestions } from './advanced-grammar';
@@ -36,6 +37,7 @@ export const allQuestions: Question[] = [
   ...timeExpressionQuestions,
   ...passiveQuotationQuestions,
   ...phonemeChangeReviewQuestions,
+  ...grammarElementsReviewQuestions,
   ...advancedBasicsQuestions,
   ...advancedPhonemeChangeQuestions,
   ...advancedGrammarQuestions,
