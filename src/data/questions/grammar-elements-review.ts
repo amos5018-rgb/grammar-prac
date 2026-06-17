@@ -55,7 +55,7 @@ export const grammarElementsReviewQuestions: Question[] = [
     question: '이 문장의 높임에 대한 설명으로 알맞은 것은?',
     choices: [
       '주어를 직접 높이는 직접 높임이다',
-      '주어와 관련된 대상(다리)을 높여 주어를 높이는 간접 높임이다',
+      '주어와 관련된 대상을 높여 주어를 높이는 간접 높임이다',
       '객체를 높이는 객체 높임이다',
       '청자를 높이는 상대 높임이다',
     ],
@@ -84,7 +84,7 @@ export const grammarElementsReviewQuestions: Question[] = [
     question: '이 문장에 나타난 높임에 대한 설명으로 알맞은 것은?',
     choices: [
       "'말씀'을 직접 높인 직접 높임이다",
-      "주체(교장 선생님)와 관련된 '말씀'을 높여 주체를 높인 간접 높임이다",
+      "주체와 관련된 '말씀'을 높여 주체를 높인 간접 높임이다",
       '객체를 높이는 객체 높임이다',
       '높임 표현이 없다',
     ],
@@ -117,8 +117,8 @@ export const grammarElementsReviewQuestions: Question[] = [
     passage: '어르신께서 식사를 잡수셨다.',
     question: "'먹다'의 높임말로, 주체를 높이는 특수 어휘의 기본형을 쓰시오.",
     choices: [],
-    answer: '잡수시다|자시다|잡수다|드시다',
-    explanation: "'먹다'의 높임말인 특수 어휘 '잡수시다(자시다, 드시다)'가 주체(어르신)를 높입니다.",
+    answer: '잡수시다|잡수다',
+    explanation: "'먹다'의 높임말인 특수 어휘 '잡수시다(잡수다)'가 주체(어르신)를 높입니다.",
   },
   {
     id: 'GER012', unitCode: 'grammar-elements-review', block: 'A', type: '단답형', difficulty: '중',
@@ -141,8 +141,8 @@ export const grammarElementsReviewQuestions: Question[] = [
     passage: '작년에 외할아버지께서 돌아가셨다.',
     question: "'죽다'의 높임말로, 주체를 높이는 특수 어휘의 기본형을 쓰시오.",
     choices: [],
-    answer: '돌아가시다',
-    explanation: "'죽다'의 높임말인 특수 어휘 '돌아가시다'가 주체(외할아버지)를 높입니다.",
+    answer: '돌아가시다|돌아가다',
+    explanation: "'죽다'의 높임말인 특수 어휘 '돌아가시다(돌아가다)'가 주체(외할아버지)를 높입니다.",
   },
   {
     id: 'GER015', unitCode: 'grammar-elements-review', block: 'A', type: '단답형', difficulty: '중',
@@ -242,7 +242,7 @@ export const grammarElementsReviewQuestions: Question[] = [
   {
     id: 'GER026', unitCode: 'grammar-elements-review', block: 'B', type: '단답형', difficulty: '중',
     passage: '그는 내일 곧 떠나겠다.',
-    question: '이 문장에서 미래 시제(추측·의지)를 실현하는 선어말 어미를 쓰시오.',
+    question: '이 문장에서 미래 시제를 실현하는 선어말 어미를 쓰시오.',
     choices: [],
     answer: '-겠-|겠',
     explanation: "'떠나겠다'는 '떠나-+-겠-+-다'로 분석되며, 선어말 어미 '-겠-'이 미래 시제를 나타냅니다.",
@@ -290,7 +290,7 @@ export const grammarElementsReviewQuestions: Question[] = [
     passage: '할머니가 이불 위에 책을 놓았다.',
     question: '이 능동문을 피동문으로 바꿀 때 빈칸에 들어갈 서술어를 쓰시오.\n→ 책이 이불 위에 (   ).',
     choices: [],
-    answer: '놓였다|놓여졌다',
+    answer: '놓였다',
     explanation: "'놓다'에 피동 접미사 '-이-'가 붙어 '놓이다'가 됩니다. 과거형은 '놓였다'입니다. (파생적 피동, 접미사 '-이-')",
   },
   {
@@ -346,7 +346,7 @@ export const grammarElementsReviewQuestions: Question[] = [
     passage: '선수들이 오랜 노력 끝에 꿈을 이루었다.',
     question: "이 능동문을 '-어지다' 통사적 피동문으로 바꾸시오.\n→ 꿈이 오랜 노력 끝에 [___].",
     choices: [],
-    answer: '이루어졌다',
+    answer: '이루어졌다|이뤄졌다',
     explanation: "용언 어간에 '-어지다'가 붙는 통사적 피동입니다. '이루다 → 이루어지다'로 '이루어졌다'가 됩니다.",
   },
 
@@ -427,7 +427,7 @@ export const grammarElementsReviewQuestions: Question[] = [
     question: '이 직접 인용문을 간접 인용문으로 바꾸시오.\n→ 그는 자기가 가겠다[___] 말했다.',
     choices: [],
     answer: '고',
-    explanation: "간접 인용에서는 인용격 조사 '라고' 대신 '고'를 씁니다. 인칭도 '내가 → 자기가'로 바뀝니다.",
+    explanation: "간접 인용에서는 인용격 조사 '라고' 대신 '고'를 씁니다. 인칭 대명사도 '내가 → 자기가'로 바뀝니다.",
   },
   {
     id: 'GER047', unitCode: 'grammar-elements-review', block: 'D', type: '빈칸', difficulty: '하',
@@ -459,7 +459,7 @@ export const grammarElementsReviewQuestions: Question[] = [
     question: '명령형 종결에 유의하여 간접 인용문으로 바꾸시오.\n→ 선생님이 책을 [___] 하셨다.',
     choices: [],
     answer: '읽으라고',
-    explanation: "명령형 '-아/어라'는 간접 인용에서 '-(으)라고'로 바뀝니다. '읽어라 → 읽으라고'.",
+    explanation: "명령형 종결 어미는 간접 인용에서 '-(으)라'로 바뀌고, 인용격 조사 '고'가 결합합니다. '읽어라 → 읽으라'.",
   },
   {
     id: 'GER051', unitCode: 'grammar-elements-review', block: 'D', type: '빈칸', difficulty: '상',
@@ -467,7 +467,7 @@ export const grammarElementsReviewQuestions: Question[] = [
     question: '청유형 종결에 유의하여 간접 인용문으로 바꾸시오.\n→ 친구가 같이 [___] 했다.',
     choices: [],
     answer: '가자고',
-    explanation: "청유형 '-자'는 간접 인용에서 '-자고'로 바뀝니다. '가자 → 가자고'.",
+    explanation: "청유형 종결 어미는 간접 인용에서 '-자'로 바뀌고, 인용격 조사 '고'가 결합합니다. '가자 → 가자'.",
   },
   {
     id: 'GER052', unitCode: 'grammar-elements-review', block: 'D', type: '빈칸', difficulty: '상',
@@ -475,7 +475,7 @@ export const grammarElementsReviewQuestions: Question[] = [
     question: '의문형 종결에 유의하여 간접 인용문으로 바꾸시오.\n→ 동생이 형이 빵을 먹었[___] 물었다.',
     choices: [],
     answer: '냐고',
-    explanation: "의문형은 간접 인용에서 '-냐고'로 바뀝니다. '먹었어? → 먹었냐고'.",
+    explanation: "의문형 종결 어미는 간접 인용에서 '-냐'로 바뀌고, 인용격 조사 '고'가 결합합니다. '먹었어? → 먹었냐'.",
   },
   {
     id: 'GER053', unitCode: 'grammar-elements-review', block: 'D', type: '빈칸', difficulty: '중',
@@ -499,7 +499,7 @@ export const grammarElementsReviewQuestions: Question[] = [
     question: "인칭 표현에 유의하여, '나는'을 간접 인용에 맞게 바꾼 말을 쓰시오.",
     choices: [],
     answer: '자기는',
-    explanation: "화자를 가리키던 1인칭 '나는'이 간접 인용에서는 '자기는'으로 바뀝니다.",
+    explanation: "'그는'을 가리키던 '나는'이 간접 인용에서는 '자기는'으로 바뀝니다.",
   },
   {
     id: 'GER056', unitCode: 'grammar-elements-review', block: 'D', type: '객관식', difficulty: '중',
@@ -541,7 +541,7 @@ export const grammarElementsReviewQuestions: Question[] = [
     question: '명령형 종결에 유의하여 간접 인용문으로 바꾸시오.\n→ 엄마가 조용히 [___] 하셨다.',
     choices: [],
     answer: '하라고',
-    explanation: "명령형 '해라'는 간접 인용에서 '하라고'로 바뀝니다('-여라/-아라 → -(으)라고').",
+    explanation: "명령형 종결 어미는 간접 인용에서 '-라'로 바뀌고, 인용격 조사 '고'가 결합합니다('-어라/-아라 → -(으)라').",
   },
   {
     id: 'GER060', unitCode: 'grammar-elements-review', block: 'D', type: '단답형', difficulty: '상',
@@ -549,6 +549,6 @@ export const grammarElementsReviewQuestions: Question[] = [
     question: '의문형 종결에 유의하여 빈칸에 들어갈 말을 쓰시오.',
     choices: [],
     answer: '되냐고|되느냐고',
-    explanation: "의문형은 간접 인용에서 '-냐고(-느냐고)'로 바뀌고 상대 높임이 중화됩니다('됩니까 → 되냐고'). 지시어도 '이 옷 → 그 옷'으로 바뀝니다.",
+    explanation: "의문형은 간접 인용에서 '-냐(-느냐)'로 바뀌고 상대 높임이 중화됩니다('됩니까 → 되냐고'). 지시어도 '이 옷 → 그 옷'으로 바뀝니다.",
   },
 ];
