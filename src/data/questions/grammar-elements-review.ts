@@ -14,50 +14,53 @@ import { Question } from '@/lib/types';
 
 export const grammarElementsReviewQuestions: Question[] = [
   // ── 블록 A: 높임 찾기 (GER001~GER015) ──
+  // 대상 다양화: 사장님·선배님·고객·할아버지·아버지·어머니·할머니·교수님·교장 선생님·
+  //   손님·선생님·어르신·이모님·외할아버지·삼촌 (각 최대 2회)
+  // 서술어 15개 전부 상이, '댁'을 주체 높임 실현 요소에 포함
   {
     id: 'GER001', unitCode: 'grammar-elements-review', block: 'A', type: '객관식', difficulty: '하',
-    passage: '할머니께서 진지를 잡수신다.',
+    passage: '사장님께서 회의에서 말씀하셨다.',
     question: '이 문장에 나타난 높임의 종류로 알맞은 것은?',
     choices: ['상대 높임', '주체 높임', '객체 높임', '높임 표현 없음'],
     answer: '2',
-    explanation: "주격 조사 '께서', 선어말 어미 '-시-', 특수 어휘 '잡수시다'로 문장의 주체(할머니)를 높이고 있으므로 주체 높임입니다.",
+    explanation: "주격 조사 '께서'와 선어말 어미 '-시-'로 주체(사장님)를 높이고 있으므로 주체 높임입니다.",
   },
   {
     id: 'GER002', unitCode: 'grammar-elements-review', block: 'A', type: '객관식', difficulty: '하',
-    passage: '나는 선생님께 그 일을 여쭈었다.',
+    passage: '나는 선배님께 진로에 대해 여쭈었다.',
     question: '이 문장에 나타난 높임의 종류로 알맞은 것은?',
     choices: ['상대 높임', '주체 높임', '객체 높임', '높임 표현 없음'],
     answer: '3',
-    explanation: "부사격 조사 '께'와 특수 어휘 '여쭈다'로 문장의 객체(선생님)를 높이고 있으므로 객체 높임입니다.",
+    explanation: "부사격 조사 '께'와 특수 어휘 '여쭈다'로 객체(선배님)를 높이고 있으므로 객체 높임입니다.",
   },
   {
     id: 'GER003', unitCode: 'grammar-elements-review', block: 'A', type: '객관식', difficulty: '중',
-    passage: '(점원이 손님에게) 어서 오십시오.',
+    passage: '(직원이 고객에게) 이쪽으로 앉으십시오.',
     question: '이 문장에 실현된 높임의 종류로 알맞은 것은?',
     choices: ['상대 높임', '주체 높임', '객체 높임', '높임 표현 없음'],
     answer: '1',
-    explanation: "종결 어미 '-십시오'(하십시오체)로 대화의 상대(청자, 손님)를 높이고 있으므로 상대 높임입니다.",
+    explanation: "종결 어미 '-십시오'(하십시오체)로 대화의 상대(청자, 고객)를 높이고 있으므로 상대 높임입니다.",
   },
   {
     id: 'GER004', unitCode: 'grammar-elements-review', block: 'A', type: '객관식', difficulty: '중',
-    passage: '할머니께서 댁에 계신다.',
+    passage: '할아버지께서 댁에서 주무신다.',
     question: '이 문장에서 주체 높임을 실현하는 요소를 모두 고른 것은?',
-    choices: ['께서, 계시다', '께, 계시다', '계시다, 댁', '께서, 댁'],
-    answer: '1',
-    explanation: "주격 조사 '께서'와 '있다'의 높임말인 특수 어휘 '계시다'가 주체(할머니)를 높입니다. '댁'은 높임 어휘이지만 처소를 가리키는 명사입니다.",
+    choices: ['께서, 주무시다', '께서, 주무시다, 댁', '주무시다, 댁', '께서만'],
+    answer: '2',
+    explanation: "주격 조사 '께서', '자다'의 높임말인 특수 어휘 '주무시다', '집'의 높임말인 '댁'이 모두 주체(할아버지)를 높이는 요소입니다.",
   },
   {
     id: 'GER005', unitCode: 'grammar-elements-review', block: 'A', type: '객관식', difficulty: '상',
-    passage: '할머니께서는 귀가 밝으시다.',
+    passage: '아버지께서는 다리가 아프시다.',
     question: '이 문장의 높임에 대한 설명으로 알맞은 것은?',
     choices: [
       '주어를 직접 높이는 직접 높임이다',
-      '주어와 관련된 대상(귀)을 높여 주어를 높이는 간접 높임이다',
+      '주어와 관련된 대상(다리)을 높여 주어를 높이는 간접 높임이다',
       '객체를 높이는 객체 높임이다',
       '청자를 높이는 상대 높임이다',
     ],
     answer: '2',
-    explanation: "주체(할머니)와 관련된 신체 부분 '귀'에 '-시-'를 붙여 주체를 간접적으로 높이는 간접 높임입니다.",
+    explanation: "주체(아버지)와 관련된 신체 부분 '다리'에 '-시-'를 붙여('아프시다') 주체를 간접적으로 높이는 간접 높임입니다.",
   },
   {
     id: 'GER006', unitCode: 'grammar-elements-review', block: 'A', type: '객관식', difficulty: '중',
@@ -65,15 +68,15 @@ export const grammarElementsReviewQuestions: Question[] = [
     question: '이 문장에 나타난 높임의 종류를 모두 고른 것은?',
     choices: ['주체 높임, 객체 높임', '상대 높임, 객체 높임', '주체 높임만', '객체 높임만'],
     answer: '1',
-    explanation: "'께서'·'가시다'로 주체(어머니)를, 특수 어휘 '모시다'로 객체(할머니)를 높이므로 주체 높임과 객체 높임이 함께 나타납니다.",
+    explanation: "'께서'·'-시-'로 주체(어머니)를, 특수 어휘 '모시다'로 객체(할머니)를 높이므로 주체 높임과 객체 높임이 함께 나타납니다.",
   },
   {
     id: 'GER007', unitCode: 'grammar-elements-review', block: 'A', type: '객관식', difficulty: '중',
-    passage: '나는 아버지를 모시고 집으로 왔다.',
+    passage: '나는 교수님을 찾아뵈었다.',
     question: '이 문장에 나타난 높임의 종류로 알맞은 것은?',
     choices: ['상대 높임', '주체 높임', '객체 높임', '높임 표현 없음'],
     answer: '3',
-    explanation: "특수 어휘 '모시다'로 문장의 객체(아버지)를 높이고 있으므로 객체 높임입니다. 주체는 '나'이므로 주체 높임은 없습니다.",
+    explanation: "특수 어휘 '뵙다'('만나다'의 높임말)로 객체(교수님)를 높이고 있으므로 객체 높임입니다.",
   },
   {
     id: 'GER008', unitCode: 'grammar-elements-review', block: 'A', type: '객관식', difficulty: '상',
@@ -103,51 +106,51 @@ export const grammarElementsReviewQuestions: Question[] = [
   },
   {
     id: 'GER010', unitCode: 'grammar-elements-review', block: 'A', type: '단답형', difficulty: '하',
-    passage: '아버지께서 신문을 보신다.',
+    passage: '선생님께서 교실에 들어오신다.',
     question: '이 문장에서 주체 높임을 실현하는 선어말 어미를 쓰시오.',
     choices: [],
     answer: '-시-|시',
-    explanation: "'보신다'는 '보-+-시-+-ㄴ다'로 분석되며, 선어말 어미 '-시-'가 주체(아버지)를 높입니다.",
+    explanation: "'들어오신다'는 '들어오-+-시-+-ㄴ다'로 분석되며, 선어말 어미 '-시-'가 주체(선생님)를 높입니다.",
   },
   {
     id: 'GER011', unitCode: 'grammar-elements-review', block: 'A', type: '단답형', difficulty: '중',
-    passage: '어머니께서 할머니를 모시고 오셨다.',
-    question: '객체(할머니)를 높이는 특수 어휘의 기본형을 쓰시오.',
+    passage: '어르신께서 식사를 잡수셨다.',
+    question: "'먹다'의 높임말로, 주체를 높이는 특수 어휘의 기본형을 쓰시오.",
     choices: [],
-    answer: '모시다',
-    explanation: "'데리다'의 높임말인 특수 어휘 '모시다'가 객체(할머니)를 높입니다.",
+    answer: '잡수시다|자시다|잡수다|드시다',
+    explanation: "'먹다'의 높임말인 특수 어휘 '잡수시다(자시다, 드시다)'가 주체(어르신)를 높입니다.",
   },
   {
     id: 'GER012', unitCode: 'grammar-elements-review', block: 'A', type: '단답형', difficulty: '중',
-    passage: '나는 할머니께 선물을 드렸다.',
+    passage: '나는 이모님께 생신 선물을 드렸다.',
     question: '이 문장에서 객체 높임을 실현하는 부사격 조사를 쓰시오.',
     choices: [],
     answer: '께',
-    explanation: "부사격 조사 '에게'의 높임말인 '께'가 객체(할머니)를 높입니다. 특수 어휘 '드리다'도 함께 객체를 높입니다.",
+    explanation: "부사격 조사 '에게'의 높임말인 '께'가 객체(이모님)를 높입니다. 특수 어휘 '드리다'도 함께 객체를 높입니다.",
   },
   {
     id: 'GER013', unitCode: 'grammar-elements-review', block: 'A', type: '단답형', difficulty: '중',
-    passage: '할머니께서 댁에 계신다.',
-    question: '이 문장에서 주체 높임을 실현하는 주격 조사를 쓰시오.',
+    passage: '아버지께서 서재에 계신다.',
+    question: "'있다'의 높임말로, 주체를 높이는 특수 어휘의 기본형을 쓰시오.",
     choices: [],
-    answer: '께서',
-    explanation: "주격 조사 '이/가'의 높임말인 '께서'가 주체(할머니)를 높입니다.",
+    answer: '계시다',
+    explanation: "'있다'의 높임말인 특수 어휘 '계시다'가 주체(아버지)를 높입니다.",
   },
   {
     id: 'GER014', unitCode: 'grammar-elements-review', block: 'A', type: '단답형', difficulty: '중',
-    passage: '할아버지께서 진지를 잡수신다.',
-    question: "'먹다'의 높임말로, 주체를 높이는 특수 어휘의 기본형을 쓰시오.",
+    passage: '작년에 외할아버지께서 돌아가셨다.',
+    question: "'죽다'의 높임말로, 주체를 높이는 특수 어휘의 기본형을 쓰시오.",
     choices: [],
-    answer: '잡수시다|자시다|잡수다',
-    explanation: "'먹다'의 높임말인 특수 어휘 '잡수시다(자시다)'가 주체(할아버지)를 높입니다.",
+    answer: '돌아가시다',
+    explanation: "'죽다'의 높임말인 특수 어휘 '돌아가시다'가 주체(외할아버지)를 높입니다.",
   },
   {
     id: 'GER015', unitCode: 'grammar-elements-review', block: 'A', type: '단답형', difficulty: '중',
-    passage: '나는 선생님께 모르는 것을 여쭈었다.',
-    question: "'묻다'의 높임말로, 객체를 높이는 특수 어휘의 기본형을 쓰시오.",
+    passage: '삼촌께서 아침 일찍 출발하셨다.',
+    question: '이 문장에서 주체 높임을 실현하는 주격 조사를 쓰시오.',
     choices: [],
-    answer: '여쭈다|여쭙다',
-    explanation: "'묻다'의 높임말인 특수 어휘 '여쭈다(여쭙다)'가 객체(선생님)를 높입니다.",
+    answer: '께서',
+    explanation: "주격 조사 '이/가'의 높임말인 '께서'가 주체(삼촌)를 높입니다.",
   },
 
   // ── 블록 B: 시제 찾기 (GER016~GER030) ──
@@ -278,8 +281,8 @@ export const grammarElementsReviewQuestions: Question[] = [
   },
 
   // ── 블록 C: 능동↔피동 변환 (GER031~GER045) ──
-  // 피동 접미사 골고루: -이-(3) / -히-(2) / -리-(3) / -기-(2) + 통사적(3) + 판단(2)
-  // 능동→피동 8문항 + 피동→능동 5문항 + 객관식 2문항, 서술어 중복 없음
+  // 파생적 피동: -이-(2) / -히-(2) / -리-(2) / -기-(1) + 통사적 피동(6) + 판단(2)
+  // 능동→피동 8문항 + 피동→능동 5문항 + 객관식 2문항, 통사적 피동 40%
 
   // ── 능동→피동 ──
   {
@@ -315,12 +318,12 @@ export const grammarElementsReviewQuestions: Question[] = [
     explanation: "'안다'에 피동 접미사 '-기-'가 붙어 '안기다'가 됩니다. 과거형은 '안겼다'입니다. (파생적 피동, 접미사 '-기-')",
   },
   {
-    id: 'GER035', unitCode: 'grammar-elements-review', block: 'C', type: '단답형', difficulty: '하',
-    passage: '상인이 시장에서 과일을 팔았다.',
-    question: '이 능동문을 피동문으로 바꿀 때 빈칸에 들어갈 서술어를 쓰시오.\n→ 과일이 시장에서 (   ).',
+    id: 'GER035', unitCode: 'grammar-elements-review', block: 'C', type: '빈칸', difficulty: '중',
+    passage: '사람들이 오래된 건물을 허물었다.',
+    question: "이 능동문을 '-어지다' 통사적 피동문으로 바꾸시오.\n→ 오래된 건물이 [___].",
     choices: [],
-    answer: '팔렸다',
-    explanation: "'팔다'에 피동 접미사 '-리-'가 붙어 '팔리다'가 됩니다. 과거형은 '팔렸다'입니다. (파생적 피동, 접미사 '-리-')",
+    answer: '허물어졌다',
+    explanation: "용언 어간에 '-어지다'가 붙는 통사적 피동입니다. '허물다 → 허물어지다'로 '허물어졌다'가 됩니다.",
   },
   {
     id: 'GER036', unitCode: 'grammar-elements-review', block: 'C', type: '빈칸', difficulty: '중',
@@ -339,12 +342,12 @@ export const grammarElementsReviewQuestions: Question[] = [
     explanation: "'-하다'를 '-되다'로 바꾸어 피동을 만듭니다. '발견했다 → 발견되었다'가 됩니다. (통사적 피동)",
   },
   {
-    id: 'GER038', unitCode: 'grammar-elements-review', block: 'C', type: '단답형', difficulty: '중',
-    passage: '아이들이 운동장에 블록을 높이 쌓았다.',
-    question: '이 능동문을 피동문으로 바꿀 때 빈칸에 들어갈 서술어를 쓰시오.\n→ 블록이 운동장에 높이 (   ).',
+    id: 'GER038', unitCode: 'grammar-elements-review', block: 'C', type: '빈칸', difficulty: '중',
+    passage: '시에서 새 도서관을 건설했다.',
+    question: "이 능동문을 '-되다' 통사적 피동문으로 바꾸시오.\n→ 새 도서관이 [___].",
     choices: [],
-    answer: '쌓였다',
-    explanation: "'쌓다'에 피동 접미사 '-이-'가 붙어 '쌓이다'가 됩니다. 과거형은 '쌓였다'입니다. (파생적 피동, 접미사 '-이-')",
+    answer: '건설되었다',
+    explanation: "'-하다'를 '-되다'로 바꾸어 피동을 만듭니다. '건설했다 → 건설되었다'가 됩니다. (통사적 피동)",
   },
 
   // ── 피동→능동 ──
@@ -358,11 +361,11 @@ export const grammarElementsReviewQuestions: Question[] = [
   },
   {
     id: 'GER040', unitCode: 'grammar-elements-review', block: 'C', type: '빈칸', difficulty: '상',
-    passage: '실이 가위에 끊겼다.',
-    question: '이 피동문을 능동문으로 바꾸시오.\n→ 가위가 실을 [___].',
+    passage: '그 안건이 위원회에서 승인되었다.',
+    question: '이 통사적 피동문을 능동문으로 바꾸시오.\n→ 위원회가 그 안건을 [___].',
     choices: [],
-    answer: '끊었다',
-    explanation: "피동사 '끊기다'(접미사 '-기-')의 능동사는 '끊다'이므로 '끊었다'가 됩니다.",
+    answer: '승인했다',
+    explanation: "통사적 피동 '-되다'를 '-하다'로 되돌립니다. '승인되었다 → 승인했다'가 됩니다.",
   },
   {
     id: 'GER041', unitCode: 'grammar-elements-review', block: 'C', type: '단답형', difficulty: '상',
