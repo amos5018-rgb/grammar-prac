@@ -281,7 +281,7 @@ export const grammarElementsReviewQuestions: Question[] = [
   },
 
   // ── 블록 C: 능동↔피동 변환 (GER031~GER045) ──
-  // 파생적 피동: -이-(2) / -히-(2) / -리-(2) / -기-(1) + 통사적 피동(6) + 판단(2)
+  // 파생적 피동: -이-(2) / -히-(2) / -리-(2) / -기-(1) + 통사적 피동 -어지다(6) + 판단(2)
   // 능동→피동 8문항 + 피동→능동 5문항 + 객관식 2문항, 통사적 피동 40%
 
   // ── 능동→피동 ──
@@ -335,19 +335,19 @@ export const grammarElementsReviewQuestions: Question[] = [
   },
   {
     id: 'GER037', unitCode: 'grammar-elements-review', block: 'C', type: '빈칸', difficulty: '중',
-    passage: '탐험가가 무인도에서 새로운 동굴을 발견했다.',
-    question: "이 능동문을 '-되다' 통사적 피동문으로 바꾸시오.\n→ 새로운 동굴이 무인도에서 [___].",
+    passage: '선생님이 학생들을 두 팀으로 나누었다.',
+    question: "이 능동문을 '-어지다' 통사적 피동문으로 바꾸시오.\n→ 학생들이 두 팀으로 [___].",
     choices: [],
-    answer: '발견되었다',
-    explanation: "'-하다'를 '-되다'로 바꾸어 피동을 만듭니다. '발견했다 → 발견되었다'가 됩니다. (통사적 피동)",
+    answer: '나누어졌다|나눠졌다',
+    explanation: "용언 어간에 '-어지다'가 붙는 통사적 피동입니다. '나누다 → 나누어지다'로 '나누어졌다'가 됩니다.",
   },
   {
     id: 'GER038', unitCode: 'grammar-elements-review', block: 'C', type: '빈칸', difficulty: '중',
-    passage: '시에서 새 도서관을 건설했다.',
-    question: "이 능동문을 '-되다' 통사적 피동문으로 바꾸시오.\n→ 새 도서관이 [___].",
+    passage: '선수들이 오랜 노력 끝에 꿈을 이루었다.',
+    question: "이 능동문을 '-어지다' 통사적 피동문으로 바꾸시오.\n→ 꿈이 오랜 노력 끝에 [___].",
     choices: [],
-    answer: '건설되었다',
-    explanation: "'-하다'를 '-되다'로 바꾸어 피동을 만듭니다. '건설했다 → 건설되었다'가 됩니다. (통사적 피동)",
+    answer: '이루어졌다',
+    explanation: "용언 어간에 '-어지다'가 붙는 통사적 피동입니다. '이루다 → 이루어지다'로 '이루어졌다'가 됩니다.",
   },
 
   // ── 피동→능동 ──
@@ -361,11 +361,11 @@ export const grammarElementsReviewQuestions: Question[] = [
   },
   {
     id: 'GER040', unitCode: 'grammar-elements-review', block: 'C', type: '빈칸', difficulty: '상',
-    passage: '그 안건이 위원회에서 승인되었다.',
-    question: '이 통사적 피동문을 능동문으로 바꾸시오.\n→ 위원회가 그 안건을 [___].',
+    passage: '고장 난 시계가 수리공에 의해 고쳐졌다.',
+    question: '이 통사적 피동문을 능동문으로 바꾸시오.\n→ 수리공이 고장 난 시계를 [___].',
     choices: [],
-    answer: '승인했다',
-    explanation: "통사적 피동 '-되다'를 '-하다'로 되돌립니다. '승인되었다 → 승인했다'가 됩니다.",
+    answer: '고쳤다',
+    explanation: "통사적 피동 '-어지다'를 떼어 능동으로 되돌립니다. '고쳐지다 → 고치다'이므로 '고쳤다'가 됩니다.",
   },
   {
     id: 'GER041', unitCode: 'grammar-elements-review', block: 'C', type: '단답형', difficulty: '상',
@@ -385,11 +385,11 @@ export const grammarElementsReviewQuestions: Question[] = [
   },
   {
     id: 'GER043', unitCode: 'grammar-elements-review', block: 'C', type: '빈칸', difficulty: '상',
-    passage: '그 문제가 회의를 통해 해결되었다.',
-    question: '이 통사적 피동문을 능동문으로 바꾸시오.\n→ 그들이 회의를 통해 그 문제를 [___].',
+    passage: '빈 그릇이 음식으로 채워졌다.',
+    question: '이 통사적 피동문을 능동문으로 바꾸시오.\n→ 어머니가 빈 그릇을 음식으로 [___].',
     choices: [],
-    answer: '해결했다',
-    explanation: "통사적 피동 '-되다'를 '-하다'로 되돌립니다. '해결되었다 → 해결했다'가 됩니다.",
+    answer: '채웠다',
+    explanation: "통사적 피동 '-어지다'를 떼어 능동으로 되돌립니다. '채워지다 → 채우다'이므로 '채웠다'가 됩니다.",
   },
 
   // ── 판단·구분 ──
@@ -400,11 +400,11 @@ export const grammarElementsReviewQuestions: Question[] = [
     choices: [
       '아이가 엄마에게 안겼다',
       '문이 바람에 닫혔다',
-      '새 도로가 마을에 놓여졌다',
+      '오래된 건물이 허물어졌다',
       '그 노래가 많은 사람에게 들렸다',
     ],
     answer: '3',
-    explanation: "'놓여졌다'는 용언 어간에 '-어지다'가 붙은 통사적 피동입니다. 나머지는 피동 접미사(-기-/-히-/-리-)가 붙은 파생적 피동입니다.",
+    explanation: "'허물어졌다'는 용언 어간 '허물-'에 '-어지다'가 붙은 통사적 피동입니다. 나머지는 피동 접미사(-기-/-히-/-리-)가 붙은 파생적 피동입니다.",
   },
   {
     id: 'GER045', unitCode: 'grammar-elements-review', block: 'C', type: '객관식', difficulty: '상',
