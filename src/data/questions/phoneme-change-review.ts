@@ -179,12 +179,12 @@ export const phonemeChangeReviewQuestions: Question[] = [
   // ── 비음화 + 거센소리되기 ──
   {
     id: 'PCR018', unitCode: 'phoneme-change-review', type: '변동분석', difficulty: '상',
-    passage: '', question: '적막한', choices: [],
+    passage: '', question: '먹먹한', choices: [],
     answer: '비음화/거센소리되기',
-    explanation: "'적'의 받침 ㄱ이 ㅁ 앞에서 ㅇ으로 교체됩니다(비음화). '막'의 받침 ㄱ과 ㅎ이 만나 ㅋ으로 축약됩니다(거센소리되기).",
+    explanation: "첫 음절 '먹'의 받침 ㄱ이 ㅁ 앞에서 ㅇ으로 교체됩니다(비음화). 둘째 음절 '먹'의 받침 ㄱ과 '한'의 ㅎ이 만나 ㅋ으로 축약됩니다(거센소리되기).",
     steps: [
-      { result: '정막한', change: '비음화' },
-      { result: '정마칸', change: '거센소리되기' },
+      { result: '멍먹한', change: '비음화' },
+      { result: '멍머칸', change: '거센소리되기' },
     ],
   },
   {
