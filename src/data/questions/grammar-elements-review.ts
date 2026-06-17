@@ -447,11 +447,11 @@ export const grammarElementsReviewQuestions: Question[] = [
   },
   {
     id: 'GER049', unitCode: 'grammar-elements-review', block: 'D', type: '단답형', difficulty: '중',
-    passage: '그녀가 "내일 떠나겠다"라고 했다.\n→ 그녀가 (   ) 떠나겠다고 했다.',
-    question: "시간 표현에 유의하여, '내일'을 간접 인용에 맞게 바꾼 말을 쓰시오.",
+    passage: '저번 달에 선생님께서 "다음 달에 수행 봅니다!"라고 하셨다.\n→ 저번 달에 선생님께서 (   ) 수행 본다고 하셨다.',
+    question: "시간 표현에 유의하여, '다음 달에'를 간접 인용에 맞게 바꾼 말을 쓰시오.",
     choices: [],
-    answer: '다음 날|이튿날',
-    explanation: "전달 시점이 달라지므로 시간 표현 '내일'이 '다음 날(이튿날)'로 바뀝니다.",
+    answer: '이번 달에|이번달에',
+    explanation: "전달 시점이 달라지므로 시간 표현 '다음 달'이 '이번 달'로 바뀝니다.",
   },
   {
     id: 'GER050', unitCode: 'grammar-elements-review', block: 'D', type: '빈칸', difficulty: '중',
