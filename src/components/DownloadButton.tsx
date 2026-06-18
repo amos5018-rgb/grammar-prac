@@ -3,11 +3,13 @@ import Link from 'next/link';
 export default function DownloadButton({ fileName, label, color }: {
   fileName: string;
   label: string;
-  color: 'primary' | 'warning';
+  color: 'primary' | 'warning' | 'success';
 }) {
-  const colorClass = color === 'primary'
-    ? 'bg-primary-light text-primary'
-    : 'bg-warning-light text-warning';
+  const colorClass = {
+    primary: 'bg-primary-light text-primary',
+    warning: 'bg-warning-light text-warning',
+    success: 'bg-success-light text-success',
+  }[color];
 
   return (
     <Link

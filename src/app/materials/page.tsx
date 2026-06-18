@@ -10,6 +10,7 @@ interface WorksheetGroup {
   title: string;
   studentFile?: string;
   teacherFile?: string;
+  pptFile?: string;
 }
 
 function getMaterials() {
@@ -20,12 +21,16 @@ function getMaterials() {
 
   const worksheetMap = new Map<string, WorksheetGroup>();
   const supplements: string[] = [];
+  let grammarElementsPptFile: string | undefined;
 
   for (const file of files) {
     const studentMatch = file.match(/^(.+)\(학생용\)\..+$/);
     const teacherMatch = file.match(/^(.+)\(교사용\)\..+$/);
+    const grammarElementsPptMatch = file.match(/^문법요소 ppt\(배포용\)\..+$/i);
 
-    if (studentMatch) {
+    if (grammarElementsPptMatch) {
+      grammarElementsPptFile = file;
+    } else if (studentMatch) {
       const title = studentMatch[1].trim();
       const group = worksheetMap.get(title) ?? { title };
       group.studentFile = file;
@@ -38,6 +43,13 @@ function getMaterials() {
     } else {
       supplements.push(file);
     }
+  }
+
+  if (grammarElementsPptFile) {
+    const title = '음운의 변동+문법 요소';
+    const group = worksheetMap.get(title) ?? { title };
+    group.pptFile = grammarElementsPptFile;
+    worksheetMap.set(title, group);
   }
 
   return {
@@ -74,6 +86,9 @@ export default function MaterialsPage() {
                       )}
                       {ws.teacherFile && (
                         <DownloadButton fileName={ws.teacherFile} label="교사용" color="warning" />
+                      )}
+                      {ws.pptFile && (
+                        <DownloadButton fileName={ws.pptFile} label="PPT" color="success" />
                       )}
                     </div>
                   </div>
