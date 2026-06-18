@@ -5,6 +5,7 @@ import {
   getStreak,
   getActivityDates,
 } from './storage';
+import { AnalyticsQueue, discardSyncedAnalytics, getAnalyticsQueue } from './analytics';
 import { questionCountMap } from '@/data/questions/question-id-map';
 
 const PENDING_KEY = 'grammar_sync_pending';
@@ -30,6 +31,7 @@ export interface SyncSnapshot {
       unitCode: string;
     }>;
   }>;
+  analytics: AnalyticsQueue;
 }
 
 // 레거시(attemptId 없는) 기록용 결정적 해시 폴백
@@ -136,6 +138,7 @@ export function buildSnapshot(): SyncSnapshot | null {
     unitTiers,
     unitProgress,
     attempts,
+    analytics: getAnalyticsQueue(),
   };
 }
 
@@ -145,15 +148,17 @@ export async function syncNow(): Promise<void> {
   if (!snapshot) return;
 
   try {
+    const body = JSON.stringify(snapshot);
     const res = await fetch('/api/sync', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(snapshot),
-      keepalive: true,
+      body,
+      keepalive: body.length < 60000,
     });
     if (!res.ok) throw new Error(`sync failed: ${res.status}`);
     localStorage.removeItem(PENDING_KEY);
     localStorage.setItem(LAST_SYNC_KEY, new Date().toISOString());
+    discardSyncedAnalytics(snapshot.analytics);
   } catch {
     // 실패 시 보류 플래그 → 다음 로드/온라인 시 재시도
     localStorage.setItem(PENDING_KEY, '1');

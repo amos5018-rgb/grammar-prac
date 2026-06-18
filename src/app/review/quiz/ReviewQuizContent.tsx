@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { getDedupedWrongAnswers, getDueQuestionIds, getTopWrongQuestionIds } from '@/lib/storage';
 import { splitQuestions } from '@/data/questions/split';
 import { Question } from '@/lib/types';
+import { AnalyticsMode } from '@/lib/analytics';
 import QuizRunner from '@/components/QuizRunner';
 
 const REVIEW_BATCH = 5;
@@ -28,6 +29,17 @@ export default function ReviewQuizContent({ allQuestions }: { allQuestions: Ques
   const wrongTop = searchParams.get('wrong') === '1';
   const nParam = searchParams.get('n');
   const [questions, setQuestions] = useState<Question[] | null>(null);
+  const mode: AnalyticsMode = wrongTop
+    ? 'review_wrong_top'
+    : dueOnly
+      ? 'review_due'
+      : blockParam
+        ? 'review_block'
+        : nParam
+          ? 'review_random'
+          : unitFilter
+            ? 'review_unit'
+            : 'review_all';
 
   useEffect(() => {
     let targetIds: string[];
@@ -96,5 +108,5 @@ export default function ReviewQuizContent({ allQuestions }: { allQuestions: Ques
     );
   }
 
-  return <QuizRunner unitCode="review" questions={questions} reviewMode />;
+  return <QuizRunner unitCode="review" questions={questions} reviewMode mode={mode} />;
 }

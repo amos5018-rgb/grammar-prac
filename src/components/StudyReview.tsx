@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { StudyCard, StudyCardReveal, StudyCardTable } from '@/lib/types';
 import { saveStudyCompletion } from '@/lib/storage';
+import { createAnalyticsId, enqueueAttemptSession } from '@/lib/analytics';
 
 interface StudyReviewProps {
   unitCode: string;
@@ -38,11 +39,39 @@ export default function StudyReview({ unitCode, cards }: StudyReviewProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [revealed, setRevealed] = useState<Record<number, Set<string>>>({});
   const [completed, setCompleted] = useState(false);
+  const attemptIdRef = useRef(createAnalyticsId('attempt'));
+  const startedAtRef = useRef(new Date().toISOString());
+  const startMsRef = useRef(Date.now());
+  const sessionRecordedRef = useRef(false);
 
   const card = cards[currentIndex];
   const cardRevealed = revealed[currentIndex] || new Set<string>();
   const reveals = card.reveals && card.reveals.length > 0 ? card.reveals : legacyReveals(card);
   const hasTable = reveals.some(r => r.table);
+
+  function resetAnalyticsAttempt() {
+    attemptIdRef.current = createAnalyticsId('attempt');
+    startedAtRef.current = new Date().toISOString();
+    startMsRef.current = Date.now();
+    sessionRecordedRef.current = false;
+  }
+
+  function recordStudySession(exitReason: string, done: boolean) {
+    if (sessionRecordedRef.current) return;
+    sessionRecordedRef.current = true;
+    enqueueAttemptSession({
+      attemptId: attemptIdRef.current,
+      unitCode,
+      mode: 'study_cards',
+      startedAt: startedAtRef.current,
+      completedAt: new Date().toISOString(),
+      durationMs: Date.now() - startMsRef.current,
+      score: done ? cards.length : currentIndex,
+      total: cards.length,
+      completed: done,
+      exitReason,
+    });
+  }
 
   function toggle(key: string) {
     setRevealed(prev => {
@@ -77,6 +106,7 @@ export default function StudyReview({ unitCode, cards }: StudyReviewProps) {
       setCurrentIndex(currentIndex + 1);
     } else {
       saveStudyCompletion(unitCode);
+      recordStudySession('completed', true);
       setCompleted(true);
     }
   }
@@ -102,6 +132,7 @@ export default function StudyReview({ unitCode, cards }: StudyReviewProps) {
                 setCurrentIndex(0);
                 setRevealed({});
                 setCompleted(false);
+                resetAnalyticsAttempt();
               }}
               className="w-full py-3 bg-primary text-white rounded-xl font-semibold hover:bg-primary-dark transition-colors"
             >
@@ -125,6 +156,7 @@ export default function StudyReview({ unitCode, cards }: StudyReviewProps) {
       <div className="flex items-center justify-between mb-4">
         <Link
           href={`/units/${unitCode}`}
+          onClick={() => recordStudySession('manual_exit', false)}
           className="text-base text-text-secondary hover:text-primary"
         >
           &larr; 돌아가기

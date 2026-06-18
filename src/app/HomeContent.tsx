@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { getProfile, getUnitProgress, getDueCount } from '@/lib/storage';
+import { getProfile, getUnitProgress, getDueCount, getDday } from '@/lib/storage';
 import { getRecommendation, Recommendation, RecommendationType } from '@/lib/recommend';
+import { AnalyticsMode, inferModeFromHref, trackModeSelection, trackRecommendationClicked, trackRecommendationShown } from '@/lib/analytics';
 import LoginForm from '@/components/LoginForm';
 
 export interface CategoryCardData {
@@ -115,9 +116,48 @@ const URGENT_STYLE = { wrap: 'border-error/40 bg-gradient-to-br from-error-light
 
 function RecommendationCard({ rec }: { rec: Recommendation }) {
   const s = rec.urgent ? URGENT_STYLE : REC_STYLE[rec.type];
+  const shownRef = useRef('');
+  const mode = inferModeFromHref(rec.href);
+  const hrefUnit = rec.href.match(/\/units\/([^/?]+)/)?.[1] ?? new URLSearchParams(rec.href.split('?')[1] ?? '').get('unit') ?? undefined;
+  const hrefCategory = rec.href.match(/\/category\/([^/?]+)/)?.[1] ?? undefined;
+
+  useEffect(() => {
+    if (shownRef.current === rec.href) return;
+    shownRef.current = rec.href;
+    trackRecommendationShown({
+      recommendationType: rec.type,
+      href: rec.href,
+      ledToMode: mode,
+      urgent: rec.urgent,
+      dday: getDday(),
+    });
+  }, [mode, rec.href, rec.type, rec.urgent]);
+
+  const handleClick = () => {
+    trackRecommendationClicked({
+      recommendationType: rec.type,
+      href: rec.href,
+      ledToMode: mode,
+      urgent: rec.urgent,
+      dday: getDday(),
+    });
+    if (mode !== 'unknown') {
+      trackModeSelection({
+        sourceScreen: 'home',
+        sourceComponent: 'recommendation_card',
+        selectedMode: mode as AnalyticsMode,
+        unitCode: hrefUnit,
+        categoryCode: hrefCategory,
+        availableModes: [mode as AnalyticsMode],
+        dueCountAvailable: rec.type === 'review' ? getDueCount() : undefined,
+      });
+    }
+  };
+
   return (
     <Link
       href={rec.href}
+      onClick={handleClick}
       className={`animate-fade-up group flex items-center gap-4 w-full mb-5 p-5 rounded-2xl border transition-all duration-200 shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] hover:-translate-y-0.5 active:scale-[0.99] ${s.wrap}`}
     >
       <div className="min-w-0 flex-1">

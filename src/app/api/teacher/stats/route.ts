@@ -51,7 +51,21 @@ export async function GET(request: NextRequest) {
   const today = todayStr();
   const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
 
-  const [unitRes, qRes, rosterRes, dailyRes, perStudentRes] = await Promise.all([
+  const [
+    unitRes,
+    qRes,
+    rosterRes,
+    dailyRes,
+    perStudentRes,
+    modeByStudentRes,
+    modeByUnitRes,
+    opportunityRes,
+    reviewTriggersRes,
+    randomVsFullRes,
+    recommendationRes,
+    transitionsRes,
+    questionDiagnosticsRes,
+  ] = await Promise.all([
     supabase.from('v_unit_rates').select('*'),
     supabase.from('v_question_rates').select('*').limit(100),
     supabase
@@ -60,6 +74,14 @@ export async function GET(request: NextRequest) {
       .order('last_synced_at', { ascending: false }),
     supabase.rpc('get_daily_trend', { since_date: thirtyDaysAgo }).select('*'),
     supabase.rpc('get_per_student_rates').select('*'),
+    supabase.from('v_mode_preference_by_student').select('*').limit(200),
+    supabase.from('v_mode_preference_by_unit').select('*').limit(200),
+    supabase.from('v_mode_opportunity_rates').select('*').limit(200),
+    supabase.from('v_review_trigger_patterns').select('*').limit(100),
+    supabase.from('v_random_vs_full_outcomes').select('*').limit(20),
+    supabase.from('v_recommendation_effectiveness').select('*').limit(100),
+    supabase.from('v_session_transition_patterns').select('*').limit(100),
+    supabase.from('v_question_diagnostics').select('*').limit(100),
   ]);
 
   if (unitRes.error || qRes.error || rosterRes.error) {
@@ -184,5 +206,15 @@ export async function GET(request: NextRequest) {
     questionRates: qRes.data ?? [],
     masteryByUnit,
     roster: riskRoster,
+    patterns: {
+      modeByStudent: modeByStudentRes.error ? [] : modeByStudentRes.data ?? [],
+      modeByUnit: modeByUnitRes.error ? [] : modeByUnitRes.data ?? [],
+      opportunityRates: opportunityRes.error ? [] : opportunityRes.data ?? [],
+      reviewTriggers: reviewTriggersRes.error ? [] : reviewTriggersRes.data ?? [],
+      randomVsFullOutcomes: randomVsFullRes.error ? [] : randomVsFullRes.data ?? [],
+      recommendationEffectiveness: recommendationRes.error ? [] : recommendationRes.data ?? [],
+      sessionTransitions: transitionsRes.error ? [] : transitionsRes.data ?? [],
+      questionDiagnostics: questionDiagnosticsRes.error ? [] : questionDiagnosticsRes.data ?? [],
+    },
   });
 }
