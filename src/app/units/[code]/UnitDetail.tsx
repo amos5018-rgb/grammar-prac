@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Unit, UnitBlock } from '@/lib/types';
 import { getBestScore, getUnitAttemptCount, getUnitTier, getStudyCompletion, getDedupedWrongAnswers, getCorrectQuestionIds, isMasterCandidate } from '@/lib/storage';
-import { AnalyticsMode, trackModeSelection } from '@/lib/analytics';
+
 
 interface UnitDetailProps {
   unit: Unit;
@@ -16,7 +16,7 @@ interface UnitDetailProps {
 type Mode = {
   label: string;
   href: string;
-  mode: AnalyticsMode;
+  mode: string;
   requestedCount?: number;
   wrong?: boolean;
   wrongFull?: boolean;
@@ -60,11 +60,6 @@ function BlockUnitDetail({ unit, questionCount, questionIds, blockQuestionIds }:
 
   const base = `/units/${unit.code}/quiz`;
   const wrongBase = `/review/quiz?unit=${unit.code}`;
-  const availableModes: AnalyticsMode[] = [
-    'unit_random_10',
-    'unit_full',
-    ...(wrongCount >= 1 ? ['review_unit' as AnalyticsMode] : []),
-  ];
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
@@ -130,39 +125,12 @@ function BlockUnitDetail({ unit, questionCount, questionIds, blockQuestionIds }:
         <div className="space-y-2.5">
           <Link
             href={`${base}?n=10`}
-            onClick={() => trackModeSelection({
-              sourceScreen: 'unit_detail',
-              sourceComponent: 'unit_mode_button',
-              selectedMode: 'unit_random_10',
-              unitCode: unit.code,
-              requestedCount: 10,
-              availableModes,
-              availableQuestionCount: questionCount,
-              wrongCountAvailable: wrongCount,
-              unitAttempts: attempts,
-              unitBestScore: bestScore,
-              unitTier: tier.level,
-              coveragePct,
-            })}
             className="block w-full py-3.5 text-center rounded-xl font-semibold text-base transition-all active:scale-[0.99] bg-primary text-white shadow-[var(--shadow-sm)] hover:bg-primary-dark hover:shadow-[var(--shadow-md)]"
           >
             전체 랜덤 10문제 풀기
           </Link>
           <Link
             href={base}
-            onClick={() => trackModeSelection({
-              sourceScreen: 'unit_detail',
-              sourceComponent: 'unit_mode_button',
-              selectedMode: 'unit_full',
-              unitCode: unit.code,
-              availableModes,
-              availableQuestionCount: questionCount,
-              wrongCountAvailable: wrongCount,
-              unitAttempts: attempts,
-              unitBestScore: bestScore,
-              unitTier: tier.level,
-              coveragePct,
-            })}
             className={`block w-full py-3.5 text-center rounded-xl font-semibold text-base transition-all active:scale-[0.99] border-2 border-primary text-primary hover:bg-primary hover:text-white${isCandidate ? ' ring-2 ring-primary/40' : ''}`}
           >
             전부 풀기 ({questionCount}문제)
@@ -170,19 +138,6 @@ function BlockUnitDetail({ unit, questionCount, questionIds, blockQuestionIds }:
           {wrongCount >= 1 && (
             <Link
               href={wrongBase}
-              onClick={() => trackModeSelection({
-                sourceScreen: 'unit_detail',
-                sourceComponent: 'wrong_mode_button',
-                selectedMode: 'review_unit',
-                unitCode: unit.code,
-                availableModes,
-                availableQuestionCount: questionCount,
-                wrongCountAvailable: wrongCount,
-                unitAttempts: attempts,
-                unitBestScore: bestScore,
-                unitTier: tier.level,
-                coveragePct,
-              })}
               className="block w-full py-3.5 text-center rounded-xl font-semibold text-base transition-all active:scale-[0.99] bg-warning text-white shadow-[var(--shadow-sm)] hover:bg-warning/90"
             >
               틀린 문제 모아풀기 ({wrongCount}문제)
@@ -269,8 +224,6 @@ function SelectedBlockPanel({ block, unitCode, blockIds, correctSet, wrongSet, u
   if (bWrongCount >= 1) {
     modes.push({ label: `틀린 문제 모아풀기 (${bWrongCount}문제)`, href: wrongBase, mode: 'review_block', wrong: true, wrongFull: true });
   }
-  const availableModes = modes.map(m => m.mode);
-
   return (
     <div className="animate-fade-in bg-gray-50 dark:bg-white/5 rounded-xl p-4 border border-border/50">
       <div className="flex items-center gap-2 mb-1.5">
@@ -283,21 +236,6 @@ function SelectedBlockPanel({ block, unitCode, blockIds, correctSet, wrongSet, u
           <Link
             key={m.label}
             href={m.href}
-            onClick={() => trackModeSelection({
-              sourceScreen: 'unit_detail',
-              sourceComponent: m.wrong ? 'block_wrong_mode_button' : 'block_mode_button',
-              selectedMode: m.mode,
-              unitCode,
-              blockCode: block.code,
-              requestedCount: m.requestedCount,
-              availableModes,
-              availableQuestionCount: blockIds.length,
-              wrongCountAvailable: bWrongCount,
-              unitAttempts,
-              unitBestScore,
-              unitTier,
-              coveragePct: bCoveragePct,
-            })}
             className={`block w-full py-3.5 text-center rounded-xl font-semibold text-base transition-all active:scale-[0.99] ${
               m.wrongFull
                 ? 'bg-warning text-white hover:bg-warning/90'
@@ -357,8 +295,6 @@ function StandardUnitDetail({ unit, questionCount, questionIds }: {
     }
     modes.push({ label: `틀린 문제 모아풀기 (${wrongCount}문제)`, href: wrongHref, mode: 'review_unit', wrong: true, wrongFull: true });
   }
-  const availableModes = modes.map(m => m.mode);
-
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
       <Link
@@ -429,20 +365,6 @@ function StandardUnitDetail({ unit, questionCount, questionIds }: {
               <Link
                 key={m.label}
                 href={m.href}
-                onClick={() => trackModeSelection({
-                  sourceScreen: 'unit_detail',
-                  sourceComponent: m.wrong ? 'wrong_mode_button' : 'unit_mode_button',
-                  selectedMode: m.mode,
-                  unitCode: unit.code,
-                  requestedCount: m.requestedCount,
-                  availableModes,
-                  availableQuestionCount: questionCount,
-                  wrongCountAvailable: wrongCount,
-                  unitAttempts: attempts,
-                  unitBestScore: bestScore,
-                  unitTier: tier.level,
-                  coveragePct,
-                })}
                 className={`block w-full py-4 text-center rounded-xl font-semibold text-base transition-all active:scale-[0.99] ${
                   m.wrongFull
                     ? 'bg-warning text-white shadow-[var(--shadow-sm)] hover:bg-warning/90 hover:shadow-[var(--shadow-md)]'
@@ -492,14 +414,6 @@ function StudyUnitDetail({ unit, cardCount }: { unit: Unit; cardCount: number })
 
         <Link
           href={`/units/${unit.code}/study`}
-          onClick={() => trackModeSelection({
-            sourceScreen: 'unit_detail',
-            sourceComponent: 'study_mode_button',
-            selectedMode: 'study_cards',
-            unitCode: unit.code,
-            availableModes: ['study_cards'],
-            availableQuestionCount: cardCount,
-          })}
           className="block w-full py-4 bg-primary text-white text-center rounded-xl font-semibold text-base hover:bg-primary-dark transition-colors"
         >
           {study.completed ? '다시 학습하기' : '학습 시작'}

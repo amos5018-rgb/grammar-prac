@@ -78,6 +78,16 @@ export interface StudentProfile {
   studentId: string;
 }
 
+export type QuizMode =
+  | 'full'          // 전부 풀기
+  | 'random'        // 랜덤 N문제
+  | 'block-full'    // 블록 전부 풀기
+  | 'block-random'  // 블록 랜덤 N문제
+  | 'wrong'         // 틀린 문제 모아풀기
+  | 'wrong-random'  // 틀린 문제 랜덤 N문제
+  | 'due'           // 복습 예정 풀기
+  | 'top-wrong';    // 최다 오답 best N
+
 export interface QuizAttempt {
   unitCode: string;
   date: string;
@@ -85,6 +95,7 @@ export interface QuizAttempt {
   total: number;
   completed?: boolean; // false면 중간 종료한 기록 (최고 점수 집계에서 제외)
   full?: boolean;      // 전부 풀기 여부 (랜덤 모드는 false; 레거시 undefined는 전부 풀기로 간주)
+  quizMode?: QuizMode; // 풀이 모드 (레거시 기록에는 없음)
   answers: AnswerRecord[];
   attemptId?: string;  // 동기화 멱등키 (신규 기록은 uuid, 레거시는 sync 시 해시 폴백)
 }

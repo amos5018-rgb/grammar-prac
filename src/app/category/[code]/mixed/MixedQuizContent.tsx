@@ -69,7 +69,7 @@ export default function MixedQuizContent({ questions, categoryCode, categoryName
       unitCode={`mixed-${categoryCode}`}
       questions={selected}
       exitHref={`/category/${categoryCode}`}
-      mode="category_mixed_10"
+      quizMode="random"
     />
   );
 }

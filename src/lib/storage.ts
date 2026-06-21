@@ -75,6 +75,8 @@ export function getQuizResults(): QuizAttempt[] {
   return data ? JSON.parse(data) : [];
 }
 
+const REVIEW_MODES: Set<string> = new Set(['wrong', 'wrong-random', 'due', 'top-wrong']);
+
 export function saveQuizResult(result: QuizAttempt) {
   if (!result.attemptId) {
     result.attemptId = crypto?.randomUUID?.() ?? `${result.date}-${Math.random().toString(36).slice(2)}`;
@@ -84,22 +86,24 @@ export function saveQuizResult(result: QuizAttempt) {
   localStorage.setItem(RESULTS_KEY, JSON.stringify(results));
   localStorage.setItem(LAST_RESULT_KEY, JSON.stringify(result));
 
-  // 틀린 문제 → 복습 스케줄에 등록 (box=1, due=내일)
-  const schedule = getReviewSchedule();
-  for (const answer of result.answers) {
-    if (!answer.correct) {
-      const qid = answer.questionId;
-      const uc = answer.unitCode ?? result.unitCode;
-      if (schedule[qid]) {
-        schedule[qid].box = 1;
-        schedule[qid].due = dateOffset(getToday(), 1);
-        schedule[qid].wrongCount++;
-      } else {
-        schedule[qid] = { box: 1, due: dateOffset(getToday(), 1), wrongCount: 1, unitCode: uc };
+  // 복습 모드 퀴즈는 updateReviewState가 인라인 처리하므로 스케줄 갱신 건너뜀
+  if (!result.quizMode || !REVIEW_MODES.has(result.quizMode)) {
+    const schedule = getReviewSchedule();
+    for (const answer of result.answers) {
+      if (!answer.correct) {
+        const qid = answer.questionId;
+        const uc = answer.unitCode ?? result.unitCode;
+        if (schedule[qid]) {
+          schedule[qid].box = 1;
+          schedule[qid].due = dateOffset(getToday(), 1);
+          schedule[qid].wrongCount++;
+        } else {
+          schedule[qid] = { box: 1, due: dateOffset(getToday(), 1), wrongCount: 1, unitCode: uc };
+        }
       }
     }
+    localStorage.setItem(REVIEW_SCHEDULE_KEY, JSON.stringify(schedule));
   }
-  localStorage.setItem(REVIEW_SCHEDULE_KEY, JSON.stringify(schedule));
 
   recordActivity();
   triggerSync();
@@ -539,4 +543,10 @@ export function getStudyCompletion(unitCode: string): { completed: boolean; coun
   const entry = all[unitCode];
   if (!entry) return { completed: false, count: 0, lastDate: null };
   return { completed: true, count: entry.dates.length, lastDate: entry.lastCompleted };
+}
+
+export function getStudyCompletionAll(): Record<string, { dates: string[]; lastCompleted: string }> {
+  if (typeof window === 'undefined') return {};
+  const raw = localStorage.getItem(STUDY_COMPLETION_KEY);
+  return raw ? JSON.parse(raw) : {};
 }

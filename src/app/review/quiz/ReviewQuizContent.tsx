@@ -4,8 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { getDedupedWrongAnswers, getDueQuestionIds, getTopWrongQuestionIds } from '@/lib/storage';
 import { splitQuestions } from '@/data/questions/split';
-import { Question } from '@/lib/types';
-import { AnalyticsMode } from '@/lib/analytics';
+import { Question, QuizMode } from '@/lib/types';
 import QuizRunner from '@/components/QuizRunner';
 
 const REVIEW_BATCH = 5;
@@ -29,36 +28,25 @@ export default function ReviewQuizContent({ allQuestions }: { allQuestions: Ques
   const wrongTop = searchParams.get('wrong') === '1';
   const nParam = searchParams.get('n');
   const [questions, setQuestions] = useState<Question[] | null>(null);
-  const mode: AnalyticsMode = wrongTop
-    ? 'review_wrong_top'
-    : dueOnly
-      ? 'review_due'
-      : blockParam
-        ? 'review_block'
-        : nParam
-          ? 'review_random'
-          : unitFilter
-            ? 'review_unit'
-            : 'review_all';
+  const [quizMode, setQuizMode] = useState<QuizMode>('wrong');
 
   useEffect(() => {
     let targetIds: string[];
+    let mode: QuizMode = 'wrong';
 
     if (wrongTop) {
-      // 오답 횟수가 많은 best 5
       targetIds = getTopWrongQuestionIds(REVIEW_BATCH);
+      mode = 'top-wrong';
     } else {
       let wrong = getDedupedWrongAnswers();
       if (unitFilter) {
         wrong = wrong.filter(w => w.unitCode === unitFilter);
-        // 고난도 분할 파트: 부모 문항을 동일 규칙으로 분할해 해당 파트만 남김
         if (partParam != null) {
           const part = parseInt(partParam, 10);
           const parentQs = allQuestions.filter(q => q.unitCode === unitFilter);
           const partIds = new Set(splitQuestions(parentQs, part).map(q => q.id));
           wrong = wrong.filter(w => partIds.has(w.questionId));
         }
-        // 블록 필터: 해당 블록의 문항만 남김
         if (blockParam) {
           const blockIds = new Set(
             allQuestions.filter(q => q.unitCode === unitFilter && q.block === blockParam).map(q => q.id)
@@ -67,16 +55,18 @@ export default function ReviewQuizContent({ allQuestions }: { allQuestions: Ques
         }
       }
       if (dueOnly) {
-        // 복습 예정 문제 중 무작위 5개
         const dueIds = new Set(getDueQuestionIds());
         const dueWrong = wrong.map(w => w.questionId).filter(id => dueIds.has(id));
         targetIds = shuffle(dueWrong).slice(0, REVIEW_BATCH);
+        mode = 'due';
       } else {
-        // 오답 모아풀기 (n 지정 시 무작위 n개)
         let ids = wrong.map(w => w.questionId);
         const n = nParam ? parseInt(nParam, 10) : 0;
         if (Number.isFinite(n) && n > 0 && n < ids.length) {
           ids = shuffle(ids).slice(0, n);
+          mode = 'wrong-random';
+        } else {
+          mode = 'wrong';
         }
         targetIds = ids;
       }
@@ -97,6 +87,7 @@ export default function ReviewQuizContent({ allQuestions }: { allQuestions: Ques
       return;
     }
 
+    setQuizMode(mode);
     setQuestions(matched);
   }, [router, allQuestions, unitFilter, partParam, blockParam, dueOnly, wrongTop, nParam]);
 
@@ -108,5 +99,5 @@ export default function ReviewQuizContent({ allQuestions }: { allQuestions: Ques
     );
   }
 
-  return <QuizRunner unitCode="review" questions={questions} reviewMode mode={mode} />;
+  return <QuizRunner unitCode="review" questions={questions} reviewMode quizMode={quizMode} />;
 }

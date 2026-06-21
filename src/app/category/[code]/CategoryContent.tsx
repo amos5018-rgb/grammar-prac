@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Category, Unit } from '@/lib/types';
 import { getUnitProgress, getCorrectQuestionIds, getUnitTierMap, UnitTier } from '@/lib/storage';
-import { trackModeSelection } from '@/lib/analytics';
+
 import { questionIdMap } from '@/data/questions/question-id-map';
 import UnitCard from '@/components/UnitCard';
 
@@ -49,15 +49,6 @@ export default function CategoryContent({ category, units, questionCounts, total
       {totalQuestions > 0 && (
         <Link
           href={`/category/${category.code}/mixed`}
-          onClick={() => trackModeSelection({
-            sourceScreen: 'category',
-            sourceComponent: 'category_mixed_button',
-            selectedMode: 'category_mixed_10',
-            categoryCode: category.code,
-            requestedCount: Math.min(10, totalQuestions),
-            availableModes: ['category_mixed_10'],
-            availableQuestionCount: totalQuestions,
-          })}
           className="flex items-center justify-center gap-2 w-full mb-6 py-3 text-center bg-surface border-2 border-primary text-primary rounded-xl font-semibold shadow-[var(--shadow-sm)] hover:bg-primary hover:text-white hover:shadow-[var(--shadow-md)] transition-all active:scale-[0.99]"
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

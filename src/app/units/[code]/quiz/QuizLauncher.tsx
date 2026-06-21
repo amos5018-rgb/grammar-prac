@@ -2,8 +2,7 @@
 
 import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Question } from '@/lib/types';
-import { AnalyticsMode } from '@/lib/analytics';
+import { Question, QuizMode } from '@/lib/types';
 import QuizRunner from '@/components/QuizRunner';
 
 function sample<T>(arr: T[], n: number): T[] {
@@ -19,13 +18,13 @@ export default function QuizLauncher({ unitCode, questions }: { unitCode: string
   const searchParams = useSearchParams();
   const nParam = searchParams.get('n');
   const blockParam = searchParams.get('block');
-  const n = nParam ? parseInt(nParam, 10) : 0;
 
   const [selected] = useState(() => {
     let pool = questions;
     if (blockParam) {
       pool = questions.filter(q => q.block === blockParam);
     }
+    const n = nParam ? parseInt(nParam, 10) : 0;
     if (Number.isFinite(n) && n > 0 && n < pool.length) {
       return sample(pool, n);
     }
@@ -33,13 +32,10 @@ export default function QuizLauncher({ unitCode, questions }: { unitCode: string
   });
 
   const fullAttempt = selected.length === questions.length;
-  const mode: AnalyticsMode = blockParam
-    ? (n === 5 ? 'block_random_5' : 'block_full')
-    : n === 10
-      ? 'unit_random_10'
-      : n === 5
-        ? 'unit_random_5'
-        : 'unit_full';
+  const isRandom = selected.length < (blockParam ? questions.filter(q => q.block === blockParam).length : questions.length);
+  const quizMode: QuizMode = blockParam
+    ? (isRandom ? 'block-random' : 'block-full')
+    : (fullAttempt ? 'full' : 'random');
 
-  return <QuizRunner unitCode={unitCode} questions={selected} fullAttempt={fullAttempt} mode={mode} />;
+  return <QuizRunner unitCode={unitCode} questions={selected} fullAttempt={fullAttempt} quizMode={quizMode} />;
 }

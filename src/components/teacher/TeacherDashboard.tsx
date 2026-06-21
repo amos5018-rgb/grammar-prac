@@ -8,7 +8,7 @@ import UnitRatesTable from './UnitRatesTable';
 import HardestQuestions from './HardestQuestions';
 import StudentRoster from './StudentRoster';
 import StudentDetailDrawer from './StudentDetailDrawer';
-import PatternInsights, { PatternStats } from './PatternInsights';
+import ModeAnalytics from './ModeAnalytics';
 
 interface RosterStudent {
   clientId: string;
@@ -23,6 +23,16 @@ interface RosterStudent {
   inactiveDays: number | null;
   unitTiers: Record<string, { level: string; label: string; mastered: boolean; bestScore: number | null }>;
   unitProgress: Record<string, { attempts: number; bestScore: number | null }>;
+  modeBreakdown: Array<{ mode: string; sessionCount: number; totalAnswers: number; correctRate: number }>;
+  studyCompletions: Record<string, { dates: string[]; lastCompleted: string }>;
+}
+
+interface ModeRow {
+  mode: string;
+  sessionCount: number;
+  studentCount: number;
+  totalAnswers: number;
+  correctRate: number;
 }
 
 interface Stats {
@@ -35,10 +45,12 @@ interface Stats {
   questionRates: Array<{ question_id: string; unit_code: string; question_text: string; attempts: number; correct_count: number; correct_rate: number }>;
   masteryByUnit: Record<string, number>;
   roster: RosterStudent[];
-  patterns: PatternStats;
+  modeUsage: ModeRow[];
+  totalStudyCompletions: number;
+  studyByUnit: Record<string, number>;
 }
 
-type Tab = 'overview' | 'students' | 'units' | 'questions' | 'patterns';
+type Tab = 'overview' | 'students' | 'units' | 'questions' | 'modes';
 
 const TABS: { key: Tab; label: string; icon: React.ReactNode }[] = [
   {
@@ -78,11 +90,12 @@ const TABS: { key: Tab; label: string; icon: React.ReactNode }[] = [
     ),
   },
   {
-    key: 'patterns',
-    label: '패턴',
+    key: 'modes',
+    label: '모드',
     icon: (
       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5M7.5 6.75v10.5m5.25-10.5v10.5m4.5-10.5v10.5" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6a7.5 7.5 0 107.5 7.5h-7.5V6z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0013.5 3v7.5z" />
       </svg>
     ),
   },
@@ -224,8 +237,14 @@ export default function TeacherDashboard({ onLogout }: { onLogout: () => void })
               </div>
             )}
 
-            {tab === 'patterns' && (
-              <PatternInsights patterns={stats.patterns} />
+            {tab === 'modes' && (
+              <div className="animate-fade-in">
+                <ModeAnalytics
+                  modeUsage={stats.modeUsage ?? []}
+                  totalStudyCompletions={stats.totalStudyCompletions ?? 0}
+                  studyByUnit={stats.studyByUnit ?? {}}
+                />
+              </div>
             )}
           </>
         )}

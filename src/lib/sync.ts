@@ -4,8 +4,8 @@ import {
   getQuizResults,
   getStreak,
   getActivityDates,
+  getStudyCompletionAll,
 } from './storage';
-import { AnalyticsQueue, discardSyncedAnalytics, getAnalyticsQueue } from './analytics';
 import { questionCountMap } from '@/data/questions/question-id-map';
 
 const PENDING_KEY = 'grammar_sync_pending';
@@ -18,10 +18,12 @@ export interface SyncSnapshot {
   activityDates: string[];
   unitTiers: Record<string, { level: string; label: string; mastered: boolean; bestScore: number | null }>;
   unitProgress: Record<string, { attempts: number; bestScore: number | null }>;
+  studyCompletions: Record<string, { dates: string[]; lastCompleted: string }>;
   attempts: Array<{
     attemptId: string;
     unitCode: string;
     date: string;
+    quizMode?: string;
     answers: Array<{
       questionId: string;
       questionText: string;
@@ -31,7 +33,6 @@ export interface SyncSnapshot {
       unitCode: string;
     }>;
   }>;
-  analytics: AnalyticsQueue;
 }
 
 // 레거시(attemptId 없는) 기록용 결정적 해시 폴백
@@ -120,6 +121,7 @@ export function buildSnapshot(): SyncSnapshot | null {
     attemptId: r.attemptId ?? fallbackAttemptId(r.unitCode, r.date, r.total),
     unitCode: r.unitCode,
     date: r.date,
+    quizMode: r.quizMode,
     answers: r.answers.map(a => ({
       questionId: a.questionId,
       questionText: a.questionText ?? '',
@@ -137,8 +139,8 @@ export function buildSnapshot(): SyncSnapshot | null {
     activityDates: getActivityDates(),
     unitTiers,
     unitProgress,
+    studyCompletions: getStudyCompletionAll(),
     attempts,
-    analytics: getAnalyticsQueue(),
   };
 }
 
@@ -148,17 +150,15 @@ export async function syncNow(): Promise<void> {
   if (!snapshot) return;
 
   try {
-    const body = JSON.stringify(snapshot);
     const res = await fetch('/api/sync', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body,
-      keepalive: body.length < 60000,
+      body: JSON.stringify(snapshot),
+      keepalive: true,
     });
     if (!res.ok) throw new Error(`sync failed: ${res.status}`);
     localStorage.removeItem(PENDING_KEY);
     localStorage.setItem(LAST_SYNC_KEY, new Date().toISOString());
-    discardSyncedAnalytics(snapshot.analytics);
   } catch {
     // 실패 시 보류 플래그 → 다음 로드/온라인 시 재시도
     localStorage.setItem(PENDING_KEY, '1');

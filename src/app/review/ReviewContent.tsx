@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { getDedupedWrongAnswers, clearAllHistory, WrongAnswerRecord, getDueCount, getWrongCounts } from '@/lib/storage';
 import { Question } from '@/lib/types';
-import { AnalyticsMode, trackModeSelection } from '@/lib/analytics';
+
 import { units } from '@/data/units';
 import { categories } from '@/data/categories';
 import PhonemeChangeExercise from '@/components/PhonemeChangeExercise';
@@ -76,12 +76,6 @@ export default function ReviewContent({ allQuestions }: Props) {
 
   const previewQuestion = previewId ? questionMap.get(previewId) : null;
   const previewWrong = previewId ? wrongAnswers.find(w => w.questionId === previewId) : null;
-  const reviewAvailableModes: AnalyticsMode[] = [
-    ...(dueCount > 0 ? ['review_due' as AnalyticsMode] : []),
-    'review_random',
-    filter === 'all' ? 'review_all' : 'review_unit',
-  ];
-
   // 문제 미리보기 오버레이
   if (previewQuestion && previewWrong) {
     return (
@@ -114,16 +108,6 @@ export default function ReviewContent({ allQuestions }: Props) {
           {dueCount > 0 && (
             <Link
               href="/review/quiz?due=1"
-              onClick={() => trackModeSelection({
-                sourceScreen: 'review',
-                sourceComponent: 'due_review_button',
-                selectedMode: 'review_due',
-                requestedCount: Math.min(dueCount, 5),
-                availableModes: reviewAvailableModes,
-                availableQuestionCount: wrongAnswers.length,
-                wrongCountAvailable: wrongAnswers.length,
-                dueCountAvailable: dueCount,
-              })}
               className="flex-1 py-3.5 text-center border-2 border-primary text-primary rounded-xl font-semibold hover:bg-primary hover:text-white active:scale-[0.99] transition-all"
             >
               간격 복습 {Math.min(dueCount, 5)}문제
@@ -134,16 +118,6 @@ export default function ReviewContent({ allQuestions }: Props) {
           )}
           <Link
             href="/review/quiz?n=3"
-            onClick={() => trackModeSelection({
-              sourceScreen: 'review',
-              sourceComponent: 'random_review_button',
-              selectedMode: 'review_random',
-              requestedCount: 3,
-              availableModes: reviewAvailableModes,
-              availableQuestionCount: wrongAnswers.length,
-              wrongCountAvailable: wrongAnswers.length,
-              dueCountAvailable: dueCount,
-            })}
             className="flex-1 py-3.5 text-center border-2 border-primary text-primary rounded-xl font-semibold hover:bg-primary hover:text-white active:scale-[0.99] transition-all"
           >
             랜덤 3문제 풀기
@@ -164,16 +138,6 @@ export default function ReviewContent({ allQuestions }: Props) {
           {/* 전체 틀린 문제 모아 풀기 */}
           <Link
             href={filter === 'all' ? '/review/quiz' : `/review/quiz?unit=${filter}`}
-            onClick={() => trackModeSelection({
-              sourceScreen: 'review',
-              sourceComponent: 'all_wrong_review_button',
-              selectedMode: filter === 'all' ? 'review_all' : 'review_unit',
-              unitCode: filter === 'all' ? undefined : filter,
-              availableModes: reviewAvailableModes,
-              availableQuestionCount: filtered.length,
-              wrongCountAvailable: filtered.length,
-              dueCountAvailable: dueCount,
-            })}
             className="block w-full mb-6 py-3 text-center bg-error text-white rounded-xl font-semibold shadow-[var(--shadow-sm)] hover:bg-red-600 hover:shadow-[var(--shadow-md)] active:scale-[0.99] transition-all"
           >
             {filter === 'all'
@@ -283,16 +247,6 @@ export default function ReviewContent({ allQuestions }: Props) {
           {filtered.length > 0 && filter !== 'all' && (
             <Link
               href={`/units/${filter}/quiz`}
-              onClick={() => trackModeSelection({
-                sourceScreen: 'review',
-                sourceComponent: 'review_retry_unit_button',
-                selectedMode: 'unit_full',
-                unitCode: filter,
-                availableModes: ['unit_full'],
-                availableQuestionCount: filtered.length,
-                wrongCountAvailable: filtered.length,
-                dueCountAvailable: dueCount,
-              })}
               className="block w-full mt-6 py-3 text-center bg-primary text-white rounded-xl font-semibold shadow-[var(--shadow-sm)] hover:bg-primary-dark hover:shadow-[var(--shadow-md)] active:scale-[0.99] transition-all"
             >
               이 단원 다시 풀기

@@ -12,6 +12,7 @@ interface RosterRow {
   activity_dates: string[];
   unit_tiers: Record<string, { level: string; label: string; mastered: boolean; bestScore: number | null }>;
   unit_progress: Record<string, { attempts: number; bestScore: number | null }>;
+  study_completions: Record<string, { dates: string[]; lastCompleted: string }> | null;
   last_synced_at: string;
   created_at: string;
 }
@@ -27,6 +28,24 @@ interface PerStudentRow {
   client_id: string;
   total: number;
   correct: number;
+}
+
+interface ModeUsageRow {
+  quiz_mode: string;
+  session_count: number;
+  student_count: number;
+  total_answers: number;
+  correct_answers: number;
+  correct_rate: number;
+}
+
+interface StudentModeRow {
+  client_id: string;
+  quiz_mode: string;
+  session_count: number;
+  total_answers: number;
+  correct_answers: number;
+  correct_rate: number;
 }
 
 function todayStr(): string {
@@ -51,37 +70,17 @@ export async function GET(request: NextRequest) {
   const today = todayStr();
   const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
 
-  const [
-    unitRes,
-    qRes,
-    rosterRes,
-    dailyRes,
-    perStudentRes,
-    modeByStudentRes,
-    modeByUnitRes,
-    opportunityRes,
-    reviewTriggersRes,
-    randomVsFullRes,
-    recommendationRes,
-    transitionsRes,
-    questionDiagnosticsRes,
-  ] = await Promise.all([
+  const [unitRes, qRes, rosterRes, dailyRes, perStudentRes, modeRes, studentModeRes] = await Promise.all([
     supabase.from('v_unit_rates').select('*'),
     supabase.from('v_question_rates').select('*').limit(100),
     supabase
       .from('students')
-      .select('client_id,name,student_id,streak,activity_dates,unit_tiers,unit_progress,last_synced_at,created_at')
+      .select('client_id,name,student_id,streak,activity_dates,unit_tiers,unit_progress,study_completions,last_synced_at,created_at')
       .order('last_synced_at', { ascending: false }),
     supabase.rpc('get_daily_trend', { since_date: thirtyDaysAgo }).select('*'),
     supabase.rpc('get_per_student_rates').select('*'),
-    supabase.from('v_mode_preference_by_student').select('*').limit(200),
-    supabase.from('v_mode_preference_by_unit').select('*').limit(200),
-    supabase.from('v_mode_opportunity_rates').select('*').limit(200),
-    supabase.from('v_review_trigger_patterns').select('*').limit(100),
-    supabase.from('v_random_vs_full_outcomes').select('*').limit(20),
-    supabase.from('v_recommendation_effectiveness').select('*').limit(100),
-    supabase.from('v_session_transition_patterns').select('*').limit(100),
-    supabase.from('v_question_diagnostics').select('*').limit(100),
+    supabase.from('v_mode_usage').select('*'),
+    supabase.from('v_student_mode_rates').select('*'),
   ]);
 
   if (unitRes.error || qRes.error || rosterRes.error) {
@@ -101,7 +100,6 @@ export async function GET(request: NextRequest) {
       correctRate: r.total_answers > 0 ? Math.round((r.correct_answers / r.total_answers) * 1000) / 10 : 0,
     }));
   } else {
-    // Fallback: compute from activity_dates
     const dateMap: Record<string, number> = {};
     for (const s of roster) {
       for (const d of s.activity_dates ?? []) {
@@ -124,6 +122,45 @@ export async function GET(request: NextRequest) {
   if (!perStudentRes.error && perStudentRes.data) {
     for (const r of perStudentRes.data as PerStudentRow[]) {
       perStudentMap[r.client_id] = { total: r.total, correct: r.correct };
+    }
+  }
+
+  // Mode usage analytics
+  const modeUsage: Array<{ mode: string; sessionCount: number; studentCount: number; totalAnswers: number; correctRate: number }> = [];
+  if (!modeRes.error && modeRes.data) {
+    for (const r of modeRes.data as ModeUsageRow[]) {
+      modeUsage.push({
+        mode: r.quiz_mode,
+        sessionCount: r.session_count,
+        studentCount: r.student_count,
+        totalAnswers: r.total_answers,
+        correctRate: r.correct_rate,
+      });
+    }
+  }
+
+  // Per-student mode breakdown
+  const perStudentMode: Record<string, Array<{ mode: string; sessionCount: number; totalAnswers: number; correctRate: number }>> = {};
+  if (!studentModeRes.error && studentModeRes.data) {
+    for (const r of studentModeRes.data as StudentModeRow[]) {
+      if (!perStudentMode[r.client_id]) perStudentMode[r.client_id] = [];
+      perStudentMode[r.client_id].push({
+        mode: r.quiz_mode,
+        sessionCount: r.session_count,
+        totalAnswers: r.total_answers,
+        correctRate: r.correct_rate,
+      });
+    }
+  }
+
+  // Study completion counts
+  let totalStudyCompletions = 0;
+  const studyByUnit: Record<string, number> = {};
+  for (const s of roster) {
+    for (const [code, data] of Object.entries(s.study_completions ?? {})) {
+      const count = data?.dates?.length ?? 0;
+      totalStudyCompletions += count;
+      studyByUnit[code] = (studyByUnit[code] ?? 0) + count;
     }
   }
 
@@ -165,17 +202,14 @@ export async function GET(request: NextRequest) {
       ? Math.round((studentStats.correct / studentStats.total) * 1000) / 10
       : null;
 
-    // Inactive: no activity in last 3 days
     const sortedDates = [...(s.activity_dates ?? [])].sort();
     const lastActivity = sortedDates.length > 0 ? sortedDates[sortedDates.length - 1] : null;
     const inactiveDays = lastActivity ? daysBetween(lastActivity, today) : 999;
     if (inactiveDays >= 3) riskTags.push('inactive');
 
-    // Low mastery: < 3 mastered && registered 7+ days
     const registeredDays = s.created_at ? daysBetween(s.created_at.slice(0, 10), today) : 0;
     if (masteredCount < 3 && registeredDays >= 7) riskTags.push('low-mastery');
 
-    // Struggling: < 50% correct with 20+ answers
     if (correctRate !== null && correctRate < 50 && (studentStats?.total ?? 0) >= 20) {
       riskTags.push('struggling');
     }
@@ -193,6 +227,8 @@ export async function GET(request: NextRequest) {
       unitTiers: s.unit_tiers ?? {},
       unitProgress: s.unit_progress ?? {},
       inactiveDays: inactiveDays < 999 ? inactiveDays : null,
+      modeBreakdown: perStudentMode[s.client_id] ?? [],
+      studyCompletions: s.study_completions ?? {},
     };
   });
 
@@ -206,15 +242,8 @@ export async function GET(request: NextRequest) {
     questionRates: qRes.data ?? [],
     masteryByUnit,
     roster: riskRoster,
-    patterns: {
-      modeByStudent: modeByStudentRes.error ? [] : modeByStudentRes.data ?? [],
-      modeByUnit: modeByUnitRes.error ? [] : modeByUnitRes.data ?? [],
-      opportunityRates: opportunityRes.error ? [] : opportunityRes.data ?? [],
-      reviewTriggers: reviewTriggersRes.error ? [] : reviewTriggersRes.data ?? [],
-      randomVsFullOutcomes: randomVsFullRes.error ? [] : randomVsFullRes.data ?? [],
-      recommendationEffectiveness: recommendationRes.error ? [] : recommendationRes.data ?? [],
-      sessionTransitions: transitionsRes.error ? [] : transitionsRes.data ?? [],
-      questionDiagnostics: questionDiagnosticsRes.error ? [] : questionDiagnosticsRes.data ?? [],
-    },
+    modeUsage,
+    totalStudyCompletions,
+    studyByUnit,
   });
 }
