@@ -112,11 +112,25 @@ export default function TeacherDashboard({ onLogout }: { onLogout: () => void })
     setRefreshing(true);
     try {
       const res = await fetch('/api/teacher/stats');
-      if (!res.ok) throw new Error('failed');
+      if (!res.ok) {
+        let detail = '';
+        try {
+          const body = await res.json();
+          detail = body?.detail || body?.error || '';
+        } catch { /* 본문 없음 */ }
+        if (res.status === 401) {
+          setError('로그인이 만료되었습니다. 다시 로그인해 주세요.');
+        } else if (res.status === 503) {
+          setError('서버에 Supabase 환경변수가 설정되지 않았습니다.');
+        } else {
+          setError(`데이터를 불러올 수 없습니다${detail ? ` (${detail})` : ''}.`);
+        }
+        return;
+      }
       setStats(await res.json());
       setError('');
     } catch {
-      setError('데이터를 불러올 수 없습니다.');
+      setError('데이터를 불러올 수 없습니다. (네트워크 오류)');
     } finally {
       setRefreshing(false);
     }

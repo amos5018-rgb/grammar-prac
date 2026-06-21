@@ -75,7 +75,9 @@ export async function GET(request: NextRequest) {
     supabase.from('v_question_rates').select('*').limit(100),
     supabase
       .from('students')
-      .select('client_id,name,student_id,streak,activity_dates,unit_tiers,unit_progress,study_completions,last_synced_at,created_at')
+      // select('*') 사용: 마이그레이션 전(study_completions 컬럼 없음)에도 쿼리가 실패하지 않도록.
+      // 컬럼명을 명시하면 PostgREST가 '컬럼 없음' 오류를 내 대시보드 전체가 500이 된다.
+      .select('*')
       .order('last_synced_at', { ascending: false }),
     supabase.rpc('get_daily_trend', { since_date: thirtyDaysAgo }).select('*'),
     supabase.rpc('get_per_student_rates').select('*'),
@@ -84,7 +86,13 @@ export async function GET(request: NextRequest) {
   ]);
 
   if (unitRes.error || qRes.error || rosterRes.error) {
-    return NextResponse.json({ error: 'query failed' }, { status: 500 });
+    const detail =
+      unitRes.error?.message ||
+      qRes.error?.message ||
+      rosterRes.error?.message ||
+      'unknown';
+    console.error('[teacher/stats] core query failed:', detail);
+    return NextResponse.json({ error: 'query failed', detail }, { status: 500 });
   }
 
   const roster = (rosterRes.data ?? []) as RosterRow[];
