@@ -18,6 +18,7 @@ export default function QuizLauncher({ unitCode, questions }: { unitCode: string
   const searchParams = useSearchParams();
   const nParam = searchParams.get('n');
   const blockParam = searchParams.get('block');
+  const from = searchParams.get('from');
 
   const [selected] = useState(() => {
     let pool = questions;
@@ -37,5 +38,5 @@ export default function QuizLauncher({ unitCode, questions }: { unitCode: string
     ? (isRandom ? 'block-random' : 'block-full')
     : (fullAttempt ? 'full' : 'random');
 
-  return <QuizRunner unitCode={unitCode} questions={selected} fullAttempt={fullAttempt} quizMode={quizMode} />;
+  return <QuizRunner unitCode={unitCode} questions={selected} fullAttempt={fullAttempt} quizMode={quizMode} from={from} />;
 }

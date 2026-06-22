@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { fetchUnits, fetchQuestions, fetchStudyCards } from '@/lib/sheets';
 import { notFound } from 'next/navigation';
 import UnitDetail from './UnitDetail';
@@ -31,5 +32,9 @@ export default async function UnitPage({ params }: { params: Promise<{ code: str
     }
   }
 
-  return <UnitDetail unit={unit} questionCount={count} questionIds={questionIds} blockQuestionIds={blockQuestionIds} />;
+  return (
+    <Suspense fallback={<div className="max-w-2xl mx-auto px-4 py-12 text-center"><p className="text-text-secondary">불러오는 중...</p></div>}>
+      <UnitDetail unit={unit} questionCount={count} questionIds={questionIds} blockQuestionIds={blockQuestionIds} />
+    </Suspense>
+  );
 }

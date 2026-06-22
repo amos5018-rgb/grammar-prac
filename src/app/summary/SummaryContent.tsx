@@ -62,6 +62,7 @@ export default function SummaryContent({ groups, questionCounts }: Props) {
                   covered={coveredMap[unit.code] ?? 0}
                   tier={tierMap[unit.code]}
                   index={i}
+                  from="summary"
                 />
               ))}
             </div>

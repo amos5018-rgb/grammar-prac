@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Unit } from '@/lib/types';
 import { UnitTier } from '@/lib/storage';
+import { withFrom } from '@/lib/nav';
 
 interface UnitCardProps {
   unit: Unit;
@@ -10,12 +11,13 @@ interface UnitCardProps {
   covered?: number;
   tier?: UnitTier;
   index?: number;
+  from?: string;
 }
 
-export default function UnitCard({ unit, questionCount, bestScore, attempts, covered = 0, tier, index = 0 }: UnitCardProps) {
+export default function UnitCard({ unit, questionCount, bestScore, attempts, covered = 0, tier, index = 0, from }: UnitCardProps) {
   return (
     <Link
-      href={`/units/${unit.code}`}
+      href={withFrom(`/units/${unit.code}`, from)}
       style={{ animationDelay: `${Math.min(index, 8) * 40}ms` }}
       className={`animate-fade-up block bg-surface rounded-2xl border p-5 shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] hover:-translate-y-0.5 transition-all duration-200 active:scale-[0.98] ${
         unit.advanced

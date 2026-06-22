@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { fetchUnits, fetchStudyCards } from '@/lib/sheets';
 import { notFound } from 'next/navigation';
 import StudyReview from '@/components/StudyReview';
@@ -17,5 +18,9 @@ export default async function StudyPage({ params }: { params: Promise<{ code: st
 
   if (cards.length === 0) notFound();
 
-  return <StudyReview unitCode={code} cards={cards} />;
+  return (
+    <Suspense fallback={<div className="max-w-2xl mx-auto px-4 py-12 text-center"><p className="text-text-secondary">불러오는 중...</p></div>}>
+      <StudyReview unitCode={code} cards={cards} />
+    </Suspense>
+  );
 }

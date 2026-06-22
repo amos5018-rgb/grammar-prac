@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { QuizAttempt } from '@/lib/types';
+import { withFrom } from '@/lib/nav';
 import {
   getLastQuizResult,
   getQuizResults,
@@ -24,6 +26,9 @@ interface ResultExtra {
 }
 
 export default function ResultContent({ code }: { code: string }) {
+  const from = useSearchParams().get('from');
+  const listHref = from === 'summary' ? '/summary' : '/';
+  const quizHref = withFrom(`/units/${code}/quiz`, from);
   const [result, setResult] = useState<QuizAttempt | null>(null);
   const [extra, setExtra] = useState<ResultExtra | null>(null);
 
@@ -57,7 +62,7 @@ export default function ResultContent({ code }: { code: string }) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-12 text-center">
         <p className="text-text-secondary mb-4">결과를 찾을 수 없습니다.</p>
-        <Link href="/" className="text-primary font-medium">단원 목록으로</Link>
+        <Link href={listHref} className="text-primary font-medium">단원 목록으로</Link>
       </div>
     );
   }
@@ -120,7 +125,7 @@ export default function ResultContent({ code }: { code: string }) {
 
       {extra?.showConversion && (
         <Link
-          href={`/units/${code}/quiz`}
+          href={quizHref}
           className="block w-full mb-6 py-4 text-center bg-primary text-white rounded-xl font-semibold shadow-[var(--shadow-sm)] hover:bg-primary-dark hover:shadow-[var(--shadow-md)] active:scale-[0.99] transition-all"
         >
           &#128293; 전부 풀기로 마스터 도전 &rarr;
@@ -163,13 +168,13 @@ export default function ResultContent({ code }: { code: string }) {
 
       <div className="flex gap-3">
         <Link
-          href={`/units/${code}/quiz`}
+          href={quizHref}
           className="flex-1 py-3 text-center bg-primary text-white rounded-xl font-semibold shadow-[var(--shadow-sm)] hover:bg-primary-dark hover:shadow-[var(--shadow-md)] active:scale-[0.99] transition-all"
         >
           다시 풀기
         </Link>
         <Link
-          href="/"
+          href={listHref}
           className="flex-1 py-3 text-center border border-border rounded-xl font-semibold hover:bg-gray-50 dark:hover:bg-white/5 active:scale-[0.99] transition-all"
         >
           단원 목록

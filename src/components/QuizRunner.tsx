@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Question, QuizMode, AnswerRecord } from '@/lib/types';
 import { saveQuizResult, updateReviewState } from '@/lib/storage';
+import { withFrom } from '@/lib/nav';
 import PhonemeChangeExercise from './PhonemeChangeExercise';
 
 function shuffle<T>(arr: T[]): T[] {
@@ -23,9 +24,10 @@ interface QuizRunnerProps {
   exitHref?: string;
   fullAttempt?: boolean;
   quizMode?: QuizMode;
+  from?: string | null;
 }
 
-export default function QuizRunner({ unitCode, questions: initialQuestions, reviewMode = false, exitHref, fullAttempt = false, quizMode }: QuizRunnerProps) {
+export default function QuizRunner({ unitCode, questions: initialQuestions, reviewMode = false, exitHref, fullAttempt = false, quizMode, from }: QuizRunnerProps) {
   const router = useRouter();
   const [questions] = useState(() => shuffle(initialQuestions));
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -37,7 +39,8 @@ export default function QuizRunner({ unitCode, questions: initialQuestions, revi
   const [reviewFinished, setReviewFinished] = useState(false);
   const [quizFinished, setQuizFinished] = useState(false);
 
-  const backHref = exitHref ?? `/units/${unitCode}`;
+  const backHref = exitHref ?? withFrom(`/units/${unitCode}`, from);
+  const resultHref = withFrom(`/units/${unitCode}/result`, from);
   const hasResultPage = !exitHref;
 
   const question = questions[currentIndex];
@@ -138,7 +141,7 @@ export default function QuizRunner({ unitCode, questions: initialQuestions, revi
         answers,
       });
       if (hasResultPage) {
-        router.push(`/units/${unitCode}/result`);
+        router.push(resultHref);
       } else {
         setQuizFinished(true);
       }
@@ -181,7 +184,7 @@ export default function QuizRunner({ unitCode, questions: initialQuestions, revi
         answers,
       });
       if (hasResultPage) {
-        router.push(`/units/${unitCode}/result`);
+        router.push(resultHref);
       } else {
         setQuizFinished(true);
       }

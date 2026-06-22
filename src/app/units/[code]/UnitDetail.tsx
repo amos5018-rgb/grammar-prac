@@ -2,8 +2,10 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { Unit, UnitBlock } from '@/lib/types';
 import { getBestScore, getUnitAttemptCount, getUnitTier, getStudyCompletion, getDedupedWrongAnswers, getCorrectQuestionIds, isMasterCandidate } from '@/lib/storage';
+import { withFrom, unitListHref } from '@/lib/nav';
 
 
 interface UnitDetailProps {
@@ -24,24 +26,27 @@ type Mode = {
 };
 
 export default function UnitDetail({ unit, questionCount, questionIds = [], blockQuestionIds }: UnitDetailProps) {
+  const from = useSearchParams().get('from');
+
   if (unit.study) {
-    return <StudyUnitDetail unit={unit} cardCount={questionCount} />;
+    return <StudyUnitDetail unit={unit} cardCount={questionCount} from={from} />;
   }
 
   if (unit.blocks && unit.blocks.length > 0 && blockQuestionIds) {
-    return <BlockUnitDetail unit={unit} questionCount={questionCount} questionIds={questionIds} blockQuestionIds={blockQuestionIds} />;
+    return <BlockUnitDetail unit={unit} questionCount={questionCount} questionIds={questionIds} blockQuestionIds={blockQuestionIds} from={from} />;
   }
 
-  return <StandardUnitDetail unit={unit} questionCount={questionCount} questionIds={questionIds} />;
+  return <StandardUnitDetail unit={unit} questionCount={questionCount} questionIds={questionIds} from={from} />;
 }
 
 // ── 블록 선택 UI ──
 
-function BlockUnitDetail({ unit, questionCount, questionIds, blockQuestionIds }: {
+function BlockUnitDetail({ unit, questionCount, questionIds, blockQuestionIds, from }: {
   unit: Unit;
   questionCount: number;
   questionIds: string[];
   blockQuestionIds: Record<string, string[]>;
+  from: string | null;
 }) {
   const [selectedBlock, setSelectedBlock] = useState<string | null>(null);
   const blocks = unit.blocks!;
@@ -64,7 +69,7 @@ function BlockUnitDetail({ unit, questionCount, questionIds, blockQuestionIds }:
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
       <Link
-        href={`/category/${unit.category}`}
+        href={unitListHref(from, unit.category)}
         className="text-sm text-text-secondary hover:text-primary mb-4 inline-block"
       >
         &larr; 단원 목록
@@ -124,20 +129,20 @@ function BlockUnitDetail({ unit, questionCount, questionIds, blockQuestionIds }:
         {/* 전체 모드 */}
         <div className="space-y-2.5">
           <Link
-            href={`${base}?n=10`}
+            href={withFrom(`${base}?n=10`, from)}
             className="block w-full py-3.5 text-center rounded-xl font-semibold text-base transition-all active:scale-[0.99] bg-primary text-white shadow-[var(--shadow-sm)] hover:bg-primary-dark hover:shadow-[var(--shadow-md)]"
           >
             전체 랜덤 10문제 풀기
           </Link>
           <Link
-            href={base}
+            href={withFrom(base, from)}
             className={`block w-full py-3.5 text-center rounded-xl font-semibold text-base transition-all active:scale-[0.99] border-2 border-primary text-primary hover:bg-primary hover:text-white${isCandidate ? ' ring-2 ring-primary/40' : ''}`}
           >
             전부 풀기 ({questionCount}문제)
           </Link>
           {wrongCount >= 1 && (
             <Link
-              href={wrongBase}
+              href={withFrom(wrongBase, from)}
               className="block w-full py-3.5 text-center rounded-xl font-semibold text-base transition-all active:scale-[0.99] bg-warning text-white shadow-[var(--shadow-sm)] hover:bg-warning/90"
             >
               틀린 문제 모아풀기 ({wrongCount}문제)
@@ -193,6 +198,7 @@ function BlockUnitDetail({ unit, questionCount, questionIds, blockQuestionIds }:
             unitAttempts={attempts}
             unitBestScore={bestScore}
             unitTier={tier.level}
+            from={from}
           />
         )}
       </div>
@@ -200,7 +206,7 @@ function BlockUnitDetail({ unit, questionCount, questionIds, blockQuestionIds }:
   );
 }
 
-function SelectedBlockPanel({ block, unitCode, blockIds, correctSet, wrongSet, unitAttempts, unitBestScore, unitTier }: {
+function SelectedBlockPanel({ block, unitCode, blockIds, correctSet, wrongSet, unitAttempts, unitBestScore, unitTier, from }: {
   block: UnitBlock;
   unitCode: string;
   blockIds: string[];
@@ -209,6 +215,7 @@ function SelectedBlockPanel({ block, unitCode, blockIds, correctSet, wrongSet, u
   unitAttempts: number;
   unitBestScore: number | null;
   unitTier: string;
+  from: string | null;
 }) {
   const base = `/units/${unitCode}/quiz?block=${block.code}`;
   const wrongBase = `/review/quiz?unit=${unitCode}&block=${block.code}`;
@@ -235,7 +242,7 @@ function SelectedBlockPanel({ block, unitCode, blockIds, correctSet, wrongSet, u
         {modes.map(m => (
           <Link
             key={m.label}
-            href={m.href}
+            href={withFrom(m.href, from)}
             className={`block w-full py-3.5 text-center rounded-xl font-semibold text-base transition-all active:scale-[0.99] ${
               m.wrongFull
                 ? 'bg-warning text-white hover:bg-warning/90'
@@ -254,10 +261,11 @@ function SelectedBlockPanel({ block, unitCode, blockIds, correctSet, wrongSet, u
 
 // ── 기존 표준 UI (블록 없는 단원용) ──
 
-function StandardUnitDetail({ unit, questionCount, questionIds }: {
+function StandardUnitDetail({ unit, questionCount, questionIds, from }: {
   unit: Unit;
   questionCount: number;
   questionIds: string[];
+  from: string | null;
 }) {
   const bestScore = getBestScore(unit.code);
   const attempts = getUnitAttemptCount(unit.code);
@@ -298,7 +306,7 @@ function StandardUnitDetail({ unit, questionCount, questionIds }: {
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
       <Link
-        href={`/category/${unit.category}`}
+        href={unitListHref(from, unit.category)}
         className="text-sm text-text-secondary hover:text-primary mb-4 inline-block"
       >
         &larr; 단원 목록
@@ -364,7 +372,7 @@ function StandardUnitDetail({ unit, questionCount, questionIds }: {
             return (
               <Link
                 key={m.label}
-                href={m.href}
+                href={withFrom(m.href, from)}
                 className={`block w-full py-4 text-center rounded-xl font-semibold text-base transition-all active:scale-[0.99] ${
                   m.wrongFull
                     ? 'bg-warning text-white shadow-[var(--shadow-sm)] hover:bg-warning/90 hover:shadow-[var(--shadow-md)]'
@@ -385,13 +393,13 @@ function StandardUnitDetail({ unit, questionCount, questionIds }: {
   );
 }
 
-function StudyUnitDetail({ unit, cardCount }: { unit: Unit; cardCount: number }) {
+function StudyUnitDetail({ unit, cardCount, from }: { unit: Unit; cardCount: number; from: string | null }) {
   const study = getStudyCompletion(unit.code);
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
       <Link
-        href={`/category/${unit.category}`}
+        href={unitListHref(from, unit.category)}
         className="text-sm text-text-secondary hover:text-primary mb-4 inline-block"
       >
         &larr; 단원 목록
@@ -413,7 +421,7 @@ function StudyUnitDetail({ unit, cardCount }: { unit: Unit; cardCount: number })
         </div>
 
         <Link
-          href={`/units/${unit.code}/study`}
+          href={withFrom(`/units/${unit.code}/study`, from)}
           className="block w-full py-4 bg-primary text-white text-center rounded-xl font-semibold text-base hover:bg-primary-dark transition-colors"
         >
           {study.completed ? '다시 학습하기' : '학습 시작'}

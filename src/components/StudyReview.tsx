@@ -2,8 +2,10 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { StudyCard, StudyCardReveal, StudyCardTable } from '@/lib/types';
 import { saveStudyCompletion } from '@/lib/storage';
+import { withFrom } from '@/lib/nav';
 
 
 interface StudyReviewProps {
@@ -36,6 +38,8 @@ function legacyReveals(card: StudyCard): StudyCardReveal[] {
 }
 
 export default function StudyReview({ unitCode, cards }: StudyReviewProps) {
+  const from = useSearchParams().get('from');
+  const backToUnit = withFrom(`/units/${unitCode}`, from);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [revealed, setRevealed] = useState<Record<number, Set<string>>>({});
   const [completed, setCompleted] = useState(false);
@@ -108,7 +112,7 @@ export default function StudyReview({ unitCode, cards }: StudyReviewProps) {
               다시 복습하기
             </button>
             <Link
-              href={`/units/${unitCode}`}
+              href={backToUnit}
               className="w-full py-3 bg-gray-100 dark:bg-white/10 text-text-secondary rounded-xl font-semibold hover:bg-gray-200 dark:hover:bg-white/15 transition-colors text-center"
             >
               돌아가기
@@ -124,7 +128,7 @@ export default function StudyReview({ unitCode, cards }: StudyReviewProps) {
       {/* 상단 진행 표시 */}
       <div className="flex items-center justify-between mb-4">
         <Link
-          href={`/units/${unitCode}`}
+          href={backToUnit}
           className="text-base text-text-secondary hover:text-primary"
         >
           &larr; 돌아가기
