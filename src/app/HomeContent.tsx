@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { getProfile, getUnitProgress, getDueCount } from '@/lib/storage';
+import { getProfile, getUnitProgress, getDueCount, getDday } from '@/lib/storage';
 import { getRecommendation, Recommendation, RecommendationType } from '@/lib/recommend';
 
 import LoginForm from '@/components/LoginForm';
@@ -23,12 +23,14 @@ export default function HomeContent({ categories }: { categories: CategoryCardDa
   const [progress, setProgress] = useState<Progress>({});
   const [dueCount, setDueCount] = useState(0);
   const [recommendation, setRecommendation] = useState<Recommendation | null>(null);
+  const [dday, setDday] = useState(0);
 
   useEffect(() => {
     setLoggedIn(!!getProfile());
     setProgress(getUnitProgress());
     setDueCount(getDueCount());
     setRecommendation(getRecommendation());
+    setDday(getDday());
   }, []);
 
   if (loggedIn === null) {
@@ -54,6 +56,7 @@ export default function HomeContent({ categories }: { categories: CategoryCardDa
           setProgress(getUnitProgress());
           setDueCount(getDueCount());
           setRecommendation(getRecommendation());
+          setDday(getDday());
         }}
       />
     );
@@ -64,6 +67,25 @@ export default function HomeContent({ categories }: { categories: CategoryCardDa
 
       {/* 다음 학습 추천 카드 */}
       {recommendation && <RecommendationCard rec={recommendation} />}
+
+      {/* 시험 대비 총정리 모음 바로가기 */}
+      <Link
+        href="/summary"
+        className="animate-fade-up group flex items-center gap-4 w-full mb-6 p-5 rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-[var(--shadow-md)] hover:shadow-[var(--shadow-lg)] hover:-translate-y-0.5 transition-all duration-200 active:scale-[0.99]"
+      >
+        <svg className="w-7 h-7 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+        <div className="min-w-0 flex-1">
+          <p className="font-bold text-lg tracking-tight">
+            {dday > 0 ? `시험 ${dday}일 전, 핵심만 빠르게!` : '시험 D-DAY! 핵심만 빠르게!'}
+          </p>
+          <p className="text-sm text-white/85 mt-0.5">음운 변동 · 문법 요소 총정리 모음</p>
+        </div>
+        <svg className="w-5 h-5 shrink-0 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
+      </Link>
 
       <h1 className="text-2xl font-bold mb-1 tracking-tight">학습 영역 선택</h1>
       <p className="text-text-secondary text-sm mb-6">학습할 영역을 먼저 선택하세요</p>
