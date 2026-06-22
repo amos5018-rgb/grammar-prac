@@ -70,7 +70,9 @@ export default function QuizRunner({ unitCode, questions: initialQuestions, revi
         studentAnswer = blankAnswers.join('/');
         const expectedParts = question.answer.split('/').map(s => s.trim());
         correct = blankAnswers.length === expectedParts.length &&
-          blankAnswers.every((a, i) => a.trim() === expectedParts[i]);
+          blankAnswers.every((a, i) =>
+            expectedParts[i].split('|').map(s => s.trim()).includes(a.trim())
+          );
         break;
       }
       case '단답형': {
