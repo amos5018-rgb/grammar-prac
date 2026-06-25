@@ -26,10 +26,8 @@ export interface SyncSnapshot {
     quizMode?: string;
     answers: Array<{
       questionId: string;
-      questionText: string;
       correct: boolean;
       studentAnswer: string;
-      correctAnswer: string;
       unitCode: string;
     }>;
   }>;
@@ -124,10 +122,8 @@ export function buildSnapshot(): SyncSnapshot | null {
     quizMode: r.quizMode,
     answers: r.answers.map(a => ({
       questionId: a.questionId,
-      questionText: a.questionText ?? '',
       correct: a.correct,
       studentAnswer: a.studentAnswer ?? '',
-      correctAnswer: a.correctAnswer ?? '',
       unitCode: a.unitCode ?? r.unitCode,
     })),
   }));

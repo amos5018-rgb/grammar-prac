@@ -25,14 +25,32 @@ export function getClientId(): string {
 }
 
 // 학생 데이터를 서버로 동기화 (fire-and-forget, 학생 흐름에 영향 없음)
+// 잦은 트리거(완료마다 등)를 디바운스로 모아 Vercel 호출·Supabase 쓰기를 줄인다.
+// buildSnapshot()이 매번 localStorage 전체를 보내는 멱등 스냅샷이라, 지연 후 1회만 보내도 무손실.
 let syncInFlight = false;
-function triggerSync() {
+let syncTimer: ReturnType<typeof setTimeout> | null = null;
+const SYNC_DEBOUNCE_MS = 45000;
+
+function runSync() {
   if (typeof window === 'undefined' || syncInFlight) return;
   syncInFlight = true;
   import('./sync')
     .then(m => m.syncNow())
     .catch(() => {})
     .finally(() => { syncInFlight = false; });
+}
+
+function triggerSync() {
+  if (typeof window === 'undefined') return;
+  if (syncTimer) clearTimeout(syncTimer);
+  syncTimer = setTimeout(() => { syncTimer = null; runSync(); }, SYNC_DEBOUNCE_MS);
+}
+
+// 대기 중인 디바운스를 취소하고 즉시 동기화 (탭 이탈·종료 시 호출).
+export function flushSync() {
+  if (typeof window === 'undefined') return;
+  if (syncTimer) { clearTimeout(syncTimer); syncTimer = null; }
+  runSync();
 }
 
 // ── 날짜 유틸 (로컬 타임존 기준) ──

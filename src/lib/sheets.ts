@@ -127,6 +127,18 @@ export async function fetchQuestions(unitCode?: string): Promise<Question[]> {
   return questions;
 }
 
+// 문항 텍스트·정답 조회용 맵 (question_id → { text, answer }).
+// answers 테이블에 question_text/correct_answer를 중복 저장하지 않고,
+// 교사 대시보드에서 question_id로 앱 데이터에서 복원하기 위해 사용.
+export async function fetchQuestionLookup(): Promise<Record<string, { text: string; answer: string }>> {
+  const questions = await fetchQuestions();
+  const map: Record<string, { text: string; answer: string }> = {};
+  for (const q of questions) {
+    map[q.id] = { text: q.question, answer: q.answer };
+  }
+  return map;
+}
+
 export function fetchStudyCards(unitCode: string): StudyCard[] {
   return allStudyCards[unitCode] || [];
 }

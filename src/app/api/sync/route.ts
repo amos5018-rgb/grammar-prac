@@ -59,15 +59,15 @@ export async function POST(request: NextRequest) {
   }
 
   // 2) answers 행 평탄화 후 멱등 upsert
+  // question_text·correct_answer는 question_id로 앱 데이터에서 복원 가능한 중복이라 저장하지 않음
+  // (DB 용량·egress 절감). student_answer만 학생 고유값이라 저장.
   type AnswerRow = {
     client_id: string;
     attempt_id: string;
     question_id: string;
     unit_code: string;
-    question_text: string;
     correct: boolean;
     student_answer: string;
-    correct_answer: string;
     answered_at: string;
     quiz_mode: string | null;
   };
@@ -89,10 +89,8 @@ export async function POST(request: NextRequest) {
         attempt_id: attemptId,
         question_id: a.questionId,
         unit_code: typeof a.unitCode === 'string' ? a.unitCode : unitCode,
-        question_text: typeof a.questionText === 'string' ? a.questionText.slice(0, 1000) : '',
         correct: a.correct === true,
         student_answer: typeof a.studentAnswer === 'string' ? a.studentAnswer.slice(0, 500) : '',
-        correct_answer: typeof a.correctAnswer === 'string' ? a.correctAnswer.slice(0, 500) : '',
         answered_at: date,
         quiz_mode: qm,
       });

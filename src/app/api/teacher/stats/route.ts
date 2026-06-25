@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyTeacher } from '@/lib/teacherAuth';
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
+import { fetchQuestionLookup } from '@/lib/sheets';
 
 export const runtime = 'nodejs';
 
@@ -39,15 +40,6 @@ interface ModeUsageRow {
   correct_rate: number;
 }
 
-interface StudentModeRow {
-  client_id: string;
-  quiz_mode: string;
-  session_count: number;
-  total_answers: number;
-  correct_answers: number;
-  correct_rate: number;
-}
-
 function todayStr(): string {
   const t = new Date();
   return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`;
@@ -70,7 +62,7 @@ export async function GET(request: NextRequest) {
   const today = todayStr();
   const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
 
-  const [unitRes, qRes, rosterRes, dailyRes, perStudentRes, modeRes, studentModeRes] = await Promise.all([
+  const [unitRes, qRes, rosterRes, dailyRes, perStudentRes, modeRes] = await Promise.all([
     supabase.from('v_unit_rates').select('*'),
     supabase.from('v_question_rates').select('*').limit(100),
     supabase
@@ -82,7 +74,6 @@ export async function GET(request: NextRequest) {
     supabase.rpc('get_daily_trend', { since_date: thirtyDaysAgo }).select('*'),
     supabase.rpc('get_per_student_rates').select('*'),
     supabase.from('v_mode_usage').select('*'),
-    supabase.from('v_student_mode_rates').select('*'),
   ]);
 
   if (unitRes.error || qRes.error || rosterRes.error) {
@@ -141,20 +132,6 @@ export async function GET(request: NextRequest) {
         mode: r.quiz_mode,
         sessionCount: r.session_count,
         studentCount: r.student_count,
-        totalAnswers: r.total_answers,
-        correctRate: r.correct_rate,
-      });
-    }
-  }
-
-  // Per-student mode breakdown
-  const perStudentMode: Record<string, Array<{ mode: string; sessionCount: number; totalAnswers: number; correctRate: number }>> = {};
-  if (!studentModeRes.error && studentModeRes.data) {
-    for (const r of studentModeRes.data as StudentModeRow[]) {
-      if (!perStudentMode[r.client_id]) perStudentMode[r.client_id] = [];
-      perStudentMode[r.client_id].push({
-        mode: r.quiz_mode,
-        sessionCount: r.session_count,
         totalAnswers: r.total_answers,
         correctRate: r.correct_rate,
       });
@@ -232,13 +209,16 @@ export async function GET(request: NextRequest) {
       correctRate,
       totalAnswers: studentStats?.total ?? 0,
       riskTags,
-      unitTiers: s.unit_tiers ?? {},
-      unitProgress: s.unit_progress ?? {},
       inactiveDays: inactiveDays < 999 ? inactiveDays : null,
-      modeBreakdown: perStudentMode[s.client_id] ?? [],
-      studyCompletions: s.study_completions ?? {},
     };
   });
+
+  // 문항 텍스트는 더 이상 answers에 저장하지 않으므로 question_id로 앱 데이터에서 복원.
+  const qLookup = await fetchQuestionLookup();
+  const questionRates = ((qRes.data ?? []) as Array<Record<string, unknown>>).map(r => ({
+    ...r,
+    question_text: qLookup[r.question_id as string]?.text || (r.question_text as string) || '',
+  }));
 
   return NextResponse.json({
     totalStudents: roster.length,
@@ -247,7 +227,7 @@ export async function GET(request: NextRequest) {
     avgMasteredCount,
     dailyTrend,
     unitRates: unitRes.data ?? [],
-    questionRates: qRes.data ?? [],
+    questionRates,
     masteryByUnit,
     roster: riskRoster,
     modeUsage,

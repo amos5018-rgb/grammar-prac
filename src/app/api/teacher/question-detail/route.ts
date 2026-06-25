@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyTeacher } from '@/lib/teacherAuth';
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
+import { fetchQuestionLookup } from '@/lib/sheets';
 
 export const runtime = 'nodejs';
 
@@ -21,23 +22,25 @@ export async function GET(request: NextRequest) {
 
   const { data, error } = await supabase
     .from('answers')
-    .select('student_answer, correct_answer, correct')
+    .select('student_answer, correct')
     .eq('question_id', questionId);
 
   if (error) {
     return NextResponse.json({ error: 'query failed' }, { status: 500 });
   }
 
+  // 정답 텍스트는 answers에 저장하지 않으므로 question_id로 앱 데이터에서 복원.
+  const qLookup = await fetchQuestionLookup();
+  const correctAnswerText = qLookup[questionId]?.answer ?? '';
+
   const wrongDist: Record<string, number> = {};
   let correctCount = 0;
   let totalCount = 0;
-  let correctAnswerText = '';
 
   for (const row of data ?? []) {
     totalCount++;
     if (row.correct) {
       correctCount++;
-      if (!correctAnswerText && row.correct_answer) correctAnswerText = row.correct_answer;
     } else if (row.student_answer) {
       wrongDist[row.student_answer] = (wrongDist[row.student_answer] ?? 0) + 1;
     }

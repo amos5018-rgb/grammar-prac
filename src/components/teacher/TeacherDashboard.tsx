@@ -21,10 +21,6 @@ interface RosterStudent {
   totalAnswers: number;
   riskTags: string[];
   inactiveDays: number | null;
-  unitTiers: Record<string, { level: string; label: string; mastered: boolean; bestScore: number | null }>;
-  unitProgress: Record<string, { attempts: number; bestScore: number | null }>;
-  modeBreakdown: Array<{ mode: string; sessionCount: number; totalAnswers: number; correctRate: number }>;
-  studyCompletions: Record<string, { dates: string[]; lastCompleted: string }>;
 }
 
 interface ModeRow {
